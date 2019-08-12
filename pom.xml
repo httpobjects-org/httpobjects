@@ -140,10 +140,9 @@
         </dependency>
     </dependencies>
     <scm>
-        <connection>scm:git:git@github.com:httpobjects-org/httpobjects.git</connection>
-        <url>scm:git:git@github.com:httpobjects-org/httpobjects.git</url>
-        <developerConnection>scm:git:git@github.com:httpobjects-org/httpobjects.git
-        </developerConnection>
+        <connection>scm:git:https://github.com/httpobjects-org/httpobjects.git</connection>
+        <url>scm:git:https://github.com/httpobjects-org/httpobjects.git</url>
+        <developerConnection>scm:git:https://github.com/httpobjects-org/httpobjects.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
     <distributionManagement>
