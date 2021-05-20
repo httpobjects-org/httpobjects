@@ -180,14 +180,14 @@ public class SetCookieFieldTest {
 
     @Test
     public void full() {
-        SetCookieField c = SetCookieField.fromHeaderValue("SSID=Ap4P….GTEq; Domain=.foo.com; Path=/; Expires=Wed, 13-Jan-2021 22:23:01 GMT; Secure; HttpOnly;");
+        SetCookieField c = SetCookieField.fromHeaderValue("SSID=Ap4P….GTEq; Domain=.foo.com; Path=/; Expires=Wed, 13-Jan-2021 22:23:01 GMT; Secure; HttpOnly; SameSite=Lax");
         boolean secure = true;
         boolean httpOnly = true;
         assertSetCookieFieldSame(
-                new SetCookieField("SSID", "Ap4P….GTEq", ".foo.com", "/", "Wed, 13-Jan-2021 22:23:01 GMT", secure, httpOnly),
+                new SetCookieField("SSID", "Ap4P….GTEq", ".foo.com", "/", "Wed, 13-Jan-2021 22:23:01 GMT", secure, httpOnly, "Lax"),
                 c
         );
-        assertEquals("SSID=Ap4P….GTEq; Domain=.foo.com; Path=/; Expires=Wed, 13-Jan-2021 22:23:01 GMT; Secure; HttpOnly;", c.toString());
+        assertEquals("SSID=Ap4P….GTEq; Domain=.foo.com; Path=/; Expires=Wed, 13-Jan-2021 22:23:01 GMT; Secure; HttpOnly; SameSite=Lax;", c.toString());
 
     }
 

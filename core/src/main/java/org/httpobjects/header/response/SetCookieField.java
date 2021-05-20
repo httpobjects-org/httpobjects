@@ -244,7 +244,8 @@ public class SetCookieField extends HeaderField {
                 appendFieldIfNotNull("Path", path) +
                 appendFieldIfNotNull("Expires", expiration) +
                 secure +
-                httpOnly;
+                httpOnly +
+                appendFieldIfNotNull("SameSite", sameSite);
 
         return tail.isEmpty() ? base : base + ";" + tail;
     }
