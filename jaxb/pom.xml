@@ -6,7 +6,7 @@
     <parent>
         <artifactId>httpobjects-pom</artifactId>
         <groupId>org.httpobjects.pom</groupId>
-        <version>0.27.0</version>
+        <version>0.27.0-SNAPSHOT</version>
     </parent>
 
     <groupId>org.httpobjects.jaxb</groupId>
@@ -14,19 +14,22 @@
 
     <name>${artifactId}</name>
 
+    <dependencyManagement>
+        <dependencies>
+        </dependencies>
+     </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.httpobjects</groupId>
             <artifactId>httpobjects</artifactId>
             <version>${pom.version}</version>
         </dependency>
-    
-<dependency>
-    <groupId>javax.xml.bind</groupId>
-    <artifactId>jaxb-api</artifactId>
-    <version>2.2.11</version>
-</dependency>
-
-</dependencies>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+    </dependencies>
 
 </project>

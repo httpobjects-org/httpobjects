@@ -127,6 +127,7 @@
         <module>netty-3</module>
         <module>test</module>
         <module>multipart</module>
+        <module>jaxb</module>
         <module>client</module>
         <module>apache-httpclient-4.x</module>
     </modules>
