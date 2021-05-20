@@ -48,6 +48,11 @@ package org.httpobjects.header.response;
 import org.httpobjects.DateTimeRFC6265;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static org.junit.Assert.*;
 
 //https://tools.ietf.org/html/rfc6265
@@ -264,6 +269,26 @@ public class SetCookieFieldTest {
         assertFalse(cookieField.isSecure());
     }
 
+
+    @Test
+    public void parseSameSite() {
+        // given
+        List<String> values = Arrays.asList("None", "Lax", "Strict");
+
+        for(String value : values){
+            String headerValue = "name=value; SameSite=" + value + ";";
+
+            // when
+            SetCookieField setCookieField = SetCookieField.fromHeaderValue(headerValue);
+
+            // then
+            assertEquals(value, setCookieField.sameSite);
+            assertEquals(SetCookieField.SameSiteValue.valueOf(value), setCookieField.parseSameSite());
+        }
+
+    }
+
+
     private void assertSetCookieFieldSame(SetCookieField expected, SetCookieField actual) {
         assertEquals(expected.name, actual.name);
         assertEquals(expected.value, actual.value);
@@ -272,5 +297,6 @@ public class SetCookieFieldTest {
         assertEquals(expected.expiration, actual.expiration);
         assertEquals(expected.secure, actual.secure);
         assertEquals(expected.httpOnly, actual.httpOnly);
+        assertEquals(expected.sameSite, actual.sameSite);
     }
 }

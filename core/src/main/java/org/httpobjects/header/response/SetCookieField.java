@@ -52,6 +52,8 @@ import org.httpobjects.header.HeaderFieldVisitor;
 import java.util.StringTokenizer;
 
 public class SetCookieField extends HeaderField {
+    enum SameSiteValue{Lax, Strict, None}
+
     public static final SetCookieField fromHeaderValue(String header) {
         StringTokenizer s = new StringTokenizer(header);
         NameValue nameValue = NameValue.parse(s.nextToken(";"));
@@ -61,6 +63,7 @@ public class SetCookieField extends HeaderField {
         String expiration = null;
         Boolean secure = null;
         Boolean httpOnly = null;
+        String sameSite = null;
 
         while (s.hasMoreTokens()) {
             String next = s.nextToken(";");
@@ -80,11 +83,13 @@ public class SetCookieField extends HeaderField {
                         path = property.value;
                     } else if (name.equals("expires")) {
                         expiration = property.value;
+                    } else if (name.equals("samesite")) {
+                        sameSite = property.value;
                     }
                 }
             }
         }
-        return new SetCookieField(nameValue.name, nameValue.value, domain, path, expiration, secure, httpOnly);
+        return new SetCookieField(nameValue.name, nameValue.value, domain, path, expiration, secure, httpOnly, sameSite);
     }
 
     public boolean isSecure() {
@@ -141,20 +146,11 @@ public class SetCookieField extends HeaderField {
      */
     public final Boolean secure;
     public final Boolean httpOnly;
+    public final String sameSite ;
 
     public SetCookieField(String name, String value, String domain, String path,
-                          DateTimeRFC6265 expiration, Boolean secure, Boolean httpOnly) {
-        this.name = name;
-        this.value = value;
-        this.domain = domain;
-        this.path = path;
-        this.expiration = expiration.toString();
-        this.secure = secure;
-        this.httpOnly = httpOnly;
-    }
-
-    public SetCookieField(String name, String value, String domain, String path,
-                          String expiration, Boolean secure, Boolean httpOnly) {
+                          String expiration, Boolean secure, Boolean httpOnly,
+                          String sameSite) {
         this.name = name;
         this.value = value;
         this.domain = domain;
@@ -162,6 +158,26 @@ public class SetCookieField extends HeaderField {
         this.expiration = expiration;
         this.secure = secure;
         this.httpOnly = httpOnly;
+        this.sameSite = sameSite;
+    }
+
+    public SetCookieField(String name, String value, String domain, String path,
+                          DateTimeRFC6265 expiration, Boolean secure, Boolean httpOnly,
+                          String sameSite) {
+        this(name, value, domain,
+             path, expiration.toString(), secure, httpOnly, sameSite);
+    }
+
+    public SetCookieField(String name, String value, String domain, String path,
+                          DateTimeRFC6265 expiration, Boolean secure, Boolean httpOnly) {
+        this(name, value, domain,
+             path, expiration, secure, httpOnly, null);
+    }
+
+    public SetCookieField(String name, String value, String domain, String path,
+                          String expiration, Boolean secure, Boolean httpOnly) {
+        this(name, value, domain,
+             path, expiration, secure, httpOnly, null);
     }
 
     public SetCookieField(String name, String value, String domain, String path,
@@ -176,6 +192,18 @@ public class SetCookieField extends HeaderField {
 
     public DateTimeRFC6265 parsedExpiration(){
         return new DateTimeRFC6265(expiration);
+    }
+    public SameSiteValue parseSameSite(){
+        SameSiteValue match = null;
+
+        String sameSiteLowercase = this.sameSite.toLowerCase();
+        for(SameSiteValue n : SameSiteValue.values()){
+            if(n.name().toLowerCase().equals(sameSiteLowercase)){{
+                match = n;
+            }}
+        }
+
+        return match;
     }
 
     @Override
