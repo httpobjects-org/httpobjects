@@ -214,10 +214,10 @@ public abstract class IntegrationTest {
                 return OK(Text(secondPass));
             }  
             
-            class HeadersByName implements Comparator<HeaderField>{
+            class LowercasedHeadersByName implements Comparator<HeaderField>{
                 @Override
                 public int compare(HeaderField o1, HeaderField o2) {
-                    return o1.name().compareTo(o2.name());
+                    return o1.name().toLowerCase().compareTo(o2.name().toLowerCase());
                 }
             }
             private <T> List<T> sorted(List<T> items, Comparator<T> comparator){
@@ -225,6 +225,7 @@ public abstract class IntegrationTest {
                 Collections.sort(sorted, comparator);
                 return sorted;
             }
+
             private String toString(Request r){
                 return "URI: " + r.path().toString() + "?" + r.query().toString() + "\n" + 
                         toString(r.header().fields()) + 
@@ -232,8 +233,8 @@ public abstract class IntegrationTest {
             }
             private String toString(List<HeaderField> fields){
                 StringBuffer text = new StringBuffer();
-                for(HeaderField field : sorted(fields, new HeadersByName())){
-                    text.append(field.name() + "=" + field.value() + "\n");
+                for(HeaderField field : sorted(fields, new LowercasedHeadersByName())){
+                    text.append(field.name().toLowerCase() + "=" + field.value() + "\n");
                 }
                 return text.toString();
             }
@@ -344,10 +345,10 @@ public abstract class IntegrationTest {
         // then/when
         assertResource(request, 
                 "URI: /immutablecopy/no/mutation/allowed?\n" + 
-                "Content-Length=7\n" + 
-                "Content-Type=text/plain; charset=UTF-8\n" + 
-                "Host=localhost:" + port + "\n" + 
-                "User-Agent=Jakarta Commons-HttpClient/3.1\n" + 
+                "content-length=7\n" +
+                "content-type=text/plain; charset=UTF-8\n" +
+                "host=localhost:" + port + "\n" +
+                "user-agent=Jakarta Commons-HttpClient/3.1\n" +
                 "foo bar", 200);
         
     }
