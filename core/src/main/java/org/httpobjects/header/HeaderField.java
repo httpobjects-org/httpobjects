@@ -37,6 +37,11 @@
  */
 package org.httpobjects.header;
 
+import org.httpobjects.header.request.AuthorizationField;
+import org.httpobjects.header.request.CookieField;
+
+import java.util.Locale;
+
 public abstract class HeaderField {
 	public abstract <T> T accept(HeaderFieldVisitor<T> visitor);
 	public abstract String name();
@@ -49,5 +54,18 @@ public abstract class HeaderField {
 	public final boolean eq(HeaderField that) {
 		return  this.name().equals(that.name()) &&
 				this.value().equals(that.value());
+	}
+
+	public static HeaderField parse(String name, String value){
+		final String nameLower = name.toLowerCase();
+		final HeaderField field;
+		if(nameLower.equals("cookie")){
+			field = new CookieField(value);
+		}else if(nameLower.equals("authorization")){
+			field = AuthorizationField.parse(value);
+		}else{
+			field = new GenericHeaderField(nameLower, value);
+		}
+		return field;
 	}
 }

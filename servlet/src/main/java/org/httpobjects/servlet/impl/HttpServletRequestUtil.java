@@ -91,18 +91,8 @@ public class HttpServletRequestUtil {
 		
 		while(names.hasMoreElements()){
 			String name = names.nextElement();
-			if(name.equals("Authorization")){
-				String s = request.getHeader(name);
-				try {
-					AuthorizationField f = AuthorizationField.parse(s);
-					fields.add(f);
-				} catch (AuthorizationField.ParsingException ex) {}
-			}else if(name.equals("Cookie")){
-				String fValue = request.getHeader(name);
-				fields.add(new CookieField(fValue));
-			}else{
-				fields.add(new GenericHeaderField(name, request.getHeader(name)));
-			}
+			String value = request.getHeader(name);
+			fields.add(HeaderField.parse(name, value));
 		}
 		return new RequestHeader(fields);
 	}

@@ -69,9 +69,9 @@ import static org.junit.Assert.assertTrue;
 public class ProxyTest {
     Server jetty;
 
-    public static void main(String[] args) {
-        new ProxyTest().launch();
-    }
+//    public static void main(String[] args) {
+//        new ProxyTest().launch();
+//    }
 
 
     protected int port = -1;
@@ -241,7 +241,7 @@ public class ProxyTest {
         String representation = HttpObjectUtil.toAscii(output.representation());
         System.out.println("representation = " + representation);
 
-        assertThat(representation, containsString("X-Forwarded-Host=dummy-remote-host-value"));
+        assertThat(representation, containsString("x-forwarded-host=dummy-remote-host-value"));
     }
 
     @Test
@@ -488,7 +488,7 @@ public class ProxyTest {
         String representation = HttpObjectUtil.toAscii(output.representation());
         System.out.println("representation = " + representation);
 
-        assertThat(representation, containsString("X-Forwarded-For=dummy-remote-ip-address"));
+        assertThat(representation, containsString("x-forwarded-for=dummy-remote-ip-address"));
 
 
     }

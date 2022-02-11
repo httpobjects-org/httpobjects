@@ -42,8 +42,8 @@ public class ApacheCommons4xHttpClientTest {
             // then
             assertEquals(
                     "POST /echo\n" +
-                            "echo-header-A=alpha\n" +
-                            "echo-header-B=beta\n" +
+                            "echo-header-a=alpha\n" +
+                            "echo-header-b=beta\n" +
                             "this is my content\n" +
                             "see it?",
                     HttpObjectAssert.bodyOf(response).asString());

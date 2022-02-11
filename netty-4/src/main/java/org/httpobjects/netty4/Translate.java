@@ -83,15 +83,7 @@ public class Translate {
                 final HttpHeaders headers = beforeBody.headers();
                 for(String name: headers.names()){
                     for(String value: headers.getAll(name)){
-                        final HeaderField field;
-                        if(name.equals("Cookie")){
-                            field = new CookieField(value);
-                        }else if(name.equals("Authorization")){
-                            field = AuthorizationField.parse(value);
-                        }else{
-                            field = new GenericHeaderField(name, value);
-                        }
-                        results.add(field);
+                        results.add(HeaderField.parse(name, value));
                     }
                 }
                 return new RequestHeader(results){

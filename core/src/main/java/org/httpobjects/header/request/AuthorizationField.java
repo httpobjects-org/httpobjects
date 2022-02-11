@@ -101,7 +101,7 @@ public class AuthorizationField extends HeaderField {
 
 	@Override
     public String name() {
-        return "Authorization";
+        return "authorization";
     }
 
     @Override
@@ -111,7 +111,7 @@ public class AuthorizationField extends HeaderField {
 
 	@Override
 	public String toString() {
-		return "AuthorizationField(\"" + value() + "\")";
+		return getClass().getSimpleName() + "(\"" + value() + "\")";
 	}
 
 	@Override

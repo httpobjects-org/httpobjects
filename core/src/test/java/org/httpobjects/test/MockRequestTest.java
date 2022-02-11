@@ -86,7 +86,7 @@ public class MockRequestTest {
         
         final List<HeaderField> fields = r.header().fields();
         assertEquals(2, fields.size());
-        assertEquals("Cookie: name=sally", toString(fields.get(0)));
+        assertEquals("cookie: name=sally", toString(fields.get(0)));
         assertEquals("xyz: 123", toString(fields.get(1)));
     }
     

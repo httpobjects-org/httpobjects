@@ -125,7 +125,7 @@ public class CookieField extends HeaderField {
 
 	@Override
 	public String name() {
-		return "Cookie";
+		return "cookie";
 	}
 	
 	public List<Cookie> cookies() {

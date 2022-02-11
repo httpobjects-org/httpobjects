@@ -170,7 +170,7 @@ public class Proxy extends HttpObject {
 
         // Support for the de-facto standard "X-Forwarded-Host" header
         //   https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Host
-        HeaderField maybeHostHeader = req.header().field("Host");
+        HeaderField maybeHostHeader = req.header().field("host");
         if(maybeHostHeader!=null){
             method.addRequestHeader("X-Forwarded-Host", maybeHostHeader.value());
         }

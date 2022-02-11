@@ -42,7 +42,7 @@ public class GenericHeaderField extends HeaderField {
 	
 	public GenericHeaderField(String name, String value) {
 		super();
-		this.name = name;
+		this.name = name.toLowerCase();
 		this.value = value;
 	}
 
