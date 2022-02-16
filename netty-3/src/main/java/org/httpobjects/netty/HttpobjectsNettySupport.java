@@ -3,7 +3,9 @@ package org.httpobjects.netty;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
@@ -15,29 +17,59 @@ import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
+
 public class HttpobjectsNettySupport {
+      public static class ServerWrapper {
+          public final Integer port;
+          private final Channel channel;
+          private final ExecutorService bossExecutor;
+          private final ExecutorService workExecutor;
 
+          public ServerWrapper(Integer port, Channel channel, ExecutorService bossExecutor, ExecutorService workExecutor) {
+              this.port = port;
+              this.channel = channel;
+              this.bossExecutor = bossExecutor;
+              this.workExecutor = workExecutor;
+          }
 
-      public static Channel serve(int port, HttpObject ... objects) {
+          public void close(){
+              this.stop();
+          }
+          public void stop() {
+              try {
+                  bossExecutor.shutdownNow();
+                  workExecutor.shutdownNow();
+//                  bossExecutor.awaitTermination(5000L, TimeUnit.MILLISECONDS);
+//                  workExecutor.awaitTermination(5000L, TimeUnit.MILLISECONDS);
+                  channel.unbind().sync();
+              }catch (Throwable t){
+                  throw new RuntimeException(t);
+              }
+          }
+      }
+
+      public static ServerWrapper serve(int port, HttpObject ... objects) {
 		return serve(port, Arrays.asList(objects));
       }
-      public static Channel serve(int port, List<HttpObject> objects) {
+      public static ServerWrapper serve(int port, List<HttpObject> objects) {
           ByteAccumulatorFactory buffers = new InMemoryByteAccumulatorFactory();
           return serve(port, objects, buffers);
       }
 
-      public static Channel serve(int port, List<HttpObject> objects, ByteAccumulatorFactory buffers) {
+      public static ServerWrapper serve(int port, List<HttpObject> objects, ByteAccumulatorFactory buffers) {
           // Configure the server.
+          ExecutorService bossExecutor = Executors.newCachedThreadPool();
+          ExecutorService workExecutor = Executors.newCachedThreadPool();
           ServerBootstrap bootstrap = new ServerBootstrap(
                   new NioServerSocketChannelFactory(
-                          Executors.newCachedThreadPool(),
-                          Executors.newCachedThreadPool()));
+                          bossExecutor,
+                          workExecutor));
   
           // Set up the event pipeline factory.
           bootstrap.setPipelineFactory(new HttpServerPipelineFactory(new NettyHttpobjectsRequestHandler(objects), buffers));
   
           // Bind and start to accept incoming connections.
-          return bootstrap.bind(new InetSocketAddress(port));
+          return new ServerWrapper(port, bootstrap.bind(new InetSocketAddress(port)), bossExecutor, workExecutor) ;
       }
   
       public static void main(String[] args) {

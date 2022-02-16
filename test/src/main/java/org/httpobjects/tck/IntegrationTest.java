@@ -76,23 +76,21 @@ public abstract class IntegrationTest extends WireTest {
     protected abstract void serve(int port, HttpObject ... objects);
     protected abstract void stopServing();
 
-    private int findFreePort() {
-        try {
-            ServerSocket  serverSocket = new ServerSocket(0);
-            int port = serverSocket.getLocalPort();
-            serverSocket.close();
-            return port;
-
-        } catch(Exception e){
-            throw new RuntimeException(e);
-        }
-    }
 
     protected int port = -1;
+    private PortAllocation portAllocation = null;
 
     @Before
-    public void setup(){
-        port = findFreePort();
+    public void setup() {
+        try {
+            doIt();
+        }catch (Throwable t){
+            throw new RuntimeException("There was a problem starting (portAllocation = " + portAllocation + ")", t);
+        }
+    }
+    private void doIt(){
+        portAllocation = PortFinder.allocateFreePort(this);
+        port = portAllocation.port;
         serve(port,
         new HttpObject("/bigfiles"){
             public Response post(Request req) {

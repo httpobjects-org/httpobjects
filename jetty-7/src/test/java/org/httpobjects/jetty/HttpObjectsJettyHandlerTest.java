@@ -1,8 +1,10 @@
 package org.httpobjects.jetty;
 
+import org.eclipse.jetty.server.Server;
 import org.httpobjects.*;
 import org.httpobjects.client.ApacheCommons4xHttpClient;
 import org.httpobjects.client.HttpClient;
+import org.httpobjects.tck.PortFinder;
 import org.httpobjects.util.Method;
 
 import static org.httpobjects.DSL.Text;
@@ -13,20 +15,8 @@ import java.net.ServerSocket;
 
 public class HttpObjectsJettyHandlerTest {
 
-    private int findFreePort() {
-        try {
-            ServerSocket serverSocket = new ServerSocket(0);
-            int port = serverSocket.getLocalPort();
-            serverSocket.close();
-            return port;
-
-        } catch(Exception e){
-            throw new RuntimeException(e);
-        }
-    }
-
     @Test
-    public void requestBodyShouldBeReusable() {
+    public void requestBodyShouldBeReusable() throws Exception {
         // given
         HttpObject resource = new HttpObject("/", DSL.allowed(Method.POST)) {
             @Override
@@ -36,15 +26,19 @@ public class HttpObjectsJettyHandlerTest {
                 else return BAD_REQUEST();
             }
         };
-        int port = findFreePort();
+        int port = PortFinder.findFreePort();
         HttpClient client = new ApacheCommons4xHttpClient();
 
         // when
-        HttpObjectsJettyHandler.launchServer(port, resource);
-        Response result = client.resource("http://localhost:" + port).post(Text("body"));
-        // we make a post request to this server with body "body"
+        Server jetty = HttpObjectsJettyHandler.launchServer(port, resource);
+        try {
+            Response result = client.resource("http://localhost:" + port).post(Text("body"));
+            // we make a post request to this server with body "body"
 
-        // then
-        assertEquals(ResponseCode.OK, result.code());
+            // then
+            assertEquals(ResponseCode.OK, result.code());
+        }finally {
+            jetty.stop();
+        }
     }
 }

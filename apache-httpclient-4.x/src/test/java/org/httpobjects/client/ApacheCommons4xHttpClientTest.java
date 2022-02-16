@@ -5,12 +5,15 @@ import org.httpobjects.client.HttpClient.RemoteObject;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.netty.HttpobjectsNettySupport;
+import org.httpobjects.netty.HttpobjectsNettySupport.ServerWrapper;
+import org.httpobjects.tck.PortFinder;
 import org.httpobjects.test.HttpObjectAssert;
 import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 import org.jboss.netty.channel.Channel;
 import org.junit.Test;
 
+import javax.sound.sampled.Port;
 import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.URLDecoder;
@@ -20,32 +23,19 @@ import static org.httpobjects.DSL.Text;
 import static org.junit.Assert.assertEquals;
 
 public class ApacheCommons4xHttpClientTest {
-    final int port = findFreePort();
-
-    private int findFreePort() {
-        try {
-            ServerSocket serverSocket = new ServerSocket(0);
-            int port = serverSocket.getLocalPort();
-            serverSocket.close();
-            return port;
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
 
     @Test
     public void sendsRequests() throws Exception {
         // given
-        final Channel server = serve(port, new Echoer("/echo"));
+        final ServerWrapper server = serve( new Echoer("/echo"));
         try {
 
             final HttpClient testSubject = new ApacheCommons4xHttpClient();
 
             // when
             final Response response = testSubject
-                    .resource("http://localhost:" + port + "/echo")
+                    .resource("http://localhost:" + server.port + "/echo")
                     .post(DSL.Text("this is my content\nsee it?"),
                             new GenericHeaderField("echo-header-A", "alpha"),
                             new GenericHeaderField("echo-header-B", "beta"));
@@ -65,7 +55,7 @@ public class ApacheCommons4xHttpClientTest {
     @Test
     public void returnsResponses() throws Exception {
         // given
-        final Channel server = serve(port,
+        final ServerWrapper server = serve(
                 new HttpObject("/some/resource/with/headers") {
                     @Override
                     public Response get(Request req) {
@@ -78,7 +68,7 @@ public class ApacheCommons4xHttpClientTest {
 
             // when
             final Response response = testSubject
-                    .resource("http://localhost:" + port + "/some/resource/with/headers")
+                    .resource("http://localhost:" + server.port + "/some/resource/with/headers")
                     .get();
 
             // then
@@ -97,14 +87,14 @@ public class ApacheCommons4xHttpClientTest {
     @Test
     public void supportsAllTheMethods() throws Exception {
         // given
-        final Channel server = serve(port, new MethodEchoer("/i-have-all-the-methods"));
+        final ServerWrapper server = serve( new MethodEchoer("/i-have-all-the-methods"));
         try {
             for (Method method : Method.values()) {
 
                 final HttpClient testSubject = new ApacheCommons4xHttpClient();
 
                 final java.lang.reflect.Method m = RemoteObject.class.getMethod(method.name().toLowerCase(), String.class, HeaderField[].class);
-                final RemoteObject o = testSubject.resource("http://localhost:" + port + "/i-have-all-the-methods");
+                final RemoteObject o = testSubject.resource("http://localhost:" + server.port + "/i-have-all-the-methods");
 
                 // when
                 final Response response = (Response) m.invoke(o, "?foo=bar", (Object) new HeaderField[]{new GenericHeaderField("echo-foo", "bar")});
@@ -115,6 +105,7 @@ public class ApacheCommons4xHttpClientTest {
             }
         } finally {
             server.close();
+//            PortFinder.waitTillPortIsFree(port);
         }
 
     }
@@ -122,14 +113,14 @@ public class ApacheCommons4xHttpClientTest {
     @Test
     public void supportsAllTheMethodsWithTheQueryOnlyConvenienceVersion() throws Exception {
         // given
-        final Channel server = serve(port, new Echoer("/i-have-all-the-methods"));
+        final ServerWrapper server = serve( new Echoer("/i-have-all-the-methods"));
         try {
             for (Method method : Method.values()) {
 
                 final HttpClient testSubject = new ApacheCommons4xHttpClient();
 
                 final java.lang.reflect.Method m = RemoteObject.class.getMethod(method.name().toLowerCase(), String.class, HeaderField[].class);
-                final RemoteObject o = testSubject.resource("http://localhost:" + port + "/i-have-all-the-methods");
+                final RemoteObject o = testSubject.resource("http://localhost:" + server.port + "/i-have-all-the-methods");
 
                 // when
                 final Response response = (Response) m.invoke(o, "?foo=bar", (Object) new HeaderField[]{new GenericHeaderField("echo-foo", "bar")});
@@ -140,20 +131,21 @@ public class ApacheCommons4xHttpClientTest {
             }
         } finally {
             server.close();
+//            PortFinder.waitTillPortIsFree(port);
         }
     }
 
     @Test
     public void supportsAllTheMethodsWithTheRepresentationOnlyConvenienceVersion() throws Exception {
         // given
-        final Channel server = serve(port, new Echoer("/i-have-all-the-methods"));
+        final ServerWrapper server = serve( new Echoer("/i-have-all-the-methods"));
         try {
             for (Method method : Method.values()) {
 
                 final HttpClient testSubject = new ApacheCommons4xHttpClient();
 
                 final java.lang.reflect.Method m = RemoteObject.class.getMethod(method.name().toLowerCase(), Representation.class, HeaderField[].class);
-                final RemoteObject o = testSubject.resource("http://localhost:" + port + "/i-have-all-the-methods");
+                final RemoteObject o = testSubject.resource("http://localhost:" + server.port + "/i-have-all-the-methods");
 
                 // when
                 final Response response = (Response) m.invoke(o, Text("yo"), (Object) new HeaderField[]{new GenericHeaderField("echo-foo", "bar")});
@@ -170,14 +162,14 @@ public class ApacheCommons4xHttpClientTest {
     @Test
     public void supportsAllTheMethodsWithTheNoArgsConvenienceVersion() throws Exception {
         // given
-        final Channel server = serve(port, new Echoer("/i-have-all-the-methods"));
+        final ServerWrapper server = serve( new Echoer("/i-have-all-the-methods"));
         try {
             for (Method method : Method.values()) {
 
                 final HttpClient testSubject = new ApacheCommons4xHttpClient();
 
                 final java.lang.reflect.Method m = RemoteObject.class.getMethod(method.name().toLowerCase(), HeaderField[].class);
-                final RemoteObject o = testSubject.resource("http://localhost:" + port + "/i-have-all-the-methods");
+                final RemoteObject o = testSubject.resource("http://localhost:" + server.port + "/i-have-all-the-methods");
 
                 // when
                 final Response response = (Response) m.invoke(o, (Object) new HeaderField[]{new GenericHeaderField("echo-foo", "bar")});
@@ -194,7 +186,8 @@ public class ApacheCommons4xHttpClientTest {
 
     }
 
-    private Channel serve(int port, HttpObject... objects) {
+    private HttpobjectsNettySupport.ServerWrapper serve(HttpObject... objects) {
+        final int port = PortFinder.findFreePort();
         return HttpobjectsNettySupport.serve(port, objects);
     }
 

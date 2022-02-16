@@ -3,6 +3,7 @@ package org.httpobjects.jetty;
 import org.httpobjects.*;
 import org.httpobjects.client.ApacheCommons4xHttpClient;
 import org.httpobjects.client.HttpClient;
+import org.httpobjects.tck.PortFinder;
 import org.httpobjects.util.Method;
 
 import static org.httpobjects.DSL.Text;
@@ -12,18 +13,6 @@ import org.junit.Test;
 import java.net.ServerSocket;
 
 public class HttpObjectsJettyHandlerTest {
-
-    private int findFreePort() {
-        try {
-            ServerSocket serverSocket = new ServerSocket(0);
-            int port = serverSocket.getLocalPort();
-            serverSocket.close();
-            return port;
-
-        } catch(Exception e){
-            throw new RuntimeException(e);
-        }
-    }
 
     @Test
     public void requestBodyShouldBeReusable() {
@@ -36,7 +25,7 @@ public class HttpObjectsJettyHandlerTest {
                 else return BAD_REQUEST();
             }
         };
-        int port = findFreePort();
+        int port = PortFinder.findFreePort();
         HttpClient client = new ApacheCommons4xHttpClient();
 
         // when

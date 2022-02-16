@@ -44,9 +44,7 @@ import org.httpobjects.HttpObject;
 import org.httpobjects.tck.IntegrationTest;
 
 public class Netty3IntegrationTest extends IntegrationTest {
-
 	HttpobjectsNettySupport.ServerWrapper server;
-
 	@Override
 	protected void serve(int port, HttpObject... objects) {
 		server = HttpobjectsNettySupport.serve(port, Arrays.asList(objects));
@@ -54,6 +52,6 @@ public class Netty3IntegrationTest extends IntegrationTest {
 	
 	@Override
 	protected void stopServing() {
-		server.unbind().awaitUninterruptibly();
+		server.stop();
 	}
 }

@@ -31,6 +31,12 @@
             <version>${pom.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.httpobjects.test</groupId>
+            <artifactId>httpobjects-test</artifactId>
+            <version>${pom.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

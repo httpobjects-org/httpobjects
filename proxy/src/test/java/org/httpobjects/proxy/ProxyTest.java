@@ -45,6 +45,8 @@ import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.jetty.HttpObjectsJettyHandler;
+import org.httpobjects.tck.PortAllocation;
+import org.httpobjects.tck.PortFinder;
 import org.httpobjects.test.HttpObjectAssert;
 import org.httpobjects.test.MockRequest;
 import org.httpobjects.util.HttpObjectUtil;
@@ -71,24 +73,21 @@ public class ProxyTest {
         new ProxyTest().launch();
     }
 
-    private int findFreePort() {
-        try {
-            ServerSocket serverSocket = new ServerSocket(0);
-            int port = serverSocket.getLocalPort();
-            serverSocket.close();
-            return port;
-
-        } catch(Exception e){
-            throw new RuntimeException(e);
-        }
-    }
 
     protected int port = -1;
-
+    private PortAllocation portAllocation = null;
 
     @Before
     public void launch() {
-        port = findFreePort();
+        portAllocation = PortFinder.allocateFreePort(this);
+        port = portAllocation.port;
+        try{
+            foo();
+        }catch(Throwable t){
+           throw new RuntimeException("Error starting with port allocation " + portAllocation, t);
+        }
+    }
+    private void foo(){
         jetty = HttpObjectsJettyHandler.launchServer(port,
         			new HttpObject("/") {
 		            public Response get(Request req) {

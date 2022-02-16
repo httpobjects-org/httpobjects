@@ -56,9 +56,7 @@ public class Netty3IntegrationWithFilesystemBuffersTest extends IntegrationTest 
 	}
 	
 	@Override
-	protected void stopServing() {
-		server.unbind().awaitUninterruptibly();
-	}
+	protected void stopServing() {server.stop();}
 	
 	private File tempDir(){
 	    try {
