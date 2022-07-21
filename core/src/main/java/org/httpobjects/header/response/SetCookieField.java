@@ -218,18 +218,7 @@ public class SetCookieField extends HeaderField {
 
     @Override
     public String value() {
-        String base = name + "=" + value;
-
-        String secure = (this.secure != null && this.secure) ? " Secure;" : "";
-        String httpOnly = (this.httpOnly != null && this.httpOnly) ? " HttpOnly;" : "";
-
-        String tail = appendFieldIfNotNull("Domain", domain) +
-                appendFieldIfNotNull("Path", path) +
-                appendFieldIfNotNull("Expires", expiration) +
-                secure +
-                httpOnly;
-
-        return tail.isEmpty() ? base : base + ";" + tail;
+        return toString();
     }
 
 
