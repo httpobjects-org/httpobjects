@@ -2,7 +2,6 @@
 <html>
     <head>
     <link href="prettify/prettify.css" type="text/css" rel="stylesheet" />
-    <!--<link href="prettify/desert.css" type="text/css" rel="stylesheet" />-->
     <script type="text/javascript" src="prettify/prettify.js"></script>
 
         <script src="jquery-1.7.2.min.js"></script>
@@ -73,7 +72,7 @@
         <div class="mainLink" style="background:grey;color:white;font-family:sans-serif;font-weight:bold;font-size:14pt;padding:10px;text-align:left;margin-bottom:0px;border-bottom:1px solid #eeeeee;">
 		<a id="home-link" href="">[httpobjects]</a> 
 		<div style="float:right;">
-			<a href="https://github.com/cjdev/httpobjects">GITHUB</a> 
+			<a href="https://github.com/httpobjects-org/httpobjects">GITHUB</a> 
 		</div>
 	</div>
 	<div style="background:white;padding-bottom:50px;margin-top:0px;">
@@ -109,14 +108,17 @@
             <div class="section">
                 
     <div class="heading">how do I get it?</div>
-    <p>httpobjects is available in <a href="http://search.maven.org/#search%7Cga%7C1%7Chttpobjects">maven central</a></p>
+    <p><ul>
+        <li><pre>git clone && cd httpobjects && mvn install</pre></li>
+        <li>some older versions are available in <a href="http://search.maven.org/#search%7Cga%7C1%7Chttpobjects">maven central</a></li>
+    </ul></p>
 
     <pre class="prettyprint xml">
 <!-- You'll need the core API -->
 <dependency>
     <groupId>org.httpobjects</groupId>
     <artifactId>httpobjects</artifactId>
-    <version>0.9.0</version>
+    <version>0.50.0-SNAPSHOT</version>
 </dependency>
 
 <!-- Plus one of the following implementations -->
@@ -124,25 +126,25 @@
 <dependency>
     <groupId>org.httpobjects.servlet</groupId>
     <artifactId>httpobjects-servlet</artifactId>
-    <version>0.9.0</version>
+    <version>0.50.0-SNAPSHOT</version>
 </dependency>
 
 <dependency>
     <groupId>org.httpobjects.jetty</groupId>
     <artifactId>httpobjects-jetty-7-and-8</artifactId>
-    <version>0.9.0</version>
+    <version>0.50.0-SNAPSHOT</version>
 </dependency>
 
 <dependency>
     <groupId>org.httpobjects.jetty</groupId>
     <artifactId>httpobjects-jetty-6</artifactId>
-    <version>0.9.0</version>
+    <version>0.50.0-SNAPSHOT</version>
 </dependency>
 
 <dependency>
     <groupId>org.httpobjects.netty</groupId>
     <artifactId>httpobjects-netty</artifactId>
-    <version>0.9.0</version>
+    <version>0.50.0-SNAPSHOT</version>
 </dependency>
 
    </pre>
@@ -164,7 +166,7 @@ $(function(){
 <dependency>
     <groupid>org.httpobjects.servlet</groupid>
     <artifactid>httpobjects-servlet</artifactid>
-    <version>0.9.0</version>
+    <version>0.50.0-SNAPSHOT</version>
 </dependency>
 
 </pre>
@@ -180,13 +182,13 @@ Then:
 <dependency>
     <groupId>org.httpobjects.jetty</groupId>
     <artifactId>httpobjects-jetty-7-and-8</artifactId>
-    <version>0.9.0</version>
+    <version>0.50.0-SNAPSHOT</version>
 </dependency>
 
 <dependency>
     <groupId>org.httpobjects.jetty</groupId>
     <artifactId>httpobjects-jetty-6</artifactId>
-    <version>0.9.0</version>
+    <version>0.50.0-SNAPSHOT</version>
 </dependency>
 </pre>
 
@@ -251,7 +253,7 @@ object Example {
 <dependency>
     <groupId>org.httpobjects.netty</groupId>
     <artifactId>httpobjects-netty</artifactId>
-    <version>0.9.0</version>
+    <version>0.50.0-SNAPSHOT</version>
 </dependency>
 
    </pre>
