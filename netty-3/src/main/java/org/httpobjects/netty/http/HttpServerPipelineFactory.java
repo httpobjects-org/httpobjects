@@ -50,7 +50,7 @@ public class HttpServerPipelineFactory implements ChannelPipelineFactory {
         pipeline.addLast("encoder", new HttpResponseEncoder());
         // Remove the following line if you don't want automatic content compression.
         pipeline.addLast("deflater", new HttpContentCompressor());
-        pipeline.addLast("handler", new HttpChannelHandler(handler, accumulatorFactory.newAccumulator()));
+        pipeline.addLast("handler", new HttpChannelHandler(handler, accumulatorFactory));
         return pipeline;
     }
 }

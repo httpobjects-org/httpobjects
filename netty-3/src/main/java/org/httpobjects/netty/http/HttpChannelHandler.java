@@ -27,6 +27,7 @@ import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -63,13 +64,14 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
 	}
 	
 	private final RequestHandler handler;
-	private final ByteAccumulator contentAccumulator;
+    private ByteAccumulatorFactory contentAccumulators;
+	private ByteAccumulator contentAccumulator;
     private HttpRequest request;
     private boolean readingChunks;
     
-    public HttpChannelHandler(RequestHandler handler, ByteAccumulator contentAccumulator) {
+    public HttpChannelHandler(RequestHandler handler, ByteAccumulatorFactory contentAccumulators) {
 		this.handler = handler;
-		this.contentAccumulator = contentAccumulator;
+		this.contentAccumulators = contentAccumulators;
 	}
 
 	@Override
@@ -85,22 +87,28 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
                 readingChunks = true;
             } else {
                 ChannelBuffer content = request.getContent();
+                contentAccumulator = contentAccumulators.newAccumulator();
                 if (content.readable()) {
-                	writeToBuffer(content);
+                	writeToBuffer(content, contentAccumulator);
                 }
                 
             	writeResponse(e.getChannel(), handler.respond(request, null, contentAccumulator, connectionInfo(ctx)));
+                contentAccumulator.dispose();
             }
         } else {
             HttpChunk chunk = (HttpChunk) e.getMessage();
+            if(contentAccumulator==null){
+                contentAccumulator = contentAccumulators.newAccumulator();
+            }
             if (chunk.isLast()) {
                 readingChunks = false;
 
                 HttpChunkTrailer trailer = (HttpChunkTrailer) chunk;
-                writeToBuffer(trailer.getContent());
+                writeToBuffer(trailer.getContent(), contentAccumulator);
             	writeResponse(e.getChannel(), handler.respond(request, trailer, contentAccumulator, connectionInfo(ctx)));
+                contentAccumulator.dispose();
             } else {
-            	writeToBuffer(chunk.getContent());
+            	writeToBuffer(chunk.getContent(), contentAccumulator);
             }
         }
     }
@@ -119,8 +127,11 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
                         remote.getPort());
     }
     
-    private void writeToBuffer(ChannelBuffer content) throws IOException {
-    	content.getBytes(0, contentAccumulator.out(), content.capacity());
+    private void writeToBuffer(ChannelBuffer content, ByteAccumulator contentAccumulator) throws IOException {
+        OutputStream out = contentAccumulator.out();
+        int n = content.capacity();
+    	content.getBytes(0, out, n);
+        out.flush();
     }
     
     private byte[] read(Response out) {

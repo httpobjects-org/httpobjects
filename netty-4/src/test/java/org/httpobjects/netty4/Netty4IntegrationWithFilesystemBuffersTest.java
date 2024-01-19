@@ -36,24 +36,42 @@
  * exception statement from your version.
  */
 
-package org.httpobjects.netty;
+package org.httpobjects.netty4;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.Executors;
 
 import org.httpobjects.HttpObject;
+import org.httpobjects.netty4.buffer.FilesystemByteAccumulatorFactory;
 import org.httpobjects.tck.IntegrationTest;
-import org.jboss.netty.channel.Channel;
 
-public class NettyIntegrationTest extends IntegrationTest {
-	Channel server;
+public class Netty4IntegrationWithFilesystemBuffersTest extends IntegrationTest {
+	BasicNetty4Server server;
 	
 	@Override
 	protected void serve(int port, HttpObject... objects) {
-		server = HttpobjectsNettySupport.serve(port, Arrays.asList(objects));
+	    File tempDir = tempDir();
+		server = BasicNetty4Server.serveHttp(port, Arrays.asList(objects), ResponseCreationStrategy.async(Executors.newCachedThreadPool()), new FilesystemByteAccumulatorFactory(tempDir));
 	}
 	
 	@Override
 	protected void stopServing() {
-		server.unbind().awaitUninterruptibly();
+		try {
+			server.shutdownGracefully(5000L);
+		} catch (Throwable t) {
+			throw new RuntimeException(t);
+		}
+	}
+	
+	private File tempDir(){
+	    try {
+            File d = File.createTempFile(getClass().getSimpleName(), ".dir");
+            if(!(d.delete() && d.mkdirs())) throw new RuntimeException("Could not create directory: " + d.getAbsolutePath());
+            return d;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 	}
 }

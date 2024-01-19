@@ -45,11 +45,10 @@ import java.util.Arrays;
 import org.httpobjects.HttpObject;
 import org.httpobjects.netty.http.FilesystemByteAccumulatorFactory;
 import org.httpobjects.tck.IntegrationTest;
-import org.jboss.netty.channel.Channel;
 
-public class NettyIntegrationWithFilesystemBuffersTest extends IntegrationTest {
-	Channel server;
-	
+public class Netty3IntegrationWithFilesystemBuffersTest extends IntegrationTest {
+	HttpobjectsNettySupport.ServerWrapper server;
+
 	@Override
 	protected void serve(int port, HttpObject... objects) {
 	    File tempDir = tempDir();

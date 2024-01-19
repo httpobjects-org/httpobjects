@@ -71,7 +71,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Technology Compatibility Kit
  */
-public abstract class IntegrationTest {
+public abstract class IntegrationTest extends WireTest {
 
     protected abstract void serve(int port, HttpObject ... objects);
     protected abstract void stopServing();
@@ -94,6 +94,11 @@ public abstract class IntegrationTest {
     public void setup(){
         port = findFreePort();
         serve(port,
+        new HttpObject("/bigfiles"){
+            public Response post(Request req) {
+                return OK(Text("received " + HttpObjectUtil.toByteArray(req.representation()).length + " bytes"));
+            }
+        },
         new HttpObject("/app/inbox"){
             public Response post(Request req) {
                 return OK(Text("Message Received"));
@@ -177,7 +182,7 @@ public abstract class IntegrationTest {
         new HttpObject("/cookieSetter"){
             public Response get(Request req){
                 return OK(
-                        Text("Here are some cookies!"), 
+                        Text("Here are some cookies!"),
                         new SetCookieField("name", "cookie monster", "sesamestreet.com"),
                         new SetCookieField("specialGuest", "mr rogers", "mrrogers.com", "/myNeighborhood", "Wed, 13-Jan-2021 22:23:01 GMT", true),
                         new SetCookieField("oldInsecureCookie", "yes", "the90sIntranet.com", "/images/animatedGifs", "Wed, 13-Jan-1999 22:23:01 GMT", false));
@@ -200,8 +205,8 @@ public abstract class IntegrationTest {
             public Response get(Request req) {
                 final Path path = req.path();
                 return OK(Text(
-                        path.valueFor("rank") + " " + 
-                        path.valueFor("name") + ", " + 
+                        path.valueFor("rank") + " " +
+                        path.valueFor("name") + ", " +
                         path.valueFor("serialnumber")));
             }
         },
@@ -212,8 +217,8 @@ public abstract class IntegrationTest {
                 final String firstPass = toString(r);
                 final String secondPass = toString(r);
                 return OK(Text(secondPass));
-            }  
-            
+            }
+
             class LowercasedHeadersByName implements Comparator<HeaderField>{
                 @Override
                 public int compare(HeaderField o1, HeaderField o2) {
@@ -227,8 +232,8 @@ public abstract class IntegrationTest {
             }
 
             private String toString(Request r){
-                return "URI: " + r.path().toString() + "?" + r.query().toString() + "\n" + 
-                        toString(r.header().fields()) + 
+                return "URI: " + r.path().toString() + "?" + r.query().toString() + "\n" +
+                        toString(r.header().fields()) +
                         toAscii(r.representation());
             }
             private String toString(List<HeaderField> fields){
@@ -248,11 +253,11 @@ public abstract class IntegrationTest {
                     return INTERNAL_SERVER_ERROR(e);
                 }
             }
-        }, 
+        },
         new HttpObject("/connectionInfo"){
             public Response get(Request req) {
                 final ConnectionInfo connection = req.connectionInfo();
-                return OK(Text("Local " + connection.localAddress + ":" + connection.localPort + ", " + 
+                return OK(Text("Local " + connection.localAddress + ":" + connection.localPort + ", " +
                                "Remote " + connection.remoteAddress + ":" + connection.remotePort));
             }
         },
@@ -287,10 +292,10 @@ public abstract class IntegrationTest {
         // given
         HttpClient client = new HttpClient();
         HeadMethod request = new HeadMethod("http://localhost:" + port + "/head");
-        
+
         //when
         int responseCode = client.executeMethod(request);
-        
+
         // then
 
         assertEquals(200, responseCode);
@@ -316,13 +321,13 @@ public abstract class IntegrationTest {
     public void returnsConnectionInfo() throws Exception {
         // given
         String url = "http://localhost:" + port + "/connectionInfo";
-        
+
         //when
         final String result = getFrom("127.0.0.1", url);
-        
+
         // then
         Pattern expectedPattern = Pattern.compile("Local 127.0.0.1:" + port + ", Remote 127.0.0.1:([0-9].*)");
-        assertTrue("'" + result + " should match '" + expectedPattern, 
+        assertTrue("'" + result + " should match '" + expectedPattern,
                 expectedPattern.matcher(result).matches());
     }
 
@@ -335,7 +340,7 @@ public abstract class IntegrationTest {
         // then/when
         assertResource(request, "yes", 200);
     }
-    
+
     @Test
     public void immutableCopies() throws Exception {
         // given
@@ -343,14 +348,14 @@ public abstract class IntegrationTest {
         request.setRequestEntity(new StringRequestEntity("foo bar", "text/plain", "UTF-8"));
 
         // then/when
-        assertResource(request, 
-                "URI: /immutablecopy/no/mutation/allowed?\n" + 
+        assertResource(request,
+                "URI: /immutablecopy/no/mutation/allowed?\n" +
                 "content-length=7\n" +
                 "content-type=text/plain; charset=UTF-8\n" +
                 "host=localhost:" + port + "\n" +
                 "user-agent=Jakarta Commons-HttpClient/3.1\n" +
                 "foo bar", 200);
-        
+
     }
 
     @Test
@@ -361,7 +366,7 @@ public abstract class IntegrationTest {
         // then/when
         assertResource(request, "private marty, abc123", 200);
     }
-    
+
     @Test
     public void parsesSubpaths() throws Exception {
         // given
@@ -488,6 +493,11 @@ public abstract class IntegrationTest {
     public void queryParameters(){
         assertResource(new GetMethod("http://localhost:" + port + "/echoQuery?a=1&b=2"), "a=1\nb=2", 200);
     }
+    @Test
+    public void queryParametersWithSlashes(){
+        assertResource(new GetMethod("http://localhost:" + port + "/echoQuery?a=http://apple.com"), "a=http://apple.com", 200);
+    }
+
 
     @Test
     public void urlToString(){
@@ -503,10 +513,20 @@ public abstract class IntegrationTest {
     @Test
     public void redirectsAndSetsCookies(){
 
-        assertResource(new PostMethod("http://localhost:" + port + "/app/message"), 303, 
+        assertResource(new PostMethod("http://localhost:" + port + "/app/message"), 303,
                 new HeaderSpec("Location", "/app"),
                 new HeaderSpec("Set-Cookie", "name=frank"));
     }
+
+    @Test
+    public void handlesExpectContinue(){
+        PostMethod request = new PostMethod("http://localhost:" + port + "/bigfiles");
+        request.setUseExpectHeader(true);
+        byte[] data = new byte[1024 * 1024];
+        request.setRequestEntity(new ByteArrayRequestEntity(data));
+        assertResource(request, "received " + data.length + " bytes", 200);
+    }
+
 
     @SuppressWarnings("deprecation")
     private static <T extends EntityEnclosingMethod> T withBody(T m, String body){
@@ -514,64 +534,6 @@ public abstract class IntegrationTest {
         return m;
     }
 
-    private void assertResource(HttpMethod method,
-            int expectedResponseCode, HeaderSpec ... header) {
-        assertResource(method, null, expectedResponseCode, header);
-    }
-    private void assertResource(HttpMethod method, String expectedBody,
-            int expectedResponseCode, HeaderSpec ... header) {
-        try {
-            HttpClient client = new HttpClient();
-            int response = client.executeMethod(method);
-            
-            Assert.assertEquals(expectedResponseCode, response);
-            if(expectedBody!=null) Assert.assertEquals(expectedBody, method.getResponseBodyAsString());
-
-            if(header!=null){
-                for(HeaderSpec next : header){
-                    Header h = method.getResponseHeader(next.name);
-                    Assert.assertNotNull("Expected a \"" + next.name + "\" value of \"" + next.value + "\"", h);
-                    Assert.assertEquals(next.value, h.getValue());
-                }
-            }
-        } catch (HttpException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private class HeaderSpec {
-        final String name;
-        final String value;
-        private HeaderSpec(String name, String value) {
-            super();
-            this.name = name;
-            this.value = value;
-        }
-
-    }
-
-    private String getFrom(String address, String url) {
-        try {
-            HttpClient client = new HttpClient();
-            client.getHostConfiguration().setLocalAddress(InetAddress.getByName(address));
-            GetMethod request = new GetMethod(url);
-            int responseCode = client.executeMethod(request);
-            String result = request.getResponseBodyAsString();
-            return result;
-        }catch(Exception e){
-            throw new RuntimeException(e);
-        }
-    }
-
-    private String get(String url) throws IOException, HttpException {
-        HttpClient client = new HttpClient();
-        GetMethod request = new GetMethod(url);
-        int responseCode = client.executeMethod(request);
-        String result = request.getResponseBodyAsString();
-        return result;
-    }
 
     @After
     public void tearDown() throws Exception {

@@ -1,11 +1,11 @@
-package org.httpobjects.netty.http;
+package org.httpobjects.netty4.buffer;
 
 import java.io.*;
 
 public class FilesystemByteAccumulatorFactory implements ByteAccumulatorFactory {
     private final File tempDir;
     private final String prefix = getClass().getSimpleName();
-    
+
     public FilesystemByteAccumulatorFactory(File tempDir) {
         this.tempDir = tempDir;
     }

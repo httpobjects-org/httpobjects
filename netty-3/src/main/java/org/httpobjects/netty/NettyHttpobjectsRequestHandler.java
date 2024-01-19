@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 	@Override
 	public Response respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body, ConnectionInfo connectionInfo) {
 
-		final String uri = request.getUri();
+		final String uri = pathFromUri(request.getUri());
 
 		for(HttpObject next : objects){
 		    final PathPattern pattern = next.pattern();
@@ -59,6 +60,15 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 		}
 
         return defaultResponse;
+	}
+
+	private String pathFromUri(String uri){
+		try{
+			return new URI(uri).getPath();
+		}catch (Throwable t){
+			t.printStackTrace();
+			throw new RuntimeException("Unable to parse uri: " + uri, t);
+		}
 	}
 
 	private Request readRequest(final PathPattern pathPattern, final HttpRequest request, final HttpChunkTrailer lastChunk, final ByteAccumulator body, final ConnectionInfo connectionInfo) {
