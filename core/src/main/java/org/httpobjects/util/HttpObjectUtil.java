@@ -49,36 +49,40 @@ import org.httpobjects.Response;
 public class HttpObjectUtil {
 
     public static Response invokeMethod(HttpObject object, final Method m, final Request input) {
-        final Response output;
-        switch(m){
-        case GET:
-            output = object.get(input);
-            break;
-        case DELETE:
-            output = object.delete(input);
-            break;
-        case POST:
-            output = object.post(input);
-            break;
-        case PUT:
-            output = object.put(input);
-            break;
-        case PATCH:
-            output = object.patch(input);
-            break;
-        case HEAD:
-            output = object.head(input);
-            break;
-        case OPTIONS:
-            output = object.options(input);
-            break;
-        case TRACE:
-            output = object.trace(input);
-            break;
-        default:
-            output = HttpObject.NOT_IMPLEMENTED();
+        if(m==null){
+            return HttpObject.NOT_IMPLEMENTED(HttpObject.Text("Not a method I support"));
+        }else{
+            final Response output;
+            switch(m){
+                case GET:
+                    output = object.get(input);
+                    break;
+                case DELETE:
+                    output = object.delete(input);
+                    break;
+                case POST:
+                    output = object.post(input);
+                    break;
+                case PUT:
+                    output = object.put(input);
+                    break;
+                case PATCH:
+                    output = object.patch(input);
+                    break;
+                case HEAD:
+                    output = object.head(input);
+                    break;
+                case OPTIONS:
+                    output = object.options(input);
+                    break;
+                case TRACE:
+                    output = object.trace(input);
+                    break;
+                default:
+                    output = HttpObject.NOT_IMPLEMENTED();
+            }
+            return output;
         }
-        return output;
     }
 
     public static byte[] toByteArray(Representation r){

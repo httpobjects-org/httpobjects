@@ -113,6 +113,9 @@ public class ServletMethodInvoker {
 		final Method m = Method.fromString(r.getMethod());
 		final Request input = new ImmutableRequestImpl(object.pattern().match(r.getRequestURI()), r);
 
+		if(m==null){
+			System.out.println("WARNING: not a method I know about: " + r.getMethod());
+		}
 		return HttpObjectUtil.invokeMethod(object, m, input);
 	}
 

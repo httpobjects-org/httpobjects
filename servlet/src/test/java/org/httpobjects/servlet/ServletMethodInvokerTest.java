@@ -43,14 +43,50 @@ import org.httpobjects.header.HeaderField;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-import java.util.List;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.*;
+import java.security.Principal;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class ServletMethodInvokerTest {
+
+    @Test
+    public void gracefullyHandlesUnknownHttpMethods() {
+        //given
+        HttpObject foo = new HttpObject("/foo/baz");
+        HttpObject[] objects = new HttpObject[]{
+                foo,
+        };
+
+        FakePathMatchObserver pathMatchObserver = new FakePathMatchObserver();
+        ServletMethodInvoker servletMethodInvoker = new ServletMethodInvoker(
+                pathMatchObserver,
+                Collections.<HeaderField>emptyList(),
+                HttpObject.NOT_FOUND(HttpObject.Text("Error: NOT_FOUND")),
+                objects
+        );
+
+        HttpServletRequest request = new TestHttpServletRequest("crazymethod", new HashMap<>());
+        TestHttpServletResponse response = new TestHttpServletResponse();
+
+        //when
+        boolean invokedAndGotNonNullResponse = servletMethodInvoker.invokeFirstPathMatchIfAble("/foo/baz", request, response);
+
+        //then
+        assertTrue(invokedAndGotNonNullResponse);
+        assertEquals(1, pathMatchObserver.checkingPathAgainstPatternInvocations.size());
+        assertEquals(1, pathMatchObserver.pathMatchedPatternInvocations.size());
+    }
+    
     @Ignore("gotta figure out a simpler way to test this, it is currently fumbling on the request response, but the real problem is we need to decouple concerns into testable chunks")
     public void weCanDebugWhichPathPatternMatched() {
         //given
@@ -82,4 +118,6 @@ public class ServletMethodInvokerTest {
         assertEquals("/user/123/account/blah", pathMatchObserver.pathMatchedPatternInvocations.get(0).path);
         assertEquals("/user/{id}/account/{name}", pathMatchObserver.pathMatchedPatternInvocations.get(0).pathPattern.raw());
     }
+
 }
+
