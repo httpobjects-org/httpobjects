@@ -59,7 +59,10 @@ public class MimeTypeTool {
 		if(endsWith(r, ".gif")){
 			return "image/gif";
 		}
-		
+
+		if(endsWith(r, ".svg")){
+			return "image/svg+xml";
+		}
 		return "";
 	}
 	private boolean endsWith(String value, String ... suffixes){
