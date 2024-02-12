@@ -67,8 +67,7 @@ public class HttpObjectsJettyHandler extends org.eclipse.jetty.server.handler.Ab
     }
 
     @Override
-    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
 
         try {
             final boolean invocationHappened = invoker.invokeFirstPathMatchIfAble(target, request, response);
@@ -77,7 +76,7 @@ public class HttpObjectsJettyHandler extends org.eclipse.jetty.server.handler.Ab
                 setHandled(baseRequest);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Unhandled error: " + e, e);
+            throw new RuntimeException("Unhandled error while processing target " + target + ": " + e.getClass().getSimpleName() + " - " + e.getMessage(), e);
         }
 
     }
