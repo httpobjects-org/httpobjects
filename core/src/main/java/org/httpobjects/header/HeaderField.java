@@ -62,7 +62,7 @@ public abstract class HeaderField {
 		if(nameLower.equals("cookie")){
 			field = new CookieField(value);
 		}else if(nameLower.equals("authorization")){
-			field = AuthorizationField.parse(value);
+			field = new AuthorizationField(value);
 		}else{
 			field = new GenericHeaderField(nameLower, value);
 		}

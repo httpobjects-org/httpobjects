@@ -47,65 +47,26 @@ import org.httpobjects.header.response.WWWAuthenticateField.Method;
 import org.httpobjects.impl.Base64;
 
 public class AuthorizationField extends HeaderField {
+	private final String value;
 
-	public static AuthorizationField parse(String s) throws ParsingException {
-		String fValue = s.trim();
-		StringTokenizer tokens = new StringTokenizer(fValue);
-
-		if (tokens.countTokens() < 2)
-			throw new ParsingException(ParsingException.Failure.MISSING_SCHEME);
-
-		Method method;
-		try {
-			method = Method.valueOf(tokens.nextToken());
-		} catch (IllegalArgumentException ex) {
-			throw new ParsingException(ParsingException.Failure.UNSUPPORTED_SCHEME);
-		}
-
-        return new AuthorizationField(method, tokens.nextToken());
-	}
-	
-	private final WWWAuthenticateField.Method method;
-	private final String rawCredentials;
-	
-	public AuthorizationField(Method method, String rawCredentials) {
+	public AuthorizationField(String value) {
 		super();
-		this.method = method;
-		this.rawCredentials = rawCredentials;
+		this.value = value;
 	}
 
 	@Override
 	public <T> T accept(HeaderFieldVisitor<T> visitor) {
 		return visitor.visit(this);
 	}
-	
-	public WWWAuthenticateField.Method method() {
-		return method;
-	}
-	public String rawCredentials() {
-		return rawCredentials;
-	}
-	
-	public String credentialsString(){
-		return new String(Base64.decode(rawCredentials));
-	}
-	
-	public BasicCredentials basicCredentials(){
-		if(this.method == Method.Basic){
-			return BasicCredentials.parse(credentialsString());
-		}else{
-			return null;
-		}
+
+	@Override
+	public String value() {
+		return value;
 	}
 
 	@Override
     public String name() {
         return "authorization";
-    }
-
-    @Override
-    public String value() {
-        return method + " " + rawCredentials;
     }
 
 	@Override
@@ -120,42 +81,16 @@ public class AuthorizationField extends HeaderField {
 
 		AuthorizationField that = (AuthorizationField) o;
 
-		if (method != that.method) return false;
-		return rawCredentials != null ? rawCredentials.equals(that.rawCredentials) : that.rawCredentials == null;
+		return value != null ? value.equals(that.value) : that.value == null;
 	}
 
 	@Override
 	public int hashCode() {
-		int result = method != null ? method.hashCode() : 0;
-		result = 31 * result + (rawCredentials != null ? rawCredentials.hashCode() : 0);
-		return result;
+		return toString().hashCode();
 	}
 
-	public static class ParsingException extends RuntimeException {
-		public enum Failure {
-			MISSING_SCHEME("missing authorization scheme"),
-			UNSUPPORTED_SCHEME("unsupported authorization scheme");
-
-			private final String message;
-
-			Failure(String message) {
-				this.message = message;
-			}
-
-			public String getMessage() {
-				return message;
-			}
-		}
-
-		private final Failure failure;
-
-		public ParsingException(Failure failure) {
-			super(failure.getMessage());
-			this.failure = failure;
-		}
-
-		public Failure getFailure() {
-			return failure;
-		}
+	public AuthorizationValue parse(){
+		return AuthorizationValue.parse(value);
 	}
+
 }

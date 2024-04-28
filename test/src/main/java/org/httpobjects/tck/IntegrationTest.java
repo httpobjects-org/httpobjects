@@ -121,9 +121,9 @@ public abstract class IntegrationTest extends WireTest {
         new HttpObject("/secure"){
             public Response get(Request req) {
                 AuthorizationField authorization = req.header().authorization();
-                if(authorization!=null && authorization.method()==Method.Basic){
+                if(authorization!=null && authorization.parse().method()==Method.Basic){
 
-                    BasicCredentials creds = authorization.basicCredentials();
+                    BasicCredentials creds = authorization.parse().basicCredentials();
                     if(creds.user().equals("Aladdin")&& creds.password().equals("open sesame")){
                         return OK(Text("You're In!"));
                     }

@@ -103,11 +103,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 					public AuthorizationField authorization() {
 						final String value = headers.get("Authorization");
 						if (value == null) return null;
-						try {
-							return AuthorizationField.parse(value);
-						} catch (AuthorizationField.ParsingException ex) {
-							return null;
-						}
+						return new AuthorizationField(value);
 					}
 				};
 			}

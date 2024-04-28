@@ -51,7 +51,7 @@ public class AuthorizationFieldTest {
     @Test
     public void accuratelyImplementsTheContractForTheValuesMethod(){
         // GIVEN:
-        AuthorizationField field = new AuthorizationField(WWWAuthenticateField.Method.Basic, "fdsfds");
+        AuthorizationField field = new AuthorizationField("Basic fdsfds");
 
         // WHEN
         String value = field.value();
@@ -62,27 +62,27 @@ public class AuthorizationFieldTest {
 
     @Test
     public void parsesBasicAuthorizationFields(){
-        AuthorizationField field = AuthorizationField.parse("Basic fdsfds");
-        Assert.assertEquals(new AuthorizationField(WWWAuthenticateField.Method.Basic, "fdsfds"), field);
+        AuthorizationField field = new AuthorizationField("Basic fdsfds");
+        Assert.assertEquals(new AuthorizationValue(WWWAuthenticateField.Method.Basic, "fdsfds"), field.parse());
     }
 
     @Test
     public void failsToParseOtherKindsOfAuthorizationFields(){
-        thrown.expect(AuthorizationField.ParsingException.class);
+        thrown.expect(AuthorizationValue.ParsingException.class);
         thrown.expectMessage("unsupported authorization scheme");
-        AuthorizationField.parse("Foobar fdsfds");
+        new AuthorizationField("Foobar fdsfds").parse();
     }
 
     @Test
     public void failsToParseAuthorizationFieldsWithoutAScheme(){
-        thrown.expect(AuthorizationField.ParsingException.class);
+        thrown.expect(AuthorizationValue.ParsingException.class);
         thrown.expectMessage("missing authorization scheme");
-        AuthorizationField.parse("fdsfds");
+        new AuthorizationField("fdsfds").parse();
     }
 
     @Test
     public void parsesBearerAuthorizationFields(){
-        AuthorizationField field = AuthorizationField.parse("Bearer qwerty");
-        Assert.assertEquals(new AuthorizationField(WWWAuthenticateField.Method.Bearer, "qwerty"), field);
+        AuthorizationValue field = AuthorizationValue.parse("Bearer qwerty");
+        Assert.assertEquals(new AuthorizationValue(WWWAuthenticateField.Method.Bearer, "qwerty"), field);
     }
 }
