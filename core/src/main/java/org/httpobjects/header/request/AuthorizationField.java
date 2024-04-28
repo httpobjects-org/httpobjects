@@ -62,8 +62,7 @@ public class AuthorizationField extends HeaderField {
 			throw new ParsingException(ParsingException.Failure.UNSUPPORTED_SCHEME);
 		}
 
-		AuthorizationField f = new AuthorizationField(method, tokens.nextToken());
-		return f;
+        return new AuthorizationField(method, tokens.nextToken());
 	}
 	
 	private final WWWAuthenticateField.Method method;
