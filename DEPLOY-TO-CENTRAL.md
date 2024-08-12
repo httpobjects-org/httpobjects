@@ -36,7 +36,7 @@ your shell history.  Ex:
   <!-- Maven Central repo username and interpolated password -->
   <servers>
     <server>
-      <id>ossrh</id>
+      <id>central</id>
       <username>aztecrex</username>
       <password>${env.MAVEN_CENTRAL_DEPLOY_PASSWORD}</password>
     </server>
@@ -50,6 +50,9 @@ your shell history.  Ex:
         <gpg.keyname>DDA4E618</gpg.keyname>
         <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
       </properties>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       ...
      </profile>
      ...
