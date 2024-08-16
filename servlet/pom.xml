@@ -22,7 +22,7 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
+            <version>2.5</version> <!-- TODO: Update to 6.x series? 2.x last released in 2006 -->
             <scope>provided</scope>
         </dependency>
     </dependencies>
