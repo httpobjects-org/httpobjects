@@ -160,9 +160,9 @@
         </dependency>
     </dependencies>
     <scm>
-        <connection>scm:git:git@github.com:cjdev/httpobjects.git</connection>
-        <url>scm:git:git@github.com:cjdev/httpobjects.git</url>
-        <developerConnection>scm:git:git@github.com:cjdev/httpobjects.git
+        <connection>scm:git:git@github.com:httpobjects-org/httpobjects.git</connection>
+        <url>scm:git:git@github.com:httpobjects-org/httpobjects.git</url>
+        <developerConnection>scm:git:git@github.com:httpobjects-org/httpobjects.git
         </developerConnection>
         <tag>HEAD</tag>
     </scm>
@@ -173,11 +173,11 @@
         </snapshotRepository>
     </distributionManagement>
     <description>simple http for the jvm</description>
-    <url>https://github.com/cjdev/httpobjects</url>
+    <url>https://github.com/httpobjects-org/httpobjects</url>
     <licenses>
         <license>
             <name>GPL 2 + classpath exception</name>
-            <url>https://raw.github.com/cjdev/httpobjects/master/LICENSE</url>
+            <url>https://raw.github.com/httpobjects-org/httpobjects/master/LICENSE</url>
         </license>
     </licenses>
     <developers>
