@@ -17,20 +17,20 @@ a watertight API for speaking http(s)
 - stable - suitable as a foundation for mission-critical components
 - non-blocking - suitable for highly concurrent applications
 - self-documenting - the API documents itself
-- self-contained - core library has no dependencies, works on JDK6 & above
+- self-contained - core library has no dependencies, works on JDK8 & above
 - compatible - interoperates well with popular JVM languages
 
 ## how do I get it?
 
 - Development version: `git clone && cd httpobjects && mvn install`
-- Release versions are available in Maven Central
+- [Release versions are available in Maven Central](https://central.sonatype.com/artifact/org.httpobjects/httpobjects)
 
 ```xml
 <!-- You'll need the core API -->
 <dependency>
     <groupid>org.httpobjects</groupid>
     <artifactid>httpobjects</artifactid>
-    <version>0.53.0</version>
+    <version>0.54.0</version>
 </dependency>
 
 <!-- Plus one of the following implementations -->
@@ -38,25 +38,25 @@ a watertight API for speaking http(s)
 <dependency>
     <groupid>org.httpobjects.servlet</groupid>
     <artifactid>httpobjects-servlet</artifactid>
-    <version>0.53.0</version>
+    <version>0.54.0</version>
 </dependency>
 
 <dependency>
     <groupid>org.httpobjects.jetty</groupid>
-    <artifactid>httpobjects-jetty-7-and-8</artifactid>
-    <version>0.53.0</version>
+    <artifactid>httpobjects-jetty-9-and-10</artifactid>
+    <version>0.54.0</version>
 </dependency>
 
 <dependency>
     <groupid>org.httpobjects.jetty</groupid>
-    <artifactid>httpobjects-jetty-6</artifactid>
-    <version>0.53.0</version>
+    <artifactid>httpobjects-jetty-12</artifactid>
+    <version>0.54.0</version>
 </dependency>
 
 <dependency>
     <groupid>org.httpobjects.netty</groupid>
-    <artifactid>httpobjects-netty</artifactid>
-    <version>0.53.0</version>
+    <artifactid>httpobjects-netty-4</artifactid>
+    <version>0.54.0</version>
 </dependency>
 ```
 
@@ -68,7 +68,7 @@ Yes. First, include the servlet implementation
 <dependency>
     <groupid>org.httpobjects.servlet</groupid>
     <artifactid>httpobjects-servlet</artifactid>
-    <version>0.53.0</version>
+    <version>0.54.0</version>
 </dependency>
 ```
 
@@ -84,14 +84,14 @@ Yes. Choose one of the following:
 ```xml
 <dependency>
     <groupid>org.httpobjects.jetty</groupid>
-    <artifactid>httpobjects-jetty-7-and-8</artifactid>
-    <version>0.53.0</version>
+    <artifactid>httpobjects-jetty-9-and-10</artifactid>
+    <version>0.54.0</version>
 </dependency>
 
 <dependency>
     <groupid>org.httpobjects.jetty</groupid>
-    <artifactid>httpobjects-jetty-6</artifactid>
-    <version>0.53.0</version>
+    <artifactid>httpobjects-jetty-12</artifactid>
+    <version>0.54.0</version>
 </dependency>
 ```
 
@@ -147,8 +147,8 @@ Yes. There is a sample netty implementation that you can either use as-is or mod
 
 <dependency>
     <groupid>org.httpobjects.netty</groupid>
-    <artifactid>httpobjects-netty</artifactid>
-    <version>0.53.0</version>
+    <artifactid>httpobjects-netty-4</artifactid>
+    <version>0.54.0</version>
 </dependency>
 ```
 
@@ -175,6 +175,6 @@ public class Example {
 ```
 
 ## who's responsible for this?
-[![Commission Junction](http://httpobjects.org/cj-logo.png)](http://engineering.cj.com/blog)
+[![Commission Junction](https://httpobjects.org/cj-logo.png)](https://engineering.cj.com/blog)
 
 httpobjects was born as a thought experiment in response to needs at CJ. CJ has also been an early adopter, using httpobjects in a variety of internal projects and generously providing developer time to address bugs and limitations.
