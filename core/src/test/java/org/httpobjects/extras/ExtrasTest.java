@@ -1,9 +1,11 @@
-package org.httpobjects;
+package org.httpobjects.extras;
 
+import org.httpobjects.*;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.path.Path;
 import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -13,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.httpobjects.DSL.*;
 import static org.junit.Assert.*;
 
-public class HttpObjectTest {
+public class ExtrasTest {
 
     @Test
     public void maskShouldUseThePathToSelectBetweenResources() throws Exception {
@@ -22,7 +24,7 @@ public class HttpObjectTest {
         Response rightResponse = OK(Text("right response"));
         HttpObject left = new HttpObject("/left", leftResponse);
         HttpObject right = new HttpObject("/right", rightResponse);
-        HttpObject masked = left.mask(right);
+        HttpObject masked = MaskMechanism.mask(left, right);
         Request leftRequest = request("/left", Method.GET);
         Request rightRequest = request("/right", Method.GET);
 
@@ -43,14 +45,14 @@ public class HttpObjectTest {
         HttpObject left = new HttpObject("/left", leftResponse);
         HttpObject right = new HttpObject("/right", rightResponse);
         Representation repr = Text("Not Found");
-        HttpObject masked = left.mask(right, repr);
+        HttpObject masked = MaskMechanism.mask(left, right, repr);
         Request request = request("/middle", Method.GET);
 
         // when
         Response maybe404 = masked.get(request);
 
         // then
-        assertEquals(ResponseCode.NOT_FOUND, maybe404.code());
+        Assert.assertEquals(ResponseCode.NOT_FOUND, maybe404.code());
         assertEquals("Not Found",
                 HttpObjectUtil.toUtf8(maybe404.representation()));
     }
@@ -63,7 +65,7 @@ public class HttpObjectTest {
             @Override public Response get(Request req) { return OK(Text("You Got!")); }
             @Override public Response post(Request req) { return OK(Text("You Post!")); }
         };
-        HttpObject decorated = resource.onEvents(decorator);
+        HttpObject decorated = EventsMechanism.onEvents(resource, decorator);
         Request getReq = request("/", Method.GET);
         Request postReq = request("/", Method.POST);
 
@@ -86,7 +88,7 @@ public class HttpObjectTest {
         HttpObject resource = new HttpObject("/", allowed(Method.GET)) {
             @Override public Response get(Request req) { throw error; }
         };
-        HttpObject decorated = resource.onEvents(decorator);
+        HttpObject decorated = EventsMechanism.onEvents(resource, decorator);
         Object result;
 
         // when
@@ -113,7 +115,7 @@ public class HttpObjectTest {
         };
     }
 
-    private class SampleEvents implements HttpObject.Events<Integer> {
+    private class SampleEvents implements EventsMechanism.Events<Integer> {
 
         AtomicInteger atomicEventId = new AtomicInteger();
 
