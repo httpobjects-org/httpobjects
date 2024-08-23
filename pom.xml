@@ -151,6 +151,9 @@
         <module>jaxb</module>
         <module>client</module>
         <module>apache-httpclient-4.x</module>
+        <module>websockets</module>
+        <module>websockets-test</module>
+        <module>netty-4-websockets</module>
     </modules>
     <dependencies>
         <dependency>
