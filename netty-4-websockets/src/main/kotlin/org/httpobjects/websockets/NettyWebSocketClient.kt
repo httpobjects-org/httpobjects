@@ -18,11 +18,6 @@ import io.netty.util.CharsetUtil
 import org.httpobjects.impl.HTLog
 import java.net.URI
 
-
-/**
- * Generic JVM code to connect to a websockets server/endpoint and send/receive frames
- * Taken from https://github.com/netty/netty/blob/4.0/example/src/main/java/io/netty/example/http/websocketx/client/WebSocketClientHandler.java
- */
 class NettyWebSocketClient(private val group: EventLoopGroup):WebSocketClient{
 
     private fun defaultPortForScheme(scheme:String) = when(scheme.toLowerCase()){

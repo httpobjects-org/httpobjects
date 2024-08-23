@@ -9,13 +9,20 @@ import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.handler.codec.http.HttpRequestDecoder
 import io.netty.handler.codec.http.HttpResponseEncoder
 import io.netty.handler.ssl.SslContext
+import org.httpobjects.DSL
 import org.httpobjects.ErrorHandler
 import org.httpobjects.HttpObject
+import org.httpobjects.Response
 import org.httpobjects.impl.HTLog
 import org.httpobjects.netty4.BasicLog
 import org.httpobjects.netty4.HttpObjectsResponder
 import org.httpobjects.netty4.ResponseCreationStrategy
 import org.httpobjects.netty4.buffer.ByteAccumulatorFactory
+import org.httpobjects.netty4.buffer.InMemoryByteAccumulatorFactory
+import org.httpobjects.util.Method
+import java.util.concurrent.SynchronousQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 interface NettyWithWebsocketsServer{
     fun stop():EventualResult<Unit>
@@ -83,6 +90,21 @@ object NettyWithWebsockets {
             }
 
         }
+    }
+
+    fun serveSimpleHttp(port: Int, objects: List<HttpObject>, webSocketObjects: List<WebSocketObject>):NettyWithWebsocketsServer {
+        val mainResponsePool = ThreadPoolExecutor(0, Int.MAX_VALUE, 60L, TimeUnit.SECONDS, SynchronousQueue())
+        return serve(
+            port = port,
+            objects = objects,
+            websocketsSessionHandlers = webSocketObjects,
+            responseStrategy = ResponseCreationStrategy.async(mainResponsePool),
+            buffers = InMemoryByteAccumulatorFactory(),
+            ssl = null,
+            errorHandler = { target, method, throwable ->
+                DSL.INTERNAL_SERVER_ERROR(DSL.Text("Not sure what to do there..."))
+           },
+        )
     }
 }
 
