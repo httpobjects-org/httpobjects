@@ -1,5 +1,6 @@
 package org.httpobjects.websockets.test
 
+import org.httpobjects.eventual.EventualResult
 import org.httpobjects.Request
 import org.httpobjects.path.SimplePathPattern
 import org.httpobjects.websockets.*

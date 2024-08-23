@@ -9,23 +9,23 @@ import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.handler.codec.http.HttpRequestDecoder
 import io.netty.handler.codec.http.HttpResponseEncoder
 import io.netty.handler.ssl.SslContext
+import org.httpobjects.eventual.BasicEventualResult
 import org.httpobjects.DSL
 import org.httpobjects.ErrorHandler
+import org.httpobjects.eventual.EventualResult
 import org.httpobjects.HttpObject
-import org.httpobjects.Response
 import org.httpobjects.impl.HTLog
 import org.httpobjects.netty4.BasicLog
 import org.httpobjects.netty4.HttpObjectsResponder
 import org.httpobjects.netty4.ResponseCreationStrategy
 import org.httpobjects.netty4.buffer.ByteAccumulatorFactory
 import org.httpobjects.netty4.buffer.InMemoryByteAccumulatorFactory
-import org.httpobjects.util.Method
 import java.util.concurrent.SynchronousQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
 interface NettyWithWebsocketsServer{
-    fun stop():EventualResult<Unit>
+    fun stop(): EventualResult<Unit>
 }
 object NettyWithWebsockets {
     private val log = HTLog(this)
@@ -68,7 +68,7 @@ object NettyWithWebsockets {
         val bindFuture = b.bind(port).sync()
 
         return object:NettyWithWebsocketsServer{
-            override fun stop():EventualResult<Unit> {
+            override fun stop(): EventualResult<Unit> {
                 val result = BasicEventualResult<Unit>()
 
                 val actions = listOf(

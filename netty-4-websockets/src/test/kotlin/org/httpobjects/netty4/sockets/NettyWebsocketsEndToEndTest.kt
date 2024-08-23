@@ -2,6 +2,7 @@ package org.httpobjects.netty4.sockets
 
 import io.netty.channel.nio.NioEventLoopGroup
 import org.httpobjects.*
+import org.httpobjects.eventual.EventualResult
 import org.httpobjects.netty4.ResponseCreationStrategy
 import org.httpobjects.netty4.buffer.InMemoryByteAccumulatorFactory
 import org.httpobjects.tck.PortFinder
