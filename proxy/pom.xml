@@ -27,7 +27,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.6</version> <!-- TODO: Update to 2.16.x series -->
+            <version>2.16.1</version>
         </dependency>
         <dependency>
             <groupId>org.httpobjects.jetty</groupId>
