@@ -41,6 +41,7 @@ import org.eclipse.jetty.io.Content;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.util.Callback;
 import org.httpobjects.HttpObject;
+import org.httpobjects.eventual.EventualResult;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.HeaderFieldVisitor;
@@ -108,7 +109,9 @@ public class HttpObjectsJettyHandler extends org.eclipse.jetty.server.handler.Ab
         if(m==null){
             System.out.println("WARNING: not a method I know about: " + r.getMethod());
         }
-        return HttpObjectUtil.invokeMethod(object, m, input).join();
+
+        final EventualResult<org.httpobjects.Response> eventualResult = HttpObjectUtil.invokeMethod(object, m, input);
+        return eventualResult==null ? null : eventualResult.join();
     }
 
     private void returnResponse(org.httpobjects.Response r, final Response resp)  {

@@ -10,6 +10,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.*;
 import org.httpobjects.DSL;
 import org.httpobjects.Response;
+import org.httpobjects.eventual.EventualResult;
 import org.httpobjects.netty4.buffer.ByteAccumulatorFactory;
 
 import java.util.*;
@@ -76,14 +77,17 @@ public class HttpobjectsChannelHandler extends SimpleChannelInboundHandler<Objec
                     responseCreator.doIt(new Runnable() {
                         @Override
                         public void run() {
-                            Response response = responder.respond(
-                                    currentRequest,
-                                    Translate.connectionInfo(ctx));
-                            Translate.writeResponse(
-                                    currentRequest.beforeBody,
-                                    ctx.channel(),
-                                    response);
-                            currentRequest.dispose();
+                            responder.respond(currentRequest, Translate.connectionInfo(ctx)).then(new EventualResult.ResultHandler<Response>() {
+                                @Override
+                                public void exec(Response response) {
+
+                                    Translate.writeResponse(
+                                            currentRequest.beforeBody,
+                                            ctx.channel(),
+                                            response);
+                                    currentRequest.dispose();
+                                }
+                            });
                         }
                     });
                 }

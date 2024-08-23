@@ -57,7 +57,7 @@ public class HttpObject extends DSL{
     public HttpObject(PathPattern pathPattern, Response defaultResponse) {
         super();
         this.pathPattern = pathPattern;
-        this.defaultResponse = new BasicEventualResult(defaultResponse);
+        this.defaultResponse = defaultResponse == null ? null : new BasicEventualResult(defaultResponse);
     }
 
     public HttpObject(String pathPattern, Response defaultResponse) {

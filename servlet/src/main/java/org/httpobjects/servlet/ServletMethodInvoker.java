@@ -48,6 +48,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import org.httpobjects.eventual.EventualResult;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.HeaderFieldVisitor;
@@ -116,7 +117,9 @@ public class ServletMethodInvoker {
 		if(m==null){
 			System.out.println("WARNING: not a method I know about: " + r.getMethod());
 		}
-		return HttpObjectUtil.invokeMethod(object, m, input).join();
+		final EventualResult<Response> eventualResult = HttpObjectUtil.invokeMethod(object, m, input);
+
+		return eventualResult == null ? null : eventualResult.join();
 	}
 
 

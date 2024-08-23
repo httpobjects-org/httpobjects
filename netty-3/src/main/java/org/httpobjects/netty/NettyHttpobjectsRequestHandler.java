@@ -17,6 +17,7 @@ import org.httpobjects.Query;
 import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import org.httpobjects.eventual.EventualResult;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.AuthorizationField;
@@ -54,8 +55,8 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 				match = next;
 				Request in = readRequest(pattern, request, lastChunk, body, connectionInfo);
 				Method m = Method.fromString(request.getMethod().getName());
-				Response out = HttpObjectUtil.invokeMethod(match, m, in).join();
-				if(out!=null) return out;
+				EventualResult<Response> out = HttpObjectUtil.invokeMethod(match, m, in);
+				if(out!=null) return out.join();
 			}
 		}
 

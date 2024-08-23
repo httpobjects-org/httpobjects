@@ -47,8 +47,11 @@ public class BasicEventualResult<T> implements EventualResult<T> {
     }
 
     public void resolve(T result){
+        if(result==null){
+            throw new RuntimeException("Someone tried to resolve this as null");
+        }
         synchronized (this){
-            System.out.println("resolve() " + this);
+            System.out.println("resolve() " + this + " as " + result);
             this.resolution = result;
             this.hasResolved = true;
 

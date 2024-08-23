@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 
 import org.httpobjects.*;
+import org.httpobjects.eventual.BasicEventualResult;
+import org.httpobjects.eventual.EventualResult;
 import org.httpobjects.path.PathPattern;
 import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
@@ -18,7 +20,7 @@ public class HttpObjectsResponder{
 		this.errorHandler = errorHandler;
 	}
 
-	public Response respond(RequestAccumulator request, ConnectionInfo connectionInfo) {
+	public EventualResult<Response> respond(RequestAccumulator request, ConnectionInfo connectionInfo) {
 
 		final String uri = pathFromUri(request.beforeBody.uri());
 
@@ -26,22 +28,22 @@ public class HttpObjectsResponder{
 		    final PathPattern pattern = next.pattern();
 			if(pattern.matches(uri)){
 				Method m = Method.fromString(request.beforeBody.getMethod().name());
-				Response out;
+				EventualResult<Response> out;
 				try{
 					HttpObject match = next;
 					Request in = Translate.readRequest(pattern, request, connectionInfo);
-					out = HttpObjectUtil.invokeMethod(match, m, in).join();
+					out = HttpObjectUtil.invokeMethod(match, m, in);
 				}catch(Throwable t){
-					out = errorHandler.createErrorResponse(
+					out = new BasicEventualResult<Response>(errorHandler.createErrorResponse(
 							next,
 							m,
-							t);
+							t));
 				}
 				if(out!=null) return out;
 			}
 		}
 
-        return defaultResponse;
+        return new BasicEventualResult<Response>(defaultResponse);
 	}
 
 

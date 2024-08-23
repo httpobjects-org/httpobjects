@@ -35,44 +35,48 @@ public class SyncHttpObject extends HttpObject {
     public Response patchSync(Request req){return defaultResponse;}
 
 
+    private <T> EventualResult<T> eventualIfNotNull(T r){
+        return r == null ? null : new BasicEventualResult<T>(r);
+    }
+
     @Override
     public EventualResult<Response> get(Request req) {
-        return new BasicEventualResult<Response>(getSync(req));
+        return eventualIfNotNull(getSync(req));
     }
 
     @Override
     public EventualResult<Response> post(Request req) {
-        return new BasicEventualResult<Response>(postSync(req));
+        return eventualIfNotNull(postSync(req));
     }
 
     @Override
     public EventualResult<Response> put(Request req) {
-        return new BasicEventualResult<Response>(putSync(req));
+        return eventualIfNotNull(putSync(req));
     }
 
     @Override
     public EventualResult<Response> delete(Request req) {
-        return new BasicEventualResult<Response>(deleteSync(req));
+        return eventualIfNotNull(deleteSync(req));
     }
 
     @Override
     public EventualResult<Response> options(Request req) {
-        return new BasicEventualResult<Response>(optionsSync(req));
+        return eventualIfNotNull(optionsSync(req));
     }
 
     @Override
     public EventualResult<Response> head(Request req) {
-        return new BasicEventualResult<Response>(headSync(req));
+        return eventualIfNotNull(headSync(req));
     }
 
     @Override
     public EventualResult<Response> trace(Request req) {
-        return new BasicEventualResult<Response>(traceSync(req));
+        return eventualIfNotNull(traceSync(req));
     }
 
     @Override
     public EventualResult<Response> patch(Request req) {
-        return new BasicEventualResult<Response>(patchSync(req));
+        return eventualIfNotNull(patchSync(req));
     }
 
 }
