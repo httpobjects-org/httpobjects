@@ -39,15 +39,15 @@ package org.httpobjects.util;
 
 import java.io.InputStream;
 
-import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import org.httpobjects.SyncHttpObject;
 import org.httpobjects.impl.fn.FunctionalJava;
 import org.httpobjects.util.impl.ClassResourceLoader;
 import org.httpobjects.util.impl.ResourceLoader;
 import org.httpobjects.util.impl.WrapperForInsecureClassloader;
 
-public class ClasspathResourcesObject  extends HttpObject {
+public class ClasspathResourcesObject  extends SyncHttpObject {
     private static final String PATH_VAR_NAME = "resource";
 	private final ResourceLoader loader;
 	private final String prefix;
@@ -77,7 +77,7 @@ public class ClasspathResourcesObject  extends HttpObject {
 	}
 
 	@Override
-	public Response get(Request req) {
+	public Response getSync(Request req) {
 		final String resource = req.path().valueFor(PATH_VAR_NAME);
 		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
 		

@@ -118,13 +118,13 @@ public interface BasicNetty4Server {
         }
 
         BasicNetty4Server.serveHttp(port,
-                new HttpObject("/") {
-                    public Response get(Request req) {
+                new SyncHttpObject("/") {
+                    public Response getSync(Request req) {
                         return OK(Html("<html><body>Welcome.  Click <a href=\"/yo\">here</a> for a special message.</body></html>"));
                     }
                 },
-                new HttpObject("/yo") {
-                    public Response get(Request req) {
+                new SyncHttpObject("/yo") {
+                    public Response getSync(Request req) {
                         return OK(Text("Hello world"));
                     }
                 }

@@ -10,12 +10,9 @@ import org.httpobjects.tck.PortFinder;
 import org.httpobjects.test.HttpObjectAssert;
 import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
-import org.jboss.netty.channel.Channel;
 import org.junit.Test;
 
-import javax.sound.sampled.Port;
 import java.io.UnsupportedEncodingException;
-import java.net.ServerSocket;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
@@ -56,9 +53,9 @@ public class ApacheCommons4xHttpClientTest {
     public void returnsResponses() throws Exception {
         // given
         final ServerWrapper server = serve(
-                new HttpObject("/some/resource/with/headers") {
+                new SyncHttpObject("/some/resource/with/headers") {
                     @Override
-                    public Response get(Request req) {
+                    public Response getSync(Request req) {
                         return OK(Text("You GET it"), new GenericHeaderField("a-custom-header-name", "a-custom-header-value"));
                     }
                 });
@@ -199,7 +196,7 @@ public class ApacheCommons4xHttpClientTest {
         }
     }
 
-    private static class MethodEchoer extends HttpObject {
+    private static class MethodEchoer extends SyncHttpObject {
         public MethodEchoer(String pattern) {
             super(pattern);
         }
@@ -209,89 +206,89 @@ public class ApacheCommons4xHttpClientTest {
         }
 
         @Override
-        public Response delete(Request req) {
+        public Response deleteSync(Request req) {
             return make("delete");
         }
 
         @Override
-        public Response get(Request req) {
+        public Response getSync(Request req) {
             return make("get");
         }
 
         @Override
-        public Response head(Request req) {
+        public Response headSync(Request req) {
             return make("head");
         }
 
         @Override
-        public Response options(Request req) {
+        public Response optionsSync(Request req) {
             return make("options");
         }
 
         @Override
-        public Response post(Request req) {
+        public Response postSync(Request req) {
             return make("post");
         }
 
         @Override
-        public Response put(Request req) {
+        public Response putSync(Request req) {
             return make("put");
         }
 
         @Override
-        public Response trace(Request req) {
+        public Response traceSync(Request req) {
             return make("trace");
         }
 
         @Override
-        public Response patch(Request req) {
+        public Response patchSync(Request req) {
             return make("patch");
         }
     }
 
-    private static class Echoer extends HttpObject {
+    private static class Echoer extends SyncHttpObject {
 
         public Echoer(String pathPattern) {
             super(pathPattern);
         }
 
         @Override
-        public Response delete(Request req) {
+        public Response deleteSync(Request req) {
             return make("delete", req);
         }
 
         @Override
-        public Response get(Request req) {
+        public Response getSync(Request req) {
             return make("get", req);
         }
 
         @Override
-        public Response head(Request req) {
+        public Response headSync(Request req) {
             return make("head", req);
         }
 
         @Override
-        public Response options(Request req) {
+        public Response optionsSync(Request req) {
             return make("options", req);
         }
 
         @Override
-        public Response post(Request req) {
+        public Response postSync(Request req) {
             return make("post", req);
         }
 
         @Override
-        public Response put(Request req) {
+        public Response putSync(Request req) {
             return make("put", req);
         }
 
         @Override
-        public Response trace(Request req) {
+        public Response traceSync(Request req) {
             return make("trace", req);
         }
 
         @Override
-        public Response patch(Request req) {
+        public Response patchSync(Request req) {
             return make("patch", req);
         }
 

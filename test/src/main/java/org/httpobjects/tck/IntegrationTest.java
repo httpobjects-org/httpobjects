@@ -39,11 +39,7 @@ package org.httpobjects.tck;
 
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.methods.*;
-import org.httpobjects.ConnectionInfo;
-import org.httpobjects.HttpObject;
-import org.httpobjects.Query;
-import org.httpobjects.Request;
-import org.httpobjects.Response;
+import org.httpobjects.*;
 import org.httpobjects.header.DefaultHeaderFieldVisitor;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
@@ -57,10 +53,7 @@ import org.httpobjects.path.Path;
 import org.httpobjects.util.HttpObjectUtil;
 import org.junit.*;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -92,34 +85,34 @@ public abstract class IntegrationTest extends WireTest {
         portAllocation = PortFinder.allocateFreePort(this);
         port = portAllocation.port;
         serve(port,
-        new HttpObject("/bigfiles"){
-            public Response post(Request req) {
+        new SyncHttpObject("/bigfiles"){
+            public Response postSync(Request req) {
                 return OK(Text("received " + HttpObjectUtil.toByteArray(req.representation()).length + " bytes"));
             }
         },
-        new HttpObject("/app/inbox"){
-            public Response post(Request req) {
+        new SyncHttpObject("/app/inbox"){
+            public Response postSync(Request req) {
                 return OK(Text("Message Received"));
             }
         },
-        new HttpObject("/app/inbox/abc"){
-            public Response put(Request req) {
+        new SyncHttpObject("/app/inbox/abc"){
+            public Response putSync(Request req) {
                 return OK(req.representation());
             }
         },
-        new HttpObject("/app"){
-            public Response get(Request req) {
+        new SyncHttpObject("/app"){
+            public Response getSync(Request req) {
                 return OK(Text("Welcome to the app"));
             }
         },
-        new HttpObject("/app/message"){
-            public Response post(Request req) {
+        new SyncHttpObject("/app/message"){
+            public Response postSync(Request req) {
                 return SEE_OTHER(Location("/app"), SetCookie("name", "frank"));
             }
         },
-        new HttpObject("/nothing", null){},
-        new HttpObject("/secure"){
-            public Response get(Request req) {
+        new SyncHttpObject("/nothing", null){},
+        new SyncHttpObject("/secure"){
+            public Response getSync(Request req) {
                 AuthorizationField authorization = req.header().authorization();
                 if(authorization!=null && authorization.parse().method()==Method.Basic){
 
@@ -131,9 +124,9 @@ public abstract class IntegrationTest extends WireTest {
                 return UNAUTHORIZED(BasicAuthentication("secure area"), Text("You must first log-in"));
             }
         },
-        new HttpObject("/echoUrl/{id}/{name}"){
+        new SyncHttpObject("/echoUrl/{id}/{name}"){
             @Override
-            public Response get(Request req) {
+            public Response getSync(Request req) {
                 try {
                     final String query = req.query().toString();
                     return OK(Text(req.path().toString() + query));
@@ -143,9 +136,9 @@ public abstract class IntegrationTest extends WireTest {
                 }
             }
         },
-        new HttpObject("/echoQuery"){
+        new SyncHttpObject("/echoQuery"){
             @Override
-            public Response get(Request req) {
+            public Response getSync(Request req) {
                 final StringBuffer text = new StringBuffer();
                 final Query query = req.query();
                 for(String name : query.paramNames()){
@@ -157,8 +150,8 @@ public abstract class IntegrationTest extends WireTest {
                 return OK(Text(text.toString()));
             }
         },
-        new HttpObject("/echoCookies"){
-            public Response get(Request req) {
+        new SyncHttpObject("/echoCookies"){
+            public Response getSync(Request req) {
 
                 final StringBuffer text = new StringBuffer();
                 for(HeaderField next : req.header().fields()){
@@ -177,8 +170,8 @@ public abstract class IntegrationTest extends WireTest {
                 return OK(Text(text.toString()));
             }
         },
-        new HttpObject("/cookieSetter"){
-            public Response get(Request req){
+        new SyncHttpObject("/cookieSetter"){
+            public Response getSync(Request req){
                 return OK(
                         Text("Here are some cookies!"),
                         new SetCookieField("name", "cookie monster", "sesamestreet.com"),
@@ -186,21 +179,21 @@ public abstract class IntegrationTest extends WireTest {
                         new SetCookieField("oldInsecureCookie", "yes", "the90sIntranet.com", "/images/animatedGifs", "Wed, 13-Jan-1999 22:23:01 GMT", false));
             }
         },
-        new HttpObject("/subpathEcho/{subPath*}"){
+        new SyncHttpObject("/subpathEcho/{subPath*}"){
             @Override
-            public Response get(Request req) {
+            public Response getSync(Request req) {
                 return OK(Text(req.path().valueFor("subPath")));
             }
         },
-        new HttpObject("/echoHasRepresentation"){
+        new SyncHttpObject("/echoHasRepresentation"){
             @Override
-            public Response post(Request req) {
+            public Response postSync(Request req) {
                 return OK(Text(req.hasRepresentation() ? "yes" : "no"));
             }
         },
-        new HttpObject("/pows/{name}/{rank}/{serialnumber}"){
+        new SyncHttpObject("/pows/{name}/{rank}/{serialnumber}"){
             @Override
-            public Response get(Request req) {
+            public Response getSync(Request req) {
                 final Path path = req.path();
                 return OK(Text(
                         path.valueFor("rank") + " " +
@@ -208,9 +201,9 @@ public abstract class IntegrationTest extends WireTest {
                         path.valueFor("serialnumber")));
             }
         },
-        new HttpObject("/immutablecopy/{subpath*}"){
+        new SyncHttpObject("/immutablecopy/{subpath*}"){
             @Override
-            public Response post(Request req) {
+            public Response postSync(Request req) {
                 Request r = req.immutableCopy();
                 final String firstPass = toString(r);
                 final String secondPass = toString(r);
@@ -242,8 +235,8 @@ public abstract class IntegrationTest extends WireTest {
                 return text.toString();
             }
         },
-        new HttpObject("/patchme"){
-            public org.httpobjects.Response patch(org.httpobjects.Request req) {
+        new SyncHttpObject("/patchme"){
+            public Response patchSync(org.httpobjects.Request req) {
                 try {
                     final String input = new String(HttpObjectUtil.toByteArray(req.representation()), "UTF-8");
                     return OK(Text("You told me to patch!" + input));
@@ -252,22 +245,22 @@ public abstract class IntegrationTest extends WireTest {
                 }
             }
         },
-        new HttpObject("/connectionInfo"){
-            public Response get(Request req) {
+        new SyncHttpObject("/connectionInfo"){
+            public Response getSync(Request req) {
                 final ConnectionInfo connection = req.connectionInfo();
                 return OK(Text("Local " + connection.localAddress + ":" + connection.localPort + ", " +
                                "Remote " + connection.remoteAddress + ":" + connection.remotePort));
             }
         },
-        new HttpObject("/head"){
+        new SyncHttpObject("/head"){
         	@Override
-        	public Response head(Request req) {
+        	public Response headSync(Request req) {
         		return OK(Text(""), new GenericHeaderField("foo", "bar"));
         	}
         },
-        new HttpObject("/options"){
+        new SyncHttpObject("/options"){
             @Override
-            public Response options(Request req) {
+            public Response optionsSync(Request req) {
                 return OK(Text(""), new GenericHeaderField("foo", "bar"));
             }
         });

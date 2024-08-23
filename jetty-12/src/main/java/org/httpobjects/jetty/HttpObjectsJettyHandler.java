@@ -108,7 +108,7 @@ public class HttpObjectsJettyHandler extends org.eclipse.jetty.server.handler.Ab
         if(m==null){
             System.out.println("WARNING: not a method I know about: " + r.getMethod());
         }
-        return HttpObjectUtil.invokeMethod(object, m, input);
+        return HttpObjectUtil.invokeMethod(object, m, input).join();
     }
 
     private void returnResponse(org.httpobjects.Response r, final Response resp)  {

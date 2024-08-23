@@ -54,7 +54,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 				match = next;
 				Request in = readRequest(pattern, request, lastChunk, body, connectionInfo);
 				Method m = Method.fromString(request.getMethod().getName());
-				Response out = HttpObjectUtil.invokeMethod(match, m, in);
+				Response out = HttpObjectUtil.invokeMethod(match, m, in).join();
 				if(out!=null) return out;
 			}
 		}

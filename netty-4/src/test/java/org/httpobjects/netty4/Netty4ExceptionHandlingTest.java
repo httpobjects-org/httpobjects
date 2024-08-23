@@ -22,9 +22,9 @@ public class Netty4ExceptionHandlingTest extends WireTest {
         portAllocation = PortFinder.allocateFreePort(this);
         server = BasicNetty4Server.serve(
                 portAllocation.port,
-                Arrays.asList(new HttpObject("/explode"){
+                Arrays.asList(new SyncHttpObject("/explode"){
                     @Override
-                    public Response get(Request req) {
+                    public Response getSync(Request req) {
                         throw new RuntimeException("Boo!");
                     }
                 }),

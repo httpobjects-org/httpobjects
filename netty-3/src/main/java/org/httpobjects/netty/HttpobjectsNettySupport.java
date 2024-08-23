@@ -5,11 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import org.httpobjects.SyncHttpObject;
 import org.httpobjects.netty.http.ByteAccumulatorFactory;
 import org.httpobjects.netty.http.HttpServerPipelineFactory;
 import org.httpobjects.netty.http.InMemoryByteAccumulatorFactory;
@@ -80,13 +80,13 @@ public class HttpobjectsNettySupport {
               port = 8080;
           }
           HttpobjectsNettySupport.serve(port, Arrays.<HttpObject>asList(
-        		  new HttpObject("/") {
-        				public Response get(Request req) {
+        		  new SyncHttpObject("/") {
+        				public Response getSync(Request req) {
         					return OK(Html("<html><body>Welcome.  Click <a href=\"/yo\">here</a> for a special message.</body></html>"));
         				}
         			},
-            		new HttpObject("/yo") {
-          				public Response get(Request req) {
+            		new SyncHttpObject("/yo") {
+          				public Response getSync(Request req) {
           					return OK(Text("Hello world"));
           				}
           			}

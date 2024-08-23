@@ -92,13 +92,13 @@ public class ProxyTest {
     }
     private void foo(){
         jetty = HttpObjectsJettyHandler.launchServer(port,
-        			new HttpObject("/") {
-		            public Response get(Request req) {
-		                return OK(Text("this is the root page"));
-		            }
+        			new SyncHttpObject("/") {
+                        public Response getSync(Request req) {
+                            return OK(Text("this is the root page"));
+                        }
         			},
-                new HttpObject("/frog") {
-                    public Response get(Request req) {
+                new SyncHttpObject("/frog") {
+                    public Response getSync(Request req) {
                         String response = "Kermit";
                         String q = req.query().toString();
                         if (q != null) {
@@ -107,29 +107,29 @@ public class ProxyTest {
                         return OK(Text(response));
                     }
 
-                    public Response patch(Request req) {
+                    public Response patchSync(Request req) {
                         final String response = HttpObjectUtil.toAscii(req.representation()) + " patched";
 
                         return OK(Text(response));
                     }
 
                     @Override
-                    public Response put(Request req) {
+                    public Response putSync(Request req) {
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
                         req.representation().write(out);
                         String textualRepresentation = new String(out.toByteArray());
                         return OK(Text(textualRepresentation));
                     }
                 },
-                new HttpObject("/superOptions") {
+                new SyncHttpObject("/superOptions") {
                     @Override
-                    public Response options(Request req) {
+                    public Response optionsSync(Request req) {
                         return OK(Json(""));
                     }
                 },
-                new HttpObject("/requirescustomheader") {
+                new SyncHttpObject("/requirescustomheader") {
                     @Override
-                    public Response get(Request req) {
+                    public Response getSync(Request req) {
                         boolean hasIt = false;
                         for (HeaderField field : req.header().fields()) {
                             boolean found = field.accept(new DefaultHeaderFieldVisitor<Boolean>() {
@@ -154,39 +154,40 @@ public class ProxyTest {
                         }
                     }
                 },
-                new HttpObject("/notme") {
-                    public Response get(Request req) {
+                new SyncHttpObject("/notme") {
+                    public Response getSync(Request req) {
                         return SEE_OTHER(Location("/me"));
                     }
                 },
-                new HttpObject("/me") {
-                    public Response get(Request req) {
+                new SyncHttpObject("/me") {
+                    public Response getSync(Request req) {
                         return OK(Text("It's me!"));
                     }
                 },
-                new HttpObject("/setcookies") {
-                    public Response get(Request req) {
+                new SyncHttpObject("/setcookies") {
+                    public Response getSync(Request req) {
                         return OK(Text("Here is a tasty cookie"), HttpObject.SetCookie("id", "1234"));
                     }
                 },
-                new HttpObject("/piggy") {
-                    public Response get(Request req) {
+                new SyncHttpObject("/piggy") {
+                    public Response getSync(Request req) {
                         return OK(Text("Oh, kermie!"));
                     }
                 },
-                new HttpObject("/echo") {
-                    public Response get(Request req) {
+                new SyncHttpObject("/echo") {
+                    public Response getSync(Request req) {
                         return OK(Bytes(req.representation().contentType(), new byte[]{}));
                     }
                 },
-                new HttpObject("/noresponse") {
+                new SyncHttpObject("/noresponse") {
                     @Override
-                    public Response put(Request req) {
+                    public Response putSync(Request req) {
                         return new Response(ResponseCode.NO_CONTENT, null);
                     }
                 },
-                new HttpObject("/characters") {
-                    public Response post(Request req) {
+                new SyncHttpObject("/characters") {
+                    @Override
+                    public Response postSync(Request req) {
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
                         req.representation().write(out);
                         String textualRepresentation = new String(out.toByteArray());
@@ -197,20 +198,20 @@ public class ProxyTest {
                         }
                     }
                 },
-                new HttpObject("/queryStringEcho") {
-                    public Response get(Request req) {
+                new SyncHttpObject("/queryStringEcho") {
+                    public Response getSync(Request req) {
                         return OK(Text(req.query().toString()));
                     }
                 },
-                new HttpObject("/contentTypeEcho") {
-                    public Response get(Request req) {
+                new SyncHttpObject("/contentTypeEcho") {
+                    public Response getSync(Request req) {
                         String requestContentType = req.representation().contentType();
 
                         return OK(Text(requestContentType == null ? "null" : requestContentType));
                     }
                 },
-                  new HttpObject("/headerEcho"){
-                      public Response get(Request req) {
+                  new SyncHttpObject("/headerEcho"){
+                      public Response getSync(Request req) {
                           StringBuilder sb = new StringBuilder();
 
                           for (HeaderField field : req.header().fields()) {

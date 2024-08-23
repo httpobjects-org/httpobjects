@@ -10,16 +10,14 @@ import static org.httpobjects.DSL.Text;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
-import java.net.ServerSocket;
-
 public class HttpObjectsJettyHandlerTest {
 
     @Test
     public void requestBodyShouldBeReusable() {
         // given
-        HttpObject resource = new HttpObject("/", DSL.allowed(Method.POST)) {
+        HttpObject resource = new SyncHttpObject("/", DSL.allowed(Method.POST)) {
             @Override
-            public Response post(Request req) {
+            public Response postSync(Request req) {
                 System.out.print(req.show());
                 if (req.body().get().equals("body")) return OK(Text("We did it!"));
                 else return BAD_REQUEST();

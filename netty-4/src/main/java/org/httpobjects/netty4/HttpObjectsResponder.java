@@ -30,7 +30,7 @@ public class HttpObjectsResponder{
 				try{
 					HttpObject match = next;
 					Request in = Translate.readRequest(pattern, request, connectionInfo);
-					out = HttpObjectUtil.invokeMethod(match, m, in);
+					out = HttpObjectUtil.invokeMethod(match, m, in).join();
 				}catch(Throwable t){
 					out = errorHandler.createErrorResponse(
 							next,

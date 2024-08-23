@@ -91,7 +91,7 @@ public class MockRequest implements Request {
 	}
 
 	public Response invoke(){
-		return HttpObjectUtil.invokeMethod(object, method, this);
+		return HttpObjectUtil.invokeMethod(object, method, this).join();
 	}
 
 	@Override

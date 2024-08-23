@@ -42,13 +42,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import org.httpobjects.SyncHttpObject;
 
 
-
-public class CMSResources extends HttpObject {
+public class CMSResources extends SyncHttpObject {
 	private final File root;
 	
 	public CMSResources(File root) {
@@ -57,7 +56,7 @@ public class CMSResources extends HttpObject {
 	}
 	
 	@Override
-	public Response get(Request req) {
+	public Response getSync(Request req) {
 		String cid = req.path().valueFor("cid");
 		String path = req.path().valueFor("path");
 		File localPath = (path==null || path.isEmpty())?root:new File(root, path);

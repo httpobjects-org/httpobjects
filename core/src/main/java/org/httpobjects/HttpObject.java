@@ -37,6 +37,8 @@
  */
 package org.httpobjects;
 
+import org.httpobjects.eventual.BasicEventualResult;
+import org.httpobjects.eventual.EventualResult;
 import org.httpobjects.path.Path;
 import org.httpobjects.path.PathParamName;
 import org.httpobjects.path.PathPattern;
@@ -50,12 +52,12 @@ import java.util.List;
 public class HttpObject extends DSL{
 
     private final PathPattern pathPattern;
-    private final Response defaultResponse;
+    private final EventualResult<Response> defaultResponse;
 
     public HttpObject(PathPattern pathPattern, Response defaultResponse) {
         super();
         this.pathPattern = pathPattern;
-        this.defaultResponse = defaultResponse;
+        this.defaultResponse = new BasicEventualResult(defaultResponse);
     }
 
     public HttpObject(String pathPattern, Response defaultResponse) {
@@ -74,13 +76,13 @@ public class HttpObject extends DSL{
         return pathPattern;
     }
 
-    public Response delete(Request req){return defaultResponse;}
-    public Response get(Request req){return defaultResponse;}
-    public Response head(Request req){return defaultResponse;}
-    public Response options(Request req){return defaultResponse;}
-    public Response post(Request req){return defaultResponse;}
-    public Response put(Request req){return defaultResponse;}
-    public Response trace(Request req){return defaultResponse;}
-    public Response patch(Request req){return defaultResponse;}
+    public EventualResult<Response> delete(Request req){return defaultResponse;}
+    public EventualResult<Response> get(Request req){return defaultResponse;}
+    public EventualResult<Response> head(Request req){return defaultResponse;}
+    public EventualResult<Response> options(Request req){return defaultResponse;}
+    public EventualResult<Response> post(Request req){return defaultResponse;}
+    public EventualResult<Response> put(Request req){return defaultResponse;}
+    public EventualResult<Response> trace(Request req){return defaultResponse;}
+    public EventualResult<Response> patch(Request req){return defaultResponse;}
 
 }

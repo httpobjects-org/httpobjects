@@ -45,16 +45,13 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.httpobjects.HttpObject;
-import org.httpobjects.Representation;
-import org.httpobjects.Request;
-import org.httpobjects.Response;
+import org.httpobjects.*;
 import org.httpobjects.test.MockRequest;
 import org.junit.Test;
 
 public class HttpObjectUtilTest {
 
-    class PatchTestingObject extends HttpObject {
+    class PatchTestingObject extends SyncHttpObject {
         final Response response;
         final List<Request> requestsRecieved = new ArrayList<Request>();
         
@@ -64,7 +61,7 @@ public class HttpObjectUtilTest {
         }
 
         @Override
-        public Response patch(Request req) {
+        public Response patchSync(Request req) {
             requestsRecieved.add(req);
             return response;
         }

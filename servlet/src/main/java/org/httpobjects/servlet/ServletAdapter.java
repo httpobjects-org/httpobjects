@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import org.httpobjects.eventual.EventualResult;
 
 @SuppressWarnings("serial")
 public final class ServletAdapter extends HttpServlet {
@@ -59,8 +60,9 @@ public final class ServletAdapter extends HttpServlet {
 		this.p = p;
 	}
 
-	private void returnResponse(Response r, HttpServletResponse resp) throws IOException {
-		
+	private void returnResponse(EventualResult<Response> er, HttpServletResponse resp) throws IOException {
+		Response r = er.join();
+
 		resp.setStatus(r.code().value());
 		
 		if(r.hasRepresentation()){

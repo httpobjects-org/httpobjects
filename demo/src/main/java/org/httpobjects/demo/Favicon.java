@@ -37,18 +37,18 @@
  */
 package org.httpobjects.demo;
 
-import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import org.httpobjects.SyncHttpObject;
 
-public class Favicon extends HttpObject {
+public class Favicon extends SyncHttpObject {
 
 	public Favicon() {
 		super("/favicon.ico");
 	}
 	
 	@Override
-	public Response get(Request req) {
+	public Response getSync(Request req) {
 		return OK(File("image/x-icon", new java.io.File("favicon.ico")));
 	}
 	

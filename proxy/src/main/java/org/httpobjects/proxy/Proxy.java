@@ -52,7 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class Proxy extends HttpObject {
+public class Proxy extends SyncHttpObject {
     private final HTLog log = new HTLog(this);
     private String base;
     private final String me;
@@ -84,32 +84,32 @@ public class Proxy extends HttpObject {
     }
 
     @Override
-    public Response get(Request req) {
+    public Response getSync(Request req) {
         return proxyRequest(req);
     }
 
     @Override
-    public Response delete(Request req) {
+    public Response deleteSync(Request req) {
         return proxyRequest(req);
     }
 
     @Override
-    public Response put(Request req) {
+    public Response putSync(Request req) {
         return proxyRequest(req);
     }
 
     @Override
-    public Response patch(Request req) {
+    public Response patchSync(Request req) {
         return proxyRequest(req);
     }
 
     @Override
-    public Response options(Request req) {
+    public Response optionsSync(Request req) {
         return proxyRequest(req);
     }
 
     @Override
-    public Response post(Request req) {
+    public Response postSync(Request req) {
         return proxyRequest(req);
     }
 

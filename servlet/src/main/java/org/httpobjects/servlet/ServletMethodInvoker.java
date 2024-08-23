@@ -116,7 +116,7 @@ public class ServletMethodInvoker {
 		if(m==null){
 			System.out.println("WARNING: not a method I know about: " + r.getMethod());
 		}
-		return HttpObjectUtil.invokeMethod(object, m, input);
+		return HttpObjectUtil.invokeMethod(object, m, input).join();
 	}
 
 

@@ -43,11 +43,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import org.httpobjects.SyncHttpObject;
 
-public class FilesystemResourcesObject  extends HttpObject {
+public class FilesystemResourcesObject  extends SyncHttpObject {
 	private final File relativeTo;
 	
 	public FilesystemResourcesObject(String pathPattern, File relativeTo) {
@@ -56,7 +56,7 @@ public class FilesystemResourcesObject  extends HttpObject {
 	}
 	
 	@Override
-	public Response get(Request req) {
+	public Response getSync(Request req) {
 		final String resource = req.path().valueFor("resource");
 		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
 		
