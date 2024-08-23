@@ -15,7 +15,7 @@ import io.netty.handler.ssl.SslContext
 import io.netty.handler.ssl.SslContextBuilder
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory
 import io.netty.util.CharsetUtil
-import org.httpobjects.websockets.*
+import org.httpobjects.impl.HTLog
 import java.net.URI
 
 
@@ -107,7 +107,7 @@ class NettyWebSocketClientHandler<T:WebSocketChannelHandler>(
     private var handshakeFuture: ChannelPromise? = null
     private var session:T? = null
 
-    private val logs = NHTOLogContext(this)
+    private val logs = HTLog(this)
 
     fun session():T? = this.session
 
@@ -125,7 +125,7 @@ class NettyWebSocketClientHandler<T:WebSocketChannelHandler>(
     }
 
     override fun channelInactive(ctx: ChannelHandlerContext) {
-        logs.log{"WebSocket Client disconnected!"}
+        logs.log("WebSocket Client disconnected!")
 
         val session = this.session
         if(session!=null){
@@ -142,10 +142,10 @@ class NettyWebSocketClientHandler<T:WebSocketChannelHandler>(
         if (!handshaker.isHandshakeComplete) {
             try {
                 handshaker.finishHandshake(ch, msg as FullHttpResponse)
-                logs.log{"WebSocket Client connected!"}
+                logs.log("WebSocket Client connected!")
                 handshakeFuture!!.setSuccess()
             } catch (e: WebSocketHandshakeException) {
-                logs.log{"WebSocket Client failed to connect"}
+                logs.log("WebSocket Client failed to connect")
                 handshakeFuture!!.setFailure(e)
             }
             return
@@ -158,7 +158,7 @@ class NettyWebSocketClientHandler<T:WebSocketChannelHandler>(
         }
         val frame = msg as WebSocketFrame
         if (frame is CloseWebSocketFrame) {
-            logs.log{"WebSocket Client received closing"}
+            logs.log("WebSocket Client received closing")
             ch.close()
         }else{
             session?.handleEvent(FrameReceived(toHttpObjectsFrame(frame)))

@@ -2,7 +2,6 @@ package org.httpobjects.websockets
 
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.Channel
-import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.EventLoopGroup
 import io.netty.channel.nio.NioEventLoopGroup
@@ -10,9 +9,9 @@ import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.handler.codec.http.HttpRequestDecoder
 import io.netty.handler.codec.http.HttpResponseEncoder
 import io.netty.handler.ssl.SslContext
-import jdk.jfr.Event
 import org.httpobjects.ErrorHandler
 import org.httpobjects.HttpObject
+import org.httpobjects.impl.HTLog
 import org.httpobjects.netty4.BasicLog
 import org.httpobjects.netty4.HttpObjectsResponder
 import org.httpobjects.netty4.ResponseCreationStrategy
@@ -22,7 +21,7 @@ interface NettyWithWebsocketsServer{
     fun stop():EventualResult<Unit>
 }
 object NettyWithWebsockets {
-    private val log = NHTOLogContext(this)
+    private val log = HTLog(this)
 
     fun serve(
         port: Int,

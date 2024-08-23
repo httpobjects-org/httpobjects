@@ -39,13 +39,12 @@ package org.httpobjects.proxy;
 
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.methods.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.httpobjects.*;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
+import org.httpobjects.impl.HTLog;
 import org.httpobjects.path.PathPattern;
 import org.httpobjects.path.RegexPathPattern;
 
@@ -55,7 +54,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class Proxy extends HttpObject {
-    private final Log log = LogFactory.getLog(getClass());
+    private final HTLog log = new HTLog(this);
     private String base;
     private final String me;
     
@@ -65,8 +64,6 @@ public class Proxy extends HttpObject {
         		null);
         setBase(base);
         this.me = me;
-        
-        
     }
 
     public Proxy(final String base, final String me) {

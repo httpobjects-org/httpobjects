@@ -37,6 +37,7 @@
  */
 package org.httpobjects.proxy;
 
+import org.eclipse.jetty.server.Server;
 import org.httpobjects.*;
 import org.httpobjects.Representation;
 import org.httpobjects.ResponseCode;
@@ -53,11 +54,9 @@ import org.httpobjects.util.HttpObjectUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mortbay.jetty.Server;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.ServerSocket;
 
 import static org.hamcrest.core.StringContains.containsString;
 import static org.httpobjects.DSL.Bytes;

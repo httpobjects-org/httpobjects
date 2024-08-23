@@ -7,6 +7,7 @@ import io.netty.handler.codec.http.HttpRequest
 import io.netty.handler.codec.http.websocketx.WebSocketFrame
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory
+import org.httpobjects.impl.HTLog
 import org.httpobjects.netty4.HttpObjectsResponder
 import org.httpobjects.netty4.HttpobjectsChannelHandler
 import org.httpobjects.netty4.ResponseCreationStrategy
@@ -24,7 +25,7 @@ class HttpObjectsPlusWebsocketsHandler(
 
     private var handshaker: WebSocketServerHandshaker? = null
 
-    private val logs = NHTOLogContext(this)
+    private val logs = HTLog(this)
 
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
 

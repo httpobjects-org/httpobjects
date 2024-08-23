@@ -27,9 +27,8 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version> <!-- TODO: Update to 4.13 series, consider moving to 5.x series? -->
+            <version>4.13.2</version>
         </dependency>
-
     </dependencies>
 
 </project>
