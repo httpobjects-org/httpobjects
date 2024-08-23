@@ -11,7 +11,7 @@ It works, and is used on real, stable projects, but ...
   - it may change in backwards-incompatible ways pretty frequently until it passes through the "incubating" stage.
 
 ## Blockers for leaving the incubator
-  - Support continuation frames
+  - Support continuation frames ([this page](https://www.openmymind.net/WebSocket-Framing-Masking-Fragmentation-and-More/) is helpful)
   - Remove the kotlin dependency (should be easy to convert to plain java)
   - Make sure it matches the spec fully and really well (terminology, concepts, etc)
     - e.g. close statuses, custom frame types
