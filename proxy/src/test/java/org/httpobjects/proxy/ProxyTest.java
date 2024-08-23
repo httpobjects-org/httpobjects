@@ -53,6 +53,7 @@ import org.httpobjects.tck.PortFinder;
 import org.httpobjects.test.HttpObjectAssert;
 import org.httpobjects.test.MockRequest;
 import org.httpobjects.util.HttpObjectUtil;
+import org.httpobjects.util.Method;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -234,10 +235,11 @@ public class ProxyTest {
     public void relaysTheOriginalHostField() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
+        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
+        MockRequest request = new MockRequest(subject, Method.GET, "/headerEcho", new Query("?name=beforeTab%09afterTab"), new GenericHeaderField("Host", "dummy-remote-host-value"));
 
         // WHEN:
-        Response output = subject.get(new MockRequest(subject, "/headerEcho", new Query("?name=beforeTab%09afterTab"), new GenericHeaderField("Host", "dummy-remote-host-value")));
+        Response output = request.invoke();
 
         // THEN:
         String representation = HttpObjectUtil.toAscii(output.representation());
@@ -250,10 +252,11 @@ public class ProxyTest {
     public void doesntDoubleEncodeTheUrl() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
+        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
+        MockRequest request = new MockRequest(subject, Method.GET, "/queryStringEcho", new Query("?name=beforeTab%09afterTab"));
 
         // WHEN: proxying a request for url with an encoded value in the query string
-        Response output = subject.get(new MockRequest(subject, "/queryStringEcho", new Query("?name=beforeTab%09afterTab")));
+        Response output = request.invoke();
 
         // THEN: The url should come through unmolested
         assertEquals("?name=beforeTab%09afterTab", bodyOf(output).asString());
@@ -263,11 +266,11 @@ public class ProxyTest {
     public void sendsNonTextContentTypes() throws Exception {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
-        Request input = new MockRequest(subject, "/echo", utf8Bytes("hi"));
+        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
+        MockRequest input = new MockRequest(subject, Method.GET, "/echo", utf8Bytes("hi"));
 
         // when
-        Response output = subject.get(input);
+        Response output = input.invoke();
 
         // then
         responseCodeOf(output).assertIs(ResponseCode.OK);
@@ -283,11 +286,11 @@ public class ProxyTest {
     public void doesntSendBlankContentTypes() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
-        Request input = new MockRequest(subject, "/contentTypeEcho");
+        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
+        MockRequest input = new MockRequest(subject, Method.GET, "/contentTypeEcho");
 
         // when
-        Response output = subject.get(input);
+        Response output = input.invoke();
 
         // then
         assertEquals("null", bodyOf(output).asString());
@@ -297,8 +300,8 @@ public class ProxyTest {
     public void sendsCustomHeaders() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
-        Request input = new MockRequest(subject, "/requirescustomheader") {
+        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
+        MockRequest input = new MockRequest(subject, Method.GET, "/requirescustomheader") {
             @Override
             public RequestHeader header() {
                 return new RequestHeader(new GenericHeaderField("xyz123", "yes!"));
@@ -306,7 +309,7 @@ public class ProxyTest {
         };
 
         // when
-        Response output = subject.get(input);
+        Response output = input.invoke();
 
         // then
         responseCodeOf(output).assertIs(ResponseCode.OK);
@@ -316,11 +319,11 @@ public class ProxyTest {
     public void proxiesSetCookieHeaders() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
-        Request input = new MockRequest(subject, "/setcookies");
+        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
+        MockRequest input = new MockRequest(subject, Method.GET, "/setcookies");
 
         // when
-        Response output = subject.get(input);
+        Response output = input.invoke();
 
         // then
         responseCodeOf(output).assertIs(ResponseCode.OK);
@@ -335,11 +338,11 @@ public class ProxyTest {
     public void proxiesOKGets() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
-        Request input = new MockRequest(subject, "/frog");
+        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
+        MockRequest input = new MockRequest(subject,  Method.GET, "/frog");
 
         // when
-        Response output = subject.get(input);
+        Response output = input.invoke();
 
         // then
         responseCodeOf(output).assertIs(ResponseCode.OK);
@@ -351,11 +354,11 @@ public class ProxyTest {
     public void proxiesQueryStrings() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
-        Request input = new MockRequest(subject, "/frog", new Query("?name=kermit&property=value"));
+        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
+        MockRequest input = new MockRequest(subject,  Method.GET, "/frog", new Query("?name=kermit&property=value"));
 
         // when
-        Response output = subject.get(input);
+        Response output = input.invoke();
 
         // then
         assertTrue(responseCodeOf(output).isOK_200());
@@ -369,10 +372,10 @@ public class ProxyTest {
 
         // given
         HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
-        Request input = new MockRequest(subject, "/characters", HttpObject.Text("Oh, kermie!"));
+        MockRequest input = new MockRequest(subject, Method.POST, "/characters", HttpObject.Text("Oh, kermie!"));
 
         // when
-        Response output = subject.post(input);
+        Response output = input.invoke();
 
         // then
         responseCodeOf(output).assertIs(ResponseCode.SEE_OTHER);
@@ -385,11 +388,11 @@ public class ProxyTest {
     public void proxiesOKPuts() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
-        Request input = new MockRequest(subject, "/frog", HttpObject.Text("Kermie"));
+        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
+        MockRequest input = new MockRequest(subject, Method.PUT, "/frog", HttpObject.Text("Kermie"));
 
         // when
-        Response output = subject.put(input);
+        Response output = input.invoke();
 
         // then
         responseCodeOf(output).assertIs(ResponseCode.OK);
@@ -400,11 +403,11 @@ public class ProxyTest {
     @Test
     public void proxiesOKPatches() {
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
-        Request input = new MockRequest(subject, "/frog", HttpObject.Text("Kermie"));
+        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
+        MockRequest input = new MockRequest(subject, Method.PATCH, "/frog", HttpObject.Text("Kermie"));
 
         // when
-        Response output = subject.patch(input);
+        Response output = input.invoke();
 
         // then
         responseCodeOf(output).assertIs(ResponseCode.OK);
@@ -415,11 +418,11 @@ public class ProxyTest {
     @Test
     public void proxiesOKOptions() {
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
-        Request input = new MockRequest(subject, "/superOptions", HttpObject.Text(""));
+        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
+        MockRequest input = new MockRequest(subject, Method.OPTIONS, "/superOptions", HttpObject.Text(""));
 
         // when
-        Response output = subject.options(input);
+        Response output = input.invoke();
 
         // then
         responseCodeOf(output).assertIs(ResponseCode.OK);
@@ -430,10 +433,10 @@ public class ProxyTest {
 
         // given
         HttpObject subject = new Proxy("http://localhost:" + port + "/", "http://me.com", client);
-        Request input = new MockRequest(subject, "/frog");
+        MockRequest input = new MockRequest(subject, Method.GET, "/frog");
 
         // when
-        Response output = subject.get(input);
+        Response output = input.invoke();
 
         // then
         responseCodeOf(output).assertIsOK_200();
@@ -446,10 +449,10 @@ public class ProxyTest {
 
         // given
         HttpObject subject = new Proxy("http://localhost:" + port + "/", "http://me.com", client);
-        Request input = new MockRequest(subject, "/notme");
+        MockRequest input = new MockRequest(subject, Method.GET, "/notme");
 
         // when
-        Response output = subject.get(input);
+        Response output = input.invoke();
 
         // then
 
@@ -462,11 +465,11 @@ public class ProxyTest {
     public void handlesNoContent() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
-        Request input = new MockRequest(subject, "/noresponse", HttpObject.Text("Kermie"));
+        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
+        MockRequest input = new MockRequest(subject, Method.PUT, "/noresponse", HttpObject.Text("Kermie"));
 
         // when
-        Response output = subject.put(input);
+        Response output = input.invoke();
 
         // then
         assertEquals(null, bodyOf(output).asString());
@@ -480,11 +483,11 @@ public class ProxyTest {
 
         //given
         HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
-        Request input = new MockRequest( new ConnectionInfo("dummy-local-ip-address",8080,"dummy-remote-ip-address",10001),
-          subject, "/headerEcho", new Query(""), HttpObject.Text("does not matter"));
+        MockRequest input = new MockRequest( new ConnectionInfo("dummy-local-ip-address",8080,"dummy-remote-ip-address",10001),
+          subject, Method.GET, "/headerEcho", new Query(""), HttpObject.Text("does not matter"));
 
         // when
-        Response output = subject.get(input);
+        Response output = input.invoke();
 
         // then
         String representation = HttpObjectUtil.toAscii(output.representation());
@@ -499,10 +502,10 @@ public class ProxyTest {
     public void handlesRootRequests(){
         //given
         HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
-        Request input = new MockRequest(subject, "/");
+        MockRequest input = new MockRequest(subject, Method.GET, "/");
 
         // when
-        Response output = subject.get(input);
+        Response output = input.invoke();
 
         // then
         String representation = HttpObjectUtil.toAscii(output.representation());

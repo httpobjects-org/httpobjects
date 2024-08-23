@@ -45,6 +45,7 @@ import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.impl.HTLog;
 import org.httpobjects.path.PathPattern;
 import org.httpobjects.path.RegexPathPattern;
+import org.httpobjects.util.Method;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -84,80 +85,39 @@ public class Proxy extends HttpObject {
 
     @Override
     public Response get(Request req) {
-        return prepRequest(req).execute("get");
+        return proxyRequest(req);
     }
 
     @Override
     public Response delete(Request req) {
-        return prepRequest(req).execute("delete");
+        return proxyRequest(req);
     }
 
     @Override
     public Response put(Request req) {
-        return prepRequest(req).execute("put");
+        return proxyRequest(req);
     }
 
     @Override
     public Response patch(Request req) {
-        return prepRequest(req).execute("patch");
+        return proxyRequest(req);
     }
 
     @Override
     public Response options(Request req) {
-        return prepRequest(req).execute("options");
+        return proxyRequest(req);
     }
 
     @Override
     public Response post(Request req) {
-        return prepRequest(req).execute("post");
+        return proxyRequest(req);
     }
 
     protected String getQuery(Request req) {
         return req.query().toString();
     }
 
-    class PreparedRequest{
-        final String url;
-        final Representation representation;
-        final String query;
-        final HeaderField[] headerFields;
-        final HttpClient.RemoteObject object;
-
-        PreparedRequest(String url, Representation representation, String query, HeaderField[] headerFields, HttpClient.RemoteObject object) {
-            this.url = url;
-            this.representation = representation;
-            this.query = query;
-            this.headerFields = headerFields;
-            this.object = object;
-        }
-
-        Response execute(String method){
-            log.info("Executing " + method + " " + url);
-            final Response r;
-            final PreparedRequest prep = this;
-            if(method.equalsIgnoreCase("get")){
-                r = prep.object.get(prep.representation, prep.query, prep.headerFields);
-            } else if(method.equalsIgnoreCase("delete")){
-                r = prep.object.delete(prep.representation, prep.query, prep.headerFields);
-            } else if(method.equalsIgnoreCase("put")){
-                r = prep.object.put(prep.representation, prep.query, prep.headerFields);
-            } else if(method.equalsIgnoreCase("patch")){
-                r = prep.object.patch(prep.representation, prep.query, prep.headerFields);
-            } else if(method.equalsIgnoreCase("options")){
-                r = prep.object.options(prep.representation, prep.query, prep.headerFields);
-            } else if(method.equalsIgnoreCase("post")){
-                r = prep.object.post(prep.representation, prep.query, prep.headerFields);
-            } else {
-                throw new RuntimeException("Not a method I support: " + method);
-            }
-
-            log.info("Immediate response: " + r.code().name());
-
-            return handleResponse(r);
-        }
-    }
-
-    private PreparedRequest prepRequest(Request req) {
+    private Response proxyRequest(Request req) {
 
         String path = req.path().valueFor("path");
         if(path == null) path = "";
@@ -189,11 +149,11 @@ public class Proxy extends HttpObject {
         }
 
 
-        final PreparedRequest prep = new PreparedRequest(url, req.representation(), query, headers.toArray(new HeaderField[0]), client.resource(url));
-
-        System.out.println("Prepared request: " + prep);
-
-        return prep;
+        final Method method = req.method();
+        log.info("Executing " + method.name() + " " + url);
+        final Response r =  client.resource(url).send(method, req.representation(), query, headers.toArray(new HeaderField[0]));
+        log.info("Response: " + r.code().name());
+        return handleResponse(r);
     }
 
     private Response handleResponse(Response response) {

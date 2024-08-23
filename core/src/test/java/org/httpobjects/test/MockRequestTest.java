@@ -51,6 +51,7 @@ import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.Cookie;
 import org.httpobjects.header.request.CookieField;
 import org.httpobjects.util.HttpObjectUtil;
+import org.httpobjects.util.Method;
 import org.junit.Test;
 
 public class MockRequestTest {
@@ -61,7 +62,7 @@ public class MockRequestTest {
         HttpObject o = new HttpObject("/foo");
         
         // when
-        MockRequest r = new MockRequest(o, "/foo");
+        MockRequest r = new MockRequest(o, Method.GET, "/foo");
         
         // then
         assertEquals("", r.query().toString());
@@ -73,7 +74,8 @@ public class MockRequestTest {
         HttpObject o = new HttpObject("/messages/welcome");
         
         // when
-        MockRequest r = new MockRequest(o, 
+        MockRequest r = new MockRequest(o,
+                                Method.GET,
                                 "/messages/welcome", new Query("?foo=bar"),
                                 Text("hello world"),
                                 new CookieField(new Cookie("name", "sally")),
@@ -102,7 +104,7 @@ public class MockRequestTest {
         // when
         Exception err = null;
         try{
-            new MockRequest(o, "/bar");
+            new MockRequest(o, Method.GET, "/bar");
         }catch(Exception e){
             err = e;
         }
@@ -123,7 +125,7 @@ public class MockRequestTest {
         // when
         Exception err = null;
         try{
-            new MockRequest(o, "/foo?foo=bar");
+            new MockRequest(o, Method.GET, "/foo?foo=bar");
         }catch(Exception e){
             err = e;
         }
@@ -142,7 +144,7 @@ public class MockRequestTest {
         HttpObject o = new HttpObject("/foo");
         
         // when
-        MockRequest r = new MockRequest(o, "/foo", new Query("?foo=bar"));
+        MockRequest r = new MockRequest(o, Method.GET, "/foo", new Query("?foo=bar"));
             
         // then
         assertEquals("?foo=bar", r.query().toString());

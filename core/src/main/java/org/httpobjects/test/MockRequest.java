@@ -39,14 +39,11 @@ package org.httpobjects.test;
 
 import static org.httpobjects.DSL.Bytes;
 
-import org.httpobjects.ConnectionInfo;
-import org.httpobjects.HttpObject;
-import org.httpobjects.Query;
-import org.httpobjects.Representation;
-import org.httpobjects.Request;
+import org.httpobjects.*;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.path.Path;
+import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 
 public class MockRequest implements Request {
@@ -56,12 +53,14 @@ public class MockRequest implements Request {
     private final RequestHeader header;
     private final ConnectionInfo connectionInfo;
     private final Method method;
+	private final HttpObject object;
 
-    public MockRequest(ConnectionInfo connectionInfo, HttpObject object, String path, Query query, Representation representation, Method method, HeaderField... fields) {
+    public MockRequest(ConnectionInfo connectionInfo, HttpObject object, Method method, String path, Query query, Representation representation, HeaderField... fields) {
         super();
         assertNoQueryInPath(path);
         this.method = method;
         this.connectionInfo = connectionInfo;
+		this.object = object;
         this.representation = representation;
         this.query = query;
         this.path = object.pattern().match(path);
@@ -71,24 +70,28 @@ public class MockRequest implements Request {
         this.header = new RequestHeader(fields);
     }
 
-    public MockRequest(ConnectionInfo connectionInfo, HttpObject object, String path, Query query, Representation representation, HeaderField... fields) {
-        this(connectionInfo, object, path, query, representation, Method.GET, fields);
+//    public MockRequest(ConnectionInfo connectionInfo, HttpObject object, String path, Query query, Representation representation, Method method, HeaderField... fields) {
+//        this(connectionInfo, object, path, query, representation, method, fields);
+//    }
+
+    public MockRequest(HttpObject object, Method method, String path, Query query, Representation representation, HeaderField ... fields) {
+        this(new ConnectionInfo("1.2.3.4", 8080, "4.3.2.1", 4332), object, method, path, query, representation, fields);
     }
 
-    public MockRequest(HttpObject object, String path, Query query, Representation representation, HeaderField ... fields) {
-        this(new ConnectionInfo("1.2.3.4", 8080, "4.3.2.1", 4332), object, path, query, representation, fields);
-    }
-
-	public MockRequest(HttpObject object, String path, Query query, HeaderField ... fields) {
-		this(object, path, query, nullRepresentation(), fields);
+	public MockRequest(HttpObject object, Method method, String path, Query query, HeaderField ... fields) {
+		this(object, method, path, query, nullRepresentation(), fields);
 	}
 
-	public MockRequest(HttpObject object, String path, HeaderField ... fields) {
-        this(object, path, new Query(null), nullRepresentation(), fields);
+	public MockRequest(HttpObject object, Method method, String path, HeaderField ... fields) {
+        this(object, method, path, new Query(null), nullRepresentation(), fields);
 	}
 
-	public MockRequest(HttpObject object, String path, Representation representation, HeaderField ... fields) {
-        this(object, path, new Query(""), representation, fields);
+	public MockRequest(HttpObject object, Method method, String path, Representation representation, HeaderField ... fields) {
+        this(object, method, path, new Query(""), representation, fields);
+	}
+
+	public Response invoke(){
+		return HttpObjectUtil.invokeMethod(object, method, this);
 	}
 
 	@Override

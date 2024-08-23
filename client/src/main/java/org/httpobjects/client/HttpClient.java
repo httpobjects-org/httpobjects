@@ -3,6 +3,7 @@ package org.httpobjects.client;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.Response;
 import org.httpobjects.Representation;
+import org.httpobjects.util.Method;
 
 /**
 * WARNING: This API is highly experimental.  This means it should be considered unstable at present; if you build on it, you may have to change your code a lot going forward.
@@ -11,6 +12,24 @@ public interface HttpClient {
     RemoteObject resource(String uri);
 
     public abstract class RemoteObject {
+
+        public Response send(Method method, Representation representation, String query, HeaderField ... headerFields){
+            if(method == Method.GET){
+                return get(representation, query, headerFields);
+            } else if(method == Method.DELETE){
+                return delete(representation, query, headerFields);
+            } else if(method == Method.PUT){
+                return put(representation, query, headerFields);
+            } else if(method == Method.PATCH){
+                return patch(representation, query, headerFields);
+            } else if(method == Method.OPTIONS){
+                return options(representation, query, headerFields);
+            } else if(method == Method.POST){
+                return post(representation, query, headerFields);
+            } else {
+                throw new RuntimeException("Not a method I support: " + method);
+            }
+        }
 
         public abstract Response get(Representation r, String query, HeaderField ... fields);
         public abstract Response post(Representation r, String query, HeaderField ... fields);

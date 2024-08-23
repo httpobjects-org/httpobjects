@@ -56,7 +56,7 @@ public class DSLTest {
 
     	// then
     	assertEquals("/{resource*}", object.pattern().raw());
-    	Response response = object.get(new MockRequest(object, "/a.txt"));
+    	Response response = new MockRequest(object, Method.GET, "/a.txt").invoke();
     	assertEquals("hello", HttpObjectUtil.toAscii(response.representation()));
     }
 
@@ -69,7 +69,7 @@ public class DSLTest {
 
     	// then
     	assertEquals("/bar/{resource*}", object.pattern().raw());
-    	Response response = object.get(new MockRequest(object, "/bar/a.txt"));
+    	Response response = new MockRequest(object, Method.GET, "/bar/a.txt").invoke();
     	assertEquals("hello", HttpObjectUtil.toAscii(response.representation()));
     }
 
@@ -82,7 +82,7 @@ public class DSLTest {
 
     	// then
     	assertEquals("/bar/{resource*}", object.pattern().raw());
-    	Response response = object.get(new MockRequest(object, "/bar/util/ClasspathResourcesObjectTest_resources/a.txt"));
+    	Response response = new MockRequest(object, Method.GET, "/bar/util/ClasspathResourcesObjectTest_resources/a.txt").invoke();
     	assertEquals("hello", HttpObjectUtil.toAscii(response.representation()));
     }
 

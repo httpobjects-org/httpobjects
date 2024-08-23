@@ -76,10 +76,10 @@ public class HttpObjectUtilTest {
         final Response expectedResponse = OK(Text("Hello WOrld"));
         final PatchTestingObject o = new PatchTestingObject("/foo", expectedResponse);
 
-        final Request input = new MockRequest(o, "/foo");
+        final MockRequest input = new MockRequest(o, Method.PATCH, "/foo");
 
         // when
-        Response result = HttpObjectUtil.invokeMethod(o, Method.PATCH, input);
+        Response result = input.invoke();
 
         // then
         assertNotNull(result);

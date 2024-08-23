@@ -61,10 +61,10 @@ public class FilesystemResourcesObjectTest {
         
         
         FilesystemResourcesObject testSubject = new FilesystemResourcesObject("/{resource*}", temp);
-        MockRequest req = new MockRequest(testSubject, "/misc-files/stuff.txt");
+        MockRequest req = new MockRequest(testSubject, Method.GET, "/misc-files/stuff.txt");
         
         // when
-        Response result = testSubject.get(req);
+        Response result = req.invoke();
 
         // then
         Assert.assertNotNull(result);
@@ -83,10 +83,10 @@ public class FilesystemResourcesObjectTest {
         File pathToPublicData = new File(temp, "public-data");
         
         FilesystemResourcesObject testSubject = new FilesystemResourcesObject("/{resource*}", pathToPublicData);
-        MockRequest req = new MockRequest(testSubject, "/../hidden.txt");
+        MockRequest req = new MockRequest(testSubject, Method.GET, "/../hidden.txt");
         
         // when
-        Response result = testSubject.get(req);
+        Response result = req.invoke();
 
         // then
         Assert.assertNull(result);

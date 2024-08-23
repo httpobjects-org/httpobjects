@@ -48,6 +48,7 @@ import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.test.MockRequest;
+import org.httpobjects.util.Method;
 import org.junit.Test;
 
 public class PersonResourceTest {
@@ -85,10 +86,10 @@ public class PersonResourceTest {
 	public void returns_stu(){
 		// given
 		HttpObject subject = new PersonResource();
-		Request input = new MockRequest(subject, "/people/stu");
+		MockRequest input = new MockRequest(subject, Method.GET, "/people/stu");
 		
 		// when
-		Response output = subject.get(input);
+		Response output = input.invoke();
 		
 		// then
 		assertTrue(responseCodeOf(output).isOK_200());
@@ -100,10 +101,10 @@ public class PersonResourceTest {
 	public void returns_NOT_FOUND_when_name_is_missing(){
 		// given
 		PersonResource subject = new PersonResource();
-		Request input = new MockRequest(subject, "/people/");
+		MockRequest input = new MockRequest(subject, Method.GET, "/people/");
 		
 		// when
-		Response output = subject.get(input);
+		Response output = input.invoke();
 		
 		// then
 		assertTrue(responseCodeOf(output).isNOT_FOUND());
