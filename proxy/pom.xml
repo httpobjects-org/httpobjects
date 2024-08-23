@@ -20,11 +20,6 @@
             <version>${pom.version}</version>
         </dependency>
         <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version> <!-- TODO: Rework to use the client module -->
-        </dependency>
-        <dependency>
             <groupId>org.httpobjects.client</groupId>
             <artifactId>httpobjects-client</artifactId>
             <version>${pom.version}</version>
@@ -36,17 +31,28 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>12.0.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.httpobjects.apache-httpclient-4.x</groupId>
+            <artifactId>httpobjects-apache-httpclient-4.x</artifactId>
+            <version>${pom.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.14</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.httpobjects.test</groupId>
             <artifactId>httpobjects-test</artifactId>
             <version>${pom.version}</version>
             <scope>test</scope>
-        </dependency>
-
-
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>12.0.12</version>
         </dependency>
     </dependencies>
 

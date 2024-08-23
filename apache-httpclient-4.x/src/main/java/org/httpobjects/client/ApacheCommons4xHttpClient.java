@@ -14,6 +14,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.httpobjects.Representation;
 import org.httpobjects.Response;
 import org.httpobjects.ResponseCode;
@@ -29,7 +30,7 @@ public final class ApacheCommons4xHttpClient implements HttpClient {
 	private final org.apache.http.client.HttpClient client;
 
 	public ApacheCommons4xHttpClient() {
-		this(new DefaultHttpClient());
+		this(HttpClientBuilder.create().disableRedirectHandling().build());
 	}
 
 	public ApacheCommons4xHttpClient(org.apache.http.client.HttpClient client) {

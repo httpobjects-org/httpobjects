@@ -37,10 +37,8 @@
  */
 package org.httpobjects.proxy;
 
-import org.apache.commons.httpclient.*;
-import org.apache.commons.httpclient.methods.*;
 import org.httpobjects.*;
-import org.httpobjects.header.GenericHeaderField;
+import org.httpobjects.client.HttpClient;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
@@ -57,17 +55,19 @@ public class Proxy extends HttpObject {
     private final HTLog log = new HTLog(this);
     private String base;
     private final String me;
-    
-    public Proxy(final String localPath, final String base, final String me) {
+    private final HttpClient client;
+
+    public Proxy(final String localPath, final String base, final String me, final HttpClient client) {
         super(
         		makePathPattern(localPath), 
         		null);
         setBase(base);
         this.me = me;
+        this.client = client;
     }
 
-    public Proxy(final String base, final String me) {
-        this("", base, me);
+    public Proxy(final String base, final String me, final HttpClient client) {
+        this("", base, me, client);
     }
     
     private static PathPattern makePathPattern(String localPath){
@@ -84,107 +84,122 @@ public class Proxy extends HttpObject {
 
     @Override
     public Response get(Request req) {
-        return proxyRequest(req, new GetMethod());
+        return prepRequest(req).execute("get");
     }
 
     @Override
     public Response delete(Request req) {
-        return proxyRequest(req, new DeleteMethod());
+        return prepRequest(req).execute("delete");
     }
 
     @Override
     public Response put(Request req) {
-        PutMethod m = new PutMethod();
-
-        setRequestRepresentation(req, m);
-        return proxyRequest(req, m);
+        return prepRequest(req).execute("put");
     }
 
     @Override
     public Response patch(Request req) {
-        PatchMethod m = new PatchMethod();
-
-        setRequestRepresentation(req, m);
-        return proxyRequest(req, m);
+        return prepRequest(req).execute("patch");
     }
 
     @Override
     public Response options(Request req) {
-        return proxyRequest(req, new OptionsMethod());
-    }
-
-    protected void setRequestRepresentation(Request req, EntityEnclosingMethod method) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        req.representation().write(out);
-        method.setRequestEntity(new InputStreamRequestEntity(new ByteArrayInputStream(out.toByteArray())));
+        return prepRequest(req).execute("options");
     }
 
     @Override
     public Response post(Request req) {
-        PostMethod m = new PostMethod();
-
-        setRequestRepresentation(req, m);
-        return proxyRequest(req, m);
+        return prepRequest(req).execute("post");
     }
 
     protected String getQuery(Request req) {
         return req.query().toString();
     }
 
-    protected String processUrl(String url) {
-        return url;
+    class PreparedRequest{
+        final String url;
+        final Representation representation;
+        final String query;
+        final HeaderField[] headerFields;
+        final HttpClient.RemoteObject object;
+
+        PreparedRequest(String url, Representation representation, String query, HeaderField[] headerFields, HttpClient.RemoteObject object) {
+            this.url = url;
+            this.representation = representation;
+            this.query = query;
+            this.headerFields = headerFields;
+            this.object = object;
+        }
+
+        Response execute(String method){
+            log.info("Executing " + method + " " + url);
+            final Response r;
+            final PreparedRequest prep = this;
+            if(method.equalsIgnoreCase("get")){
+                r = prep.object.get(prep.representation, prep.query, prep.headerFields);
+            } else if(method.equalsIgnoreCase("delete")){
+                r = prep.object.delete(prep.representation, prep.query, prep.headerFields);
+            } else if(method.equalsIgnoreCase("put")){
+                r = prep.object.put(prep.representation, prep.query, prep.headerFields);
+            } else if(method.equalsIgnoreCase("patch")){
+                r = prep.object.patch(prep.representation, prep.query, prep.headerFields);
+            } else if(method.equalsIgnoreCase("options")){
+                r = prep.object.options(prep.representation, prep.query, prep.headerFields);
+            } else if(method.equalsIgnoreCase("post")){
+                r = prep.object.post(prep.representation, prep.query, prep.headerFields);
+            } else {
+                throw new RuntimeException("Not a method I support: " + method);
+            }
+
+            log.info("Immediate response: " + r.code().name());
+
+            return handleResponse(r);
+        }
     }
 
-    protected Response proxyRequest(Request req, final HttpMethodBase method) {
-        method.setFollowRedirects(false);
+    private PreparedRequest prepRequest(Request req) {
 
         String path = req.path().valueFor("path");
         if(path == null) path = "";
         if (!path.startsWith("/")) path = "/" + path;
         String query = getQuery(req);
-        if (query == null) {
+        if (query == null || query.equals("?")) {
             query = "";
-        } else {
-            query = "?" + query;
         }
-        String url = base + path + query;
-        log.debug("doing a " + method.getClass().getSimpleName() + " for " + url);
-//		log.debug("Content type is " + req.representation().contentType());
-        try {
-            method.setURI(new URI(processUrl(url), true));
-        } catch (URIException e1) {
-            throw new RuntimeException("Error with uri: " + url, e1);
-        }
+        String url = base + path;
 
-        addRequestHeaders(req, method);
+        List<HeaderField> headers = new ArrayList<HeaderField>();
+
+        for (HeaderField next : req.header().fields()) {
+            headers.add(HeaderField.parse(next.name(), next.value()));
+        }
 
         if (req.representation().contentType() != null) {
-            method.addRequestHeader("Content-Type", req.representation().contentType());
+            headers.add(HeaderField.parse("Content-Type", req.representation().contentType()));
         }
 
 
-        method.addRequestHeader("X-Forwarded-For", req.connectionInfo().remoteAddress);
+        headers.add(HeaderField.parse("X-Forwarded-For", req.connectionInfo().remoteAddress));
 
         // Support for the de-facto standard "X-Forwarded-Host" header
         //   https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Host
         HeaderField maybeHostHeader = req.header().field("host");
         if(maybeHostHeader!=null){
-            method.addRequestHeader("X-Forwarded-Host", maybeHostHeader.value());
+            headers.add(HeaderField.parse("X-Forwarded-Host", maybeHostHeader.value()));
         }
 
-        for (Header next : method.getRequestHeaders()) {
-            log.debug("Sending header: " + next);
-        }
 
-        HttpClient client = createHttpClient();
+        final PreparedRequest prep = new PreparedRequest(url, req.representation(), query, headers.toArray(new HeaderField[0]), client.resource(url));
 
-        return executeMethod(client, method, req);
+        System.out.println("Prepared request: " + prep);
 
+        return prep;
     }
 
-    protected Response executeMethod(HttpClient client, HttpMethodBase method, Request req) {
+    private Response handleResponse(Response response) {
+        System.out.println("Handling response:" + response);
         try {
-            int codeValue = client.executeMethod(method);
+            int codeValue = response.code().value();
 
             ResponseCode responseCode = ResponseCode.forCode(codeValue);
             if (responseCode == null) {
@@ -193,9 +208,9 @@ public class Proxy extends HttpObject {
                 log.debug("Response was " + responseCode);
             }
 
-            List<HeaderField> headersReturned = extractResponseHeaders(method);
+            List<HeaderField> headersReturned = extractResponseHeaders(response);
 
-            return createResponse(method, responseCode, headersReturned);
+            return createResponse(response, headersReturned);
 
         } catch (Exception e) {
             log.error("Error proxying", e);
@@ -203,72 +218,60 @@ public class Proxy extends HttpObject {
         }
     }
 
-    protected HttpClient createHttpClient() {
-        return new HttpClient();
-    }
 
-    protected void addRequestHeaders(Request req, final HttpMethodBase method) {
-        for (HeaderField next : req.header().fields()) {
-            method.addRequestHeader(next.name(), next.value());
-        }
-    }
-
-    protected List<HeaderField> extractResponseHeaders(HttpMethodBase method) {
-        List<HeaderField> headersReturned = new ArrayList<HeaderField>();
-        for (Header h : method.getResponseHeaders()) {
-            log.debug("Found header: " + h.getName() + "=" + h.getValue());
-            String name = h.getName();
-            String value = h.getValue();
-            if (name.equals("Set-Cookie")) {
-                SetCookieField setCookieField = SetCookieField.fromHeaderValue(value);
+    private List<HeaderField> extractResponseHeaders(Response response) {
+        final List<HeaderField> headersReturned = new ArrayList<HeaderField>();
+        for (HeaderField h : response.header()) {
+            log.debug("Found header: " + h.name() + "=" + h.value());
+            final String name = h.name();
+            final String value = h.value();
+            if (name.toLowerCase().equals("set-cookie")) {
+                final SetCookieField setCookieField = SetCookieField.fromHeaderValue(value);
                 log.debug("Cookie found: " + setCookieField);
                 headersReturned.add(setCookieField);
-            } else if (name.equals("Location")) {
-                String a = processRedirect(value);
+            } else if (name.toLowerCase().equals("location")) {
+                final String a = processRedirect(value);
                 log.debug("Redirecting to " + a);
                 headersReturned.add(new LocationField(a));
             } else {
-                headersReturned.add(new GenericHeaderField(name, value));
+                headersReturned.add(HeaderField.parse(name, value));
             }
         }
         return headersReturned;
     }
 
-    protected String processRedirect(String url) {
+    private String processRedirect(String url) {
         String a = url.replaceAll(Pattern.quote(base), me);
         return a;
     }
 
-    protected Response createResponse(final HttpMethodBase method, ResponseCode responseCode, List<HeaderField> headersReturned) {
-        return new Response(responseCode, new Representation() {
+    private HeaderField getHeader(String name, HeaderField[] headers){
+        for(HeaderField header : headers){
+            if(header.name().toLowerCase().equals(name.toLowerCase())){
+                return header;
+            }
+        }
+        return null;
+    }
+
+    private Response createResponse(Response response, List<HeaderField> headersReturned) {
+
+        return new Response(response.code(), response.hasRepresentation() ? new Representation() {
             @Override
             public String contentType() {
-                Header h = method.getResponseHeader("Content-Type");
-                return h == null ? null : h.getValue();
+                HeaderField h = getHeader("Content-Type", response.header());
+                return h == null ? null : h.value();
             }
 
             @Override
             public void write(OutputStream out) {
-                try {
-                    if (method.getResponseBodyAsStream() != null) {
-
-                        byte[] buffer = new byte[1024];
-                        InputStream in = method.getResponseBodyAsStream();
-                        for (int x = in.read(buffer); x != -1; x = in.read(buffer)) {
-                            out.write(buffer, 0, x);
-                        }
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("Error writing response", e);
-                }
+                response.representation().write(out);
             }
-        },
-                headersReturned.toArray(new HeaderField[]{}));
+        } : null,
+        headersReturned.toArray(new HeaderField[]{}));
     }
 
-    protected static final String stripTrailingSlash(String text) {
+    private static String stripTrailingSlash(String text) {
         if (text.endsWith("/") && text.length() > 1) {
             return text.substring(0, text.length() - 1);
         } else {
@@ -276,16 +279,4 @@ public class Proxy extends HttpObject {
         }
     }
 
-    private static class PatchMethod extends EntityEnclosingMethod {
-        public PatchMethod() {
-        }
-
-        private PatchMethod(String uri) {
-            super(uri);
-        }
-
-        public String getName() {
-            return "PATCH";
-        }
-    }
 }

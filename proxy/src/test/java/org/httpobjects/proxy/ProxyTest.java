@@ -41,6 +41,8 @@ import org.eclipse.jetty.server.Server;
 import org.httpobjects.*;
 import org.httpobjects.Representation;
 import org.httpobjects.ResponseCode;
+import org.httpobjects.client.ApacheCommons4xHttpClient;
+import org.httpobjects.client.HttpClient;
 import org.httpobjects.header.DefaultHeaderFieldVisitor;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
@@ -67,6 +69,7 @@ import static org.junit.Assert.assertTrue;
 
 public class ProxyTest {
     Server jetty;
+    HttpClient client = new ApacheCommons4xHttpClient();
 
 //    public static void main(String[] args) {
 //        new ProxyTest().launch();
@@ -231,7 +234,7 @@ public class ProxyTest {
     public void relaysTheOriginalHostField() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
 
         // WHEN:
         Response output = subject.get(new MockRequest(subject, "/headerEcho", new Query("?name=beforeTab%09afterTab"), new GenericHeaderField("Host", "dummy-remote-host-value")));
@@ -247,7 +250,7 @@ public class ProxyTest {
     public void doesntDoubleEncodeTheUrl() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
 
         // WHEN: proxying a request for url with an encoded value in the query string
         Response output = subject.get(new MockRequest(subject, "/queryStringEcho", new Query("?name=beforeTab%09afterTab")));
@@ -260,7 +263,7 @@ public class ProxyTest {
     public void sendsNonTextContentTypes() throws Exception {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
         Request input = new MockRequest(subject, "/echo", utf8Bytes("hi"));
 
         // when
@@ -280,7 +283,7 @@ public class ProxyTest {
     public void doesntSendBlankContentTypes() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
         Request input = new MockRequest(subject, "/contentTypeEcho");
 
         // when
@@ -294,7 +297,7 @@ public class ProxyTest {
     public void sendsCustomHeaders() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
         Request input = new MockRequest(subject, "/requirescustomheader") {
             @Override
             public RequestHeader header() {
@@ -313,7 +316,7 @@ public class ProxyTest {
     public void proxiesSetCookieHeaders() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
         Request input = new MockRequest(subject, "/setcookies");
 
         // when
@@ -332,7 +335,7 @@ public class ProxyTest {
     public void proxiesOKGets() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
         Request input = new MockRequest(subject, "/frog");
 
         // when
@@ -348,7 +351,7 @@ public class ProxyTest {
     public void proxiesQueryStrings() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
         Request input = new MockRequest(subject, "/frog", new Query("?name=kermit&property=value"));
 
         // when
@@ -365,7 +368,7 @@ public class ProxyTest {
     public void proxiesOKPosts() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
         Request input = new MockRequest(subject, "/characters", HttpObject.Text("Oh, kermie!"));
 
         // when
@@ -382,7 +385,7 @@ public class ProxyTest {
     public void proxiesOKPuts() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
         Request input = new MockRequest(subject, "/frog", HttpObject.Text("Kermie"));
 
         // when
@@ -397,7 +400,7 @@ public class ProxyTest {
     @Test
     public void proxiesOKPatches() {
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
         Request input = new MockRequest(subject, "/frog", HttpObject.Text("Kermie"));
 
         // when
@@ -412,7 +415,7 @@ public class ProxyTest {
     @Test
     public void proxiesOKOptions() {
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
         Request input = new MockRequest(subject, "/superOptions", HttpObject.Text(""));
 
         // when
@@ -426,7 +429,7 @@ public class ProxyTest {
     public void handlesTargetsWithSlashes() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "/", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "/", "http://me.com", client);
         Request input = new MockRequest(subject, "/frog");
 
         // when
@@ -442,7 +445,7 @@ public class ProxyTest {
     public void handlesRedirects() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "/", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "/", "http://me.com", client);
         Request input = new MockRequest(subject, "/notme");
 
         // when
@@ -459,14 +462,14 @@ public class ProxyTest {
     public void handlesNoContent() {
 
         // given
-        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port + "", "http://me.com", client);
         Request input = new MockRequest(subject, "/noresponse", HttpObject.Text("Kermie"));
 
         // when
         Response output = subject.put(input);
 
         // then
-        assertEquals("", bodyOf(output).asString());
+        assertEquals(null, bodyOf(output).asString());
         responseCodeOf(output).assertIs(ResponseCode.NO_CONTENT);
     }
 
@@ -476,7 +479,7 @@ public class ProxyTest {
     public void proxyShouldRelayTheOriginSourceIPAddress(){
 
         //given
-        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
         Request input = new MockRequest( new ConnectionInfo("dummy-local-ip-address",8080,"dummy-remote-ip-address",10001),
           subject, "/headerEcho", new Query(""), HttpObject.Text("does not matter"));
 
@@ -495,7 +498,7 @@ public class ProxyTest {
     @Test
     public void handlesRootRequests(){
         //given
-        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com");
+        HttpObject subject = new Proxy("http://localhost:" + port, "http://me.com", client);
         Request input = new MockRequest(subject, "/");
 
         // when
