@@ -48,6 +48,7 @@ import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.jetty.HttpObjectsJettyHandler;
+import org.httpobjects.migrate.SyncHttpObject;
 import org.httpobjects.tck.PortAllocation;
 import org.httpobjects.tck.PortFinder;
 import org.httpobjects.test.HttpObjectAssert;

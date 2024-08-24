@@ -6,6 +6,7 @@ import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.netty.HttpobjectsNettySupport;
 import org.httpobjects.netty.HttpobjectsNettySupport.ServerWrapper;
+import org.httpobjects.migrate.SyncHttpObject;
 import org.httpobjects.tck.PortFinder;
 import org.httpobjects.test.HttpObjectAssert;
 import org.httpobjects.util.HttpObjectUtil;

@@ -1,9 +1,18 @@
-package org.httpobjects;
+package org.httpobjects.migrate;
 
+import org.httpobjects.HttpObject;
+import org.httpobjects.Request;
+import org.httpobjects.Response;
 import org.httpobjects.eventual.Eventual;
 import org.httpobjects.path.PathPattern;
 import org.httpobjects.path.SimplePathPattern;
 
+/**
+ * This class is one of 2 mechanisms to make it quicker for pre-1.0 code to migrate to the new (1.0) async API.
+ *   - In this case, one can extend `SyncHttpObject` and then refactor to override the `fooSync()` methods instead of `foo()` (e.g. `getSync()` instead of `get()`)
+ *   - The other mechanism is `LegacyHttpObject`
+ */
+@Deprecated()
 public class SyncHttpObject extends HttpObject {
     private final Response defaultResponse;
 

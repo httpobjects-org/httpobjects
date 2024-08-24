@@ -2,7 +2,7 @@ package org.httpobjects.netty4;
 
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.SyncHttpObject;
+import org.httpobjects.migrate.SyncHttpObject;
 
 public class SampleServer {
     public static void main(String[] args) {

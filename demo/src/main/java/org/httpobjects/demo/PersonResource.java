@@ -39,7 +39,7 @@ package org.httpobjects.demo;
 
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.SyncHttpObject;
+import org.httpobjects.migrate.SyncHttpObject;
 
 public class PersonResource extends SyncHttpObject {
 	

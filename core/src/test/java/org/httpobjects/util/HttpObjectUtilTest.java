@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.httpobjects.*;
+import org.httpobjects.migrate.SyncHttpObject;
 import org.httpobjects.test.MockRequest;
 import org.junit.Test;
 

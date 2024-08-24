@@ -41,7 +41,7 @@ import java.io.InputStream;
 
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.SyncHttpObject;
+import org.httpobjects.migrate.SyncHttpObject;
 import org.httpobjects.impl.fn.FunctionalJava;
 import org.httpobjects.util.impl.ClassResourceLoader;
 import org.httpobjects.util.impl.ResourceLoader;

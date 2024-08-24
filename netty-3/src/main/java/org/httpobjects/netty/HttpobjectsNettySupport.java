@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.SyncHttpObject;
+import org.httpobjects.migrate.SyncHttpObject;
 import org.httpobjects.netty.http.ByteAccumulatorFactory;
 import org.httpobjects.netty.http.HttpServerPipelineFactory;
 import org.httpobjects.netty.http.InMemoryByteAccumulatorFactory;

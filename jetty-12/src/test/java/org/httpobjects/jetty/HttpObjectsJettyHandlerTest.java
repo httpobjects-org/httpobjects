@@ -3,6 +3,7 @@ package org.httpobjects.jetty;
 import org.httpobjects.*;
 import org.httpobjects.client.ApacheCommons4xHttpClient;
 import org.httpobjects.client.HttpClient;
+import org.httpobjects.migrate.SyncHttpObject;
 import org.httpobjects.tck.PortFinder;
 import org.httpobjects.util.Method;
 

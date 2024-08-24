@@ -45,6 +45,7 @@ import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.impl.HTLog;
 import org.httpobjects.path.PathPattern;
 import org.httpobjects.path.RegexPathPattern;
+import org.httpobjects.migrate.SyncHttpObject;
 import org.httpobjects.util.Method;
 
 import java.io.*;

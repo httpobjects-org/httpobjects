@@ -3,6 +3,7 @@ package org.httpobjects.netty4;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.httpobjects.*;
 import org.httpobjects.netty4.buffer.InMemoryByteAccumulatorFactory;
+import org.httpobjects.migrate.SyncHttpObject;
 import org.httpobjects.tck.PortAllocation;
 import org.httpobjects.tck.PortFinder;
 import org.httpobjects.tck.WireTest;

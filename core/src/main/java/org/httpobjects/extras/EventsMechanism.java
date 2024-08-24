@@ -3,7 +3,7 @@ package org.httpobjects.extras;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.SyncHttpObject;
+import org.httpobjects.migrate.SyncHttpObject;
 import org.httpobjects.eventual.Eventual;
 import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;

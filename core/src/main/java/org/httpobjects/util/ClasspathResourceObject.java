@@ -39,7 +39,7 @@ package org.httpobjects.util;
 
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.SyncHttpObject;
+import org.httpobjects.migrate.SyncHttpObject;
 
 public class ClasspathResourceObject extends SyncHttpObject {
 	private final Class<?> clazz;
