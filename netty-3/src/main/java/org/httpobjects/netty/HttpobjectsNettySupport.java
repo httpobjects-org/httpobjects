@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.migrate.SyncHttpObject;
 import org.httpobjects.netty.http.ByteAccumulatorFactory;
 import org.httpobjects.netty.http.HttpServerPipelineFactory;
@@ -80,14 +81,14 @@ public class HttpobjectsNettySupport {
               port = 8080;
           }
           HttpobjectsNettySupport.serve(port, Arrays.<HttpObject>asList(
-        		  new SyncHttpObject("/") {
-        				public Response getSync(Request req) {
-        					return OK(Html("<html><body>Welcome.  Click <a href=\"/yo\">here</a> for a special message.</body></html>"));
+        		  new HttpObject("/") {
+        				public Eventual<Response> get(Request req) {
+        					return OK(Html("<html><body>Welcome.  Click <a href=\"/yo\">here</a> for a special message.</body></html>")).resolved();
         				}
         			},
-            		new SyncHttpObject("/yo") {
-          				public Response getSync(Request req) {
-          					return OK(Text("Hello world"));
+            		new HttpObject("/yo") {
+          				public Eventual<Response> get(Request req) {
+          					return OK(Text("Hello world")).resolved();
           				}
           			}
               		));

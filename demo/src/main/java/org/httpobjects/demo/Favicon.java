@@ -39,17 +39,18 @@ package org.httpobjects.demo;
 
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.migrate.SyncHttpObject;
+import org.httpobjects.HttpObject;
+import org.httpobjects.eventual.Eventual;
 
-public class Favicon extends SyncHttpObject {
+public class Favicon extends HttpObject {
 
 	public Favicon() {
 		super("/favicon.ico");
 	}
 	
 	@Override
-	public Response getSync(Request req) {
-		return OK(File("image/x-icon", new java.io.File("favicon.ico")));
+	public Eventual<Response> get(Request req) {
+		return OK(File("image/x-icon", new java.io.File("favicon.ico"))).resolved();
 	}
 	
 }

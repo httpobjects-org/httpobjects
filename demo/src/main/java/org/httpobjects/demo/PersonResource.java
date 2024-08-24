@@ -37,24 +37,25 @@
  */
 package org.httpobjects.demo;
 
+import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.migrate.SyncHttpObject;
+import org.httpobjects.eventual.Eventual;
 
-public class PersonResource extends SyncHttpObject {
+public class PersonResource extends HttpObject {
 	
 	public PersonResource() {
 		super("/people/{name}");
 	}
 	
 	@Override
-	public Response getSync(Request req) {
+	public Eventual<Response> get(Request req) {
 		String name = req.path().valueFor("name");
 		
 		if(name!=null && name.equals("stu")){
-			return OK(Text(name));
+			return OK(Text(name)).resolved();
 		}else{
-			return NOT_FOUND(Text("No such person"));
+			return NOT_FOUND(Text("No such person")).resolved();
 		}
 	}
 	

@@ -13,6 +13,7 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.util.concurrent.Future;
 import org.httpobjects.*;
 import org.httpobjects.HttpObject;
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.netty4.buffer.ByteAccumulatorFactory;
 import org.httpobjects.netty4.buffer.InMemoryByteAccumulatorFactory;
 import org.httpobjects.migrate.SyncHttpObject;
@@ -119,14 +120,14 @@ public interface BasicNetty4Server {
         }
 
         BasicNetty4Server.serveHttp(port,
-                new SyncHttpObject("/") {
-                    public Response getSync(Request req) {
-                        return OK(Html("<html><body>Welcome.  Click <a href=\"/yo\">here</a> for a special message.</body></html>"));
+                new HttpObject("/") {
+                    public Eventual<Response> get(Request req) {
+                        return OK(Html("<html><body>Welcome.  Click <a href=\"/yo\">here</a> for a special message.</body></html>")).resolved();
                     }
                 },
-                new SyncHttpObject("/yo") {
-                    public Response getSync(Request req) {
-                        return OK(Text("Hello world"));
+                new HttpObject("/yo") {
+                    public Eventual<Response> get(Request req) {
+                        return OK(Text("Hello world")).resolved();
                     }
                 }
         );

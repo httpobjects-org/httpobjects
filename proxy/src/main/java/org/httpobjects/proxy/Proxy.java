@@ -39,13 +39,14 @@ package org.httpobjects.proxy;
 
 import org.httpobjects.*;
 import org.httpobjects.client.HttpClient;
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.impl.HTLog;
 import org.httpobjects.path.PathPattern;
 import org.httpobjects.path.RegexPathPattern;
-import org.httpobjects.migrate.SyncHttpObject;
+import org.httpobjects.HttpObject;
 import org.httpobjects.util.Method;
 
 import java.io.*;
@@ -53,7 +54,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class Proxy extends SyncHttpObject {
+public class Proxy extends HttpObject {
     private final HTLog log = new HTLog(this);
     private String base;
     private final String me;
@@ -85,32 +86,32 @@ public class Proxy extends SyncHttpObject {
     }
 
     @Override
-    public Response getSync(Request req) {
+    public Eventual<Response> get(Request req) {
         return proxyRequest(req);
     }
 
     @Override
-    public Response deleteSync(Request req) {
+    public Eventual<Response> delete(Request req) {
         return proxyRequest(req);
     }
 
     @Override
-    public Response putSync(Request req) {
+    public Eventual<Response> put(Request req) {
         return proxyRequest(req);
     }
 
     @Override
-    public Response patchSync(Request req) {
+    public Eventual<Response> patch(Request req) {
         return proxyRequest(req);
     }
 
     @Override
-    public Response optionsSync(Request req) {
+    public Eventual<Response> options(Request req) {
         return proxyRequest(req);
     }
 
     @Override
-    public Response postSync(Request req) {
+    public Eventual<Response> post(Request req) {
         return proxyRequest(req);
     }
 
@@ -118,7 +119,7 @@ public class Proxy extends SyncHttpObject {
         return req.query().toString();
     }
 
-    private Response proxyRequest(Request req) {
+    private Eventual<Response> proxyRequest(Request req) {
 
         String path = req.path().valueFor("path");
         if(path == null) path = "";
@@ -154,7 +155,7 @@ public class Proxy extends SyncHttpObject {
         log.info("Executing " + method.name() + " " + url);
         final Response r =  client.resource(url).send(method, req.representation(), query, headers.toArray(new HeaderField[0]));
         log.info("Response: " + r.code().name());
-        return handleResponse(r);
+        return handleResponse(r).resolved();
     }
 
     private Response handleResponse(Response response) {

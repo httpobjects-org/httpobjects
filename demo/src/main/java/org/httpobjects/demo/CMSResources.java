@@ -42,12 +42,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.migrate.SyncHttpObject;
+import org.httpobjects.eventual.Eventual;
 
 
-public class CMSResources extends SyncHttpObject {
+public class CMSResources extends HttpObject {
 	private final File root;
 	
 	public CMSResources(File root) {
@@ -56,7 +57,7 @@ public class CMSResources extends SyncHttpObject {
 	}
 	
 	@Override
-	public Response getSync(Request req) {
+	public Eventual<Response> get(Request req) {
 		String cid = req.path().valueFor("cid");
 		String path = req.path().valueFor("path");
 		File localPath = (path==null || path.isEmpty())?root:new File(root, path);
@@ -68,11 +69,11 @@ public class CMSResources extends SyncHttpObject {
 			String contentType = contentTypeOf(localPath);
 			InputStream data = FileInputStream(localPath);
 			
-			return OK(Bytes(contentType, data));
+			return OK(Bytes(contentType, data)).resolved();
 		} else if(localPath.isDirectory()){
-			return OK(Html(directoryListing(cid, localPath)));
+			return OK(Html(directoryListing(cid, localPath))).resolved();
 		} else {
-			return NOT_FOUND();
+			return NOT_FOUND().resolved();
 		}
 	}
 	
