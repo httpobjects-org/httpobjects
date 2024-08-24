@@ -37,14 +37,20 @@
  */
 package org.httpobjects;
 
+import org.httpobjects.data.DataSource;
+
 import java.io.OutputStream;
 
-// TODO: make a way to write using async IO
 public interface Representation {
     String contentType();
 
+    @Deprecated
     void write(OutputStream out);
     default Long length(){
         return null;
     }
+
+    // New Data Mechanism
+    default DataSource data(){ return null; };
 }
+
