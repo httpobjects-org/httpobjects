@@ -127,7 +127,7 @@ public class Translate {
 
 
     public static ChannelFuture writeResponse(HttpRequest request, Channel sink, Response r, final ResponseCreationStrategy executor) {
-        return writeResponse(isKeepAlive(request), sink ,r, executor);
+        return writeResponse(HttpUtil.isKeepAlive(request), sink ,r, executor);
     }
 
     public static ChannelFuture writeResponse(boolean keepAlive, Channel sink, Response r, final ResponseCreationStrategy executor) {
