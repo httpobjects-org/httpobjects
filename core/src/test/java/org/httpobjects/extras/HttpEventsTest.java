@@ -12,19 +12,19 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.httpobjects.DSL.allowed;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class HttpEventsTest {
 
     @Test
     public void decorateShouldApplyDecoratorOnEvents() throws Exception {
         // given
-        SampleHttpEventObserver decorator = new SampleHttpEventObserver();
+        SampleHttpEventObserver observer = new SampleHttpEventObserver();
         HttpObject resource = new HttpObject("/", allowed(Method.GET, Method.POST)) {
             @Override public Eventual<Response> get(Request req) { return OK(Text("You Got!")).resolved(); }
             @Override public Eventual<Response> post(Request req) { return OK(Text("You Post!")).resolved(); }
         };
-        HttpObject decorated = HttpEvents.withObservations(resource, decorator);
+        HttpObject decorated = HttpEvents.withEventObservations(resource, observer);
         Request getReq = request("/", Method.GET);
         Request postReq = request("/", Method.POST);
 
@@ -33,33 +33,42 @@ public class HttpEventsTest {
         Response postRes = decorated.post(postReq).join();
 
         // then
-        assertEquals("Request: 1, " + getReq, decorator.log.get(0));
-        assertEquals("Response: 1, " + getRes, decorator.log.get(1));
-        assertEquals("Request: 2, " + postReq, decorator.log.get(2));
-        assertEquals("Response: 2, " + postRes, decorator.log.get(3));
+        assertEquals("Request: 1, " + getReq, observer.log.get(0));
+        assertEquals("Response: 1, " + getRes, observer.log.get(1));
+        assertEquals("Request: 2, " + postReq, observer.log.get(2));
+        assertEquals("Response: 2, " + postRes, observer.log.get(3));
     }
 
     @Test
     public void decorateShouldRethrowErrors() throws Exception {
         // given
-        SampleHttpEventObserver decorator = new SampleHttpEventObserver();
+        SampleHttpEventObserver observer = new SampleHttpEventObserver();
         RuntimeException error = new RuntimeException();
         HttpObject resource = new HttpObject("/", allowed(Method.GET)) {
             @Override public Eventual<Response> get(Request req) { throw error; }
         };
-        HttpObject decorated = HttpEvents.withObservations(resource, decorator);
-        Object result;
+        HttpObject decorated = HttpEvents.withEventObservations(resource, observer);
+        Object successResult;
+        Throwable errorResult;
 
         // when
-        try { result = resource.get(request("/", Method.GET)); }
-        catch (Throwable err) { result = err; }
+        try {
+            successResult = decorated.get(request("/", Method.GET));
+            errorResult = null;
+        }
+        catch (Throwable err) {
+            successResult = null;
+            errorResult = err;
+        }
 
         // then
-        assertEquals(error, result);
+        assertNull(successResult);
+        assertNotNull(errorResult);
+        assertEquals(error, errorResult.getCause());
     }
 
 
-    private class SampleHttpEventObserver implements HttpEvents.HttpEventObserver<Integer> {
+    private static class SampleHttpEventObserver implements HttpEvents.HttpEventObserver<Integer> {
 
         AtomicInteger atomicEventId = new AtomicInteger();
 

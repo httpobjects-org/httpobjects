@@ -15,8 +15,8 @@ public class HttpEvents {
         void onError(Throwable error);
     }
 
-    public static <Id> HttpObject withObservations(final HttpObject resource,
-                                                   final HttpEventObserver<Id> eventObserver) {
+    public static <Id> HttpObject withEventObservations(final HttpObject resource,
+                                                        final HttpEventObserver<Id> eventObserver) {
         return new HttpObject(resource.pattern()) {
 
             private Eventual<Response> dec(Method method, Request req) {
