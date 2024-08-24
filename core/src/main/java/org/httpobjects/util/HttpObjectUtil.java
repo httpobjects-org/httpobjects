@@ -41,17 +41,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import org.httpobjects.HttpObject;
-import org.httpobjects.Representation;
-import org.httpobjects.Request;
-import org.httpobjects.Response;
+import org.httpobjects.*;
 import org.httpobjects.eventual.Eventual;
 
 public class HttpObjectUtil {
 
     public static Eventual<Response> invokeMethod(HttpObject object, final Method m, final Request input) {
         if(m==null){
-            return Eventual.resolved(HttpObject.NOT_IMPLEMENTED(HttpObject.Text("Not a method I support")));
+            return DSL.NOT_IMPLEMENTED(HttpObject.Text("Not a method I support")).resolved();
         }else{
             final Eventual<Response> output;
             switch(m){
@@ -80,7 +77,7 @@ public class HttpObjectUtil {
                     output = object.trace(input);
                     break;
                 default:
-                    output = Eventual.resolved(HttpObject.NOT_IMPLEMENTED());
+                    output = DSL.NOT_IMPLEMENTED().resolved();
             }
             return output;
         }

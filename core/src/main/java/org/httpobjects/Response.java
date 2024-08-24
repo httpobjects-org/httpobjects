@@ -37,6 +37,7 @@
  */
 package org.httpobjects;
 
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.header.HeaderField;
 
 import java.util.stream.Collectors;
@@ -93,5 +94,9 @@ public final class Response {
 
 	private static boolean eqHeader(HeaderField[] left, HeaderField[] right) {
 		return showHeader(left).equals(showHeader(right));
+	}
+
+	public Eventual<Response> resolved(){
+		return Eventual.resolved(this);
 	}
 }
