@@ -173,7 +173,6 @@ public class HttpObjectsJettyHandler extends org.eclipse.jetty.server.handler.Ab
                     addDefaultHeadersAsApplicable(r, resp);
 
                     if(r.hasRepresentation()){
-                        System.out.println("Content type is " + r.representation().contentType());
                         final String contentType = r.representation().contentType();
                         if(contentType!=null){
                             resp.getHeaders().add("Content-Type", contentType);
