@@ -40,7 +40,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 	}
 
 	@Override
-	public Response respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body, ConnectionInfo connectionInfo) {
+	public Eventual<Response> respond(HttpRequest request, HttpChunkTrailer lastChunk, ByteAccumulator body, ConnectionInfo connectionInfo) {
 
 		final String uri = pathFromUri(request.getUri());
 
@@ -52,11 +52,11 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 				Request in = readRequest(pattern, request, lastChunk, body, connectionInfo);
 				Method m = Method.fromString(request.getMethod().getName());
 				Eventual<Response> out = HttpObjectUtil.invokeMethod(match, m, in);
-				if(out!=null) return out.join();
+				if(out!=null) return out;
 			}
 		}
 
-        return defaultResponse;
+        return defaultResponse.resolved();
 	}
 
 	private String pathFromUri(String uri){

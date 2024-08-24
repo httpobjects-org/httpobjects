@@ -80,7 +80,7 @@ public class HttpObjectsJettyHandler extends org.eclipse.jetty.server.handler.Ab
     public boolean invokeFirstPathMatchIfAble(Request r, Response httpResponse) {
         final String path = r.getHttpURI().getPath();
 
-        org.httpobjects.Response lastResponse = null;
+        Eventual<org.httpobjects.Response> lastResponse = null;
         for (HttpObject next : objects) {
             if (next.pattern().matches(path)) {
                 lastResponse = invoke(path, r, next);
@@ -94,7 +94,7 @@ public class HttpObjectsJettyHandler extends org.eclipse.jetty.server.handler.Ab
         if (lastResponse != null) {
             return true;
         } else if (notFoundResponse != null) {
-            returnResponse(notFoundResponse, httpResponse);
+            returnResponse(notFoundResponse.resolved(), httpResponse);
             return true;
         } else {
             return false;
@@ -102,7 +102,7 @@ public class HttpObjectsJettyHandler extends org.eclipse.jetty.server.handler.Ab
     }
 
 
-    private org.httpobjects.Response invoke(String path, Request r, HttpObject object) {
+    private Eventual<org.httpobjects.Response> invoke(String path, Request r, HttpObject object) {
         final Method m = Method.fromString(r.getMethod());
         final org.httpobjects.Request input = new ImmutableRequestImpl(object.pattern().match(path), r);
 
@@ -110,85 +110,93 @@ public class HttpObjectsJettyHandler extends org.eclipse.jetty.server.handler.Ab
             System.out.println("WARNING: not a method I know about: " + r.getMethod());
         }
 
-        final Eventual<org.httpobjects.Response> eventual = HttpObjectUtil.invokeMethod(object, m, input);
-        return eventual ==null ? null : eventual.join();
+        return HttpObjectUtil.invokeMethod(object, m, input);
     }
 
-    private void returnResponse(org.httpobjects.Response r, final Response resp)  {
+    private void returnResponse(Eventual<org.httpobjects.Response> eventualResponse, final Response resp)  {
 
-        try {
-            resp.setStatus(r.code().value());
+        eventualResponse.then(new Eventual.ResultHandler<org.httpobjects.Response>() {
+            @Override
+            public void exec(org.httpobjects.Response r) {
 
-            for(HeaderField next : r.header()){
-                next.accept(new HeaderFieldVisitor() {
 
-                    @Override
-                    public Void visit(CookieField cookieField) {
-                        resp.getHeaders().add(cookieField.name(), cookieField.value());
-                        return null;
+                try {
+                    resp.setStatus(r.code().value());
+
+                    for(HeaderField next : r.header()){
+                        next.accept(new HeaderFieldVisitor() {
+
+                            @Override
+                            public Void visit(CookieField cookieField) {
+                                resp.getHeaders().add(cookieField.name(), cookieField.value());
+                                return null;
+                            }
+
+                            @Override
+                            public Void visit(GenericHeaderField other) {
+                                // TODO: This might not work right with multiple headers of the same name
+                                resp.getHeaders().add(other.name(), other.value());
+                                return null;
+                            }
+
+                            @Override
+                            public Void visit(AllowField allowField) {
+                                resp.getHeaders().add(allowField.name(), allowField.value());
+                                return null;
+                            }
+
+                            @Override
+                            public Void visit(LocationField location) {
+                                resp.getHeaders().add(location.name(), location.value());
+                                return null;
+                            }
+
+                            @Override
+                            public Void visit(SetCookieField setCookieField) {
+                                resp.getHeaders().add(setCookieField.name(), setCookieField.value());
+                                return null;
+                            }
+
+                            @Override
+                            public Void visit(WWWAuthenticateField wwwAuthorizationField) {
+                                resp.getHeaders().add(wwwAuthorizationField.name(), wwwAuthorizationField.value());
+                                return null;
+                            }
+                            @Override
+                            public Void visit(AuthorizationField authorizationField) {
+                                throw new RuntimeException("Illegal header for request: " + authorizationField.getClass());
+                            }
+
+                        });
                     }
 
-                    @Override
-                    public Void visit(GenericHeaderField other) {
-                        // TODO: This might not work right with multiple headers of the same name
-                        resp.getHeaders().add(other.name(), other.value());
-                        return null;
+                    addDefaultHeadersAsApplicable(r, resp);
+
+                    if(r.hasRepresentation()){
+                        System.out.println("Content type is " + r.representation().contentType());
+                        final String contentType = r.representation().contentType();
+                        if(contentType!=null){
+                            resp.getHeaders().add("Content-Type", contentType);
+                        }
+
+                        final OutputStream out = Content.Sink.asOutputStream(resp);
+                        r.representation().write(out);
+                        out.close();
+                    }else{
+                        resp.write(
+                            true,
+                            ByteBuffer.wrap(new byte[]{}),
+                            new Callback(){}
+                        );
                     }
 
-                    @Override
-                    public Void visit(AllowField allowField) {
-                        resp.getHeaders().add(allowField.name(), allowField.value());
-                        return null;
-                    }
-
-                    @Override
-                    public Void visit(LocationField location) {
-                        resp.getHeaders().add(location.name(), location.value());
-                        return null;
-                    }
-
-                    @Override
-                    public Void visit(SetCookieField setCookieField) {
-                        resp.getHeaders().add(setCookieField.name(), setCookieField.value());
-                        return null;
-                    }
-
-                    @Override
-                    public Void visit(WWWAuthenticateField wwwAuthorizationField) {
-                        resp.getHeaders().add(wwwAuthorizationField.name(), wwwAuthorizationField.value());
-                        return null;
-                    }
-                    @Override
-                    public Void visit(AuthorizationField authorizationField) {
-                        throw new RuntimeException("Illegal header for request: " + authorizationField.getClass());
-                    }
-
-                });
-            }
-
-            addDefaultHeadersAsApplicable(r, resp);
-
-            if(r.hasRepresentation()){
-                System.out.println("Content type is " + r.representation().contentType());
-                final String contentType = r.representation().contentType();
-                if(contentType!=null){
-                    resp.getHeaders().add("Content-Type", contentType);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
 
-                final OutputStream out = Content.Sink.asOutputStream(resp);
-                r.representation().write(out);
-                out.close();
-            }else{
-                resp.write(
-                    true,
-                    ByteBuffer.wrap(new byte[]{}),
-                    new Callback(){}
-                );
-            }
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+            }
+        });
     }
 
 
