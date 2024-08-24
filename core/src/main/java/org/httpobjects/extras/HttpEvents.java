@@ -7,37 +7,33 @@ import org.httpobjects.eventual.Eventual;
 import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 
-public class EventsMechanism {
+public class HttpEvents {
 
-    public interface Events<Id> {
+    public interface HttpEventObserver<Id> {
         Id onRequest(Request request);
         void onResponse(Id id, Response response);
         void onError(Throwable error);
     }
 
-    public static <Id> HttpObject onEvents(HttpObject thiss, Events<Id> events) {
-        return eventsResource(thiss, events);
-    }
-
-    private static <Id> HttpObject eventsResource(final HttpObject resource,
-                                                  final Events<Id> events) {
+    public static <Id> HttpObject withObservations(final HttpObject resource,
+                                                   final HttpEventObserver<Id> eventObserver) {
         return new HttpObject(resource.pattern()) {
 
             private Eventual<Response> dec(Method method, Request req) {
                 try {
-                    Id id = events.onRequest(req);
+                    Id id = eventObserver.onRequest(req);
                     Eventual<Response> e = HttpObjectUtil.invokeMethod(resource, method, req);
                     if(e!=null){
                         e.then(new Eventual.ResultHandler<Response>() {
                             @Override
                             public void exec(Response res) {
-                                events.onResponse(id, res);
+                                eventObserver.onResponse(id, res);
                             }
                         });
                     }
                     return  e;
                 } catch (Throwable err) {
-                    events.onError(err);
+                    eventObserver.onError(err);
                     throw new RuntimeException(err);
                 }
             }

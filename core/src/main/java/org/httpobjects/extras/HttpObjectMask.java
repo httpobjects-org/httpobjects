@@ -11,7 +11,7 @@ import org.httpobjects.util.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MaskMechanism {
+public class HttpObjectMask {
 
     public static final HttpObject mask(HttpObject thiss, HttpObject that) {
         return maskResources(thiss, that, DSL.NOT_FOUND());
