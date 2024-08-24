@@ -46,11 +46,14 @@ public interface Representation {
 
     @Deprecated
     void write(OutputStream out);
-    default Long length(){
-        return null;
-    }
 
     // New Data Mechanism
     default DataSource data(){ return null; };
+
+    /**
+     * @return the content-length in bytes if available; otherwise, null
+     */
+    default Long length(){ return null; }
+
 }
 
