@@ -182,32 +182,15 @@ public class Translate {
             if(r.hasRepresentation()){
                 System.out.println("Writing more stuff");
 
-                PipedInputStream input = new PipedInputStream();
-                PipedOutputStream output = new PipedOutputStream(input);
+                final InputStream input = pumpDataToInputStream(r.representation(), executor);
 
-                executor.doIt(new Runnable(){
-                    @Override
-                    public void run() {
-                        try{
-                            System.out.println("Copying the output");
-                            r.representation().write(output);
-                            output.flush();
-                            output.close();
-                            System.out.println("Done copying the output");
-                        }catch (Exception t){
-                            t.printStackTrace();;
-                        }
-                    }
-                });
-
-
-                final ChunkedStream data = new ChunkedStream(input, 1024 * 1024);
+                final ChunkedStream dataChunks = new ChunkedStream(input, 1024 * 1024);
                 if(contentLength!=null){
                     System.out.println("Using normal");
-                    writeFuture = sink.writeAndFlush(data);
+                    writeFuture = sink.writeAndFlush(dataChunks);
                 }else{
                     System.out.println("Using chunked");
-                    writeFuture = sink.writeAndFlush(new HttpChunkedInput(data));
+                    writeFuture = sink.writeAndFlush(new HttpChunkedInput(dataChunks));
                 }
 
                 writeFuture.addListener(new ChannelFutureListener() {
@@ -230,6 +213,28 @@ public class Translate {
         }catch(Throwable t){
             throw new RuntimeException(t);
         }
+    }
+
+    // TODO: this is a good candidate to move out into the core utils
+    private static PipedInputStream pumpDataToInputStream(Representation r, ResponseCreationStrategy executor) throws IOException {
+        PipedInputStream input = new PipedInputStream();
+        PipedOutputStream output = new PipedOutputStream(input);
+
+        executor.doIt(new Runnable(){
+            @Override
+            public void run() {
+                try{
+                    System.out.println("Copying the output");
+                    r.write(output);
+                    output.flush();
+                    output.close();
+                    System.out.println("Done copying the output");
+                }catch (Exception t){
+                    t.printStackTrace();;
+                }
+            }
+        });
+        return input;
     }
 
     private static final ChannelFutureListener WRITE_EMPTY_BUFFER = new ChannelFutureListener() {
