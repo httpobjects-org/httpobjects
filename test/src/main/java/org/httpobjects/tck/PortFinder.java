@@ -17,7 +17,7 @@ public class PortFinder {
     }
 
     private static void log(String m){
-        System.err.println("[" + PortFinder.class.getSimpleName()  +"] " + m);
+        System.out.println("[" + PortFinder.class.getSimpleName()  +"] " + m);
     }
 
     /**
