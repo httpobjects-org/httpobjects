@@ -60,7 +60,6 @@ import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
 
-
 public class HttpObjectsJettyHandler extends org.eclipse.jetty.server.handler.AbstractHandler {
     private final HttpObject[] objects;
     private final org.httpobjects.Response notFoundResponse;
@@ -69,7 +68,6 @@ public class HttpObjectsJettyHandler extends org.eclipse.jetty.server.handler.Ab
     public HttpObjectsJettyHandler(HttpObject... objects) {
         this(Collections.<HeaderField>emptyList(), objects);
     }
-
 
     public HttpObjectsJettyHandler(List<? extends HeaderField> defaultResponseHeaders, HttpObject... objects) {
         this.defaultResponseHeaders = defaultResponseHeaders;
