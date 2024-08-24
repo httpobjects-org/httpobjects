@@ -49,6 +49,9 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.httpobjects.HttpObject;
+import org.httpobjects.Request;
+import org.httpobjects.Response;
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.jetty.HttpObjectsJettyHandler;
 import org.httpobjects.servlet.ServletFilter;
 import org.mortbay.jetty.Handler;
@@ -63,6 +66,11 @@ public class Demo {
 		final boolean useJetty = true;
 		
 		HttpObject[] objects = {
+				new HttpObject("/"){
+					public Eventual<Response> get(Request req) {
+						return OK(Text("Hello world")).resolved();
+					}
+				},
 				new CMSResources(new File(System.getProperty("user.dir"))),
 				new PersonResource(),
 				new Favicon()
