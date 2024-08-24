@@ -1,9 +1,7 @@
 package org.httpobjects.netty;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -17,11 +15,9 @@ import org.httpobjects.Query;
 import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.eventual.EventualResult;
-import org.httpobjects.header.GenericHeaderField;
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.AuthorizationField;
-import org.httpobjects.header.request.CookieField;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.netty.http.ByteAccumulator;
 import org.httpobjects.netty.http.HttpChannelHandler;
@@ -55,7 +51,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 				match = next;
 				Request in = readRequest(pattern, request, lastChunk, body, connectionInfo);
 				Method m = Method.fromString(request.getMethod().getName());
-				EventualResult<Response> out = HttpObjectUtil.invokeMethod(match, m, in);
+				Eventual<Response> out = HttpObjectUtil.invokeMethod(match, m, in);
 				if(out!=null) return out.join();
 			}
 		}

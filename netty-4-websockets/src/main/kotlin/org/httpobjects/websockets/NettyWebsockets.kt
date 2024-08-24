@@ -11,8 +11,8 @@ import io.netty.handler.codec.http.websocketx.PingWebSocketFrame
 import io.netty.handler.codec.http.websocketx.PongWebSocketFrame
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame
 import io.netty.handler.codec.http.websocketx.WebSocketFrame
-import org.httpobjects.eventual.BasicEventualResult
-import org.httpobjects.eventual.EventualResult
+import org.httpobjects.eventual.Resolvable
+import org.httpobjects.eventual.Eventual
 import org.httpobjects.websockets.impl.*
 import java.io.OutputStream
 
@@ -73,8 +73,8 @@ fun toHttpObjectsFrame(frame: WebSocketFrame): org.httpobjects.websockets.WebSoc
 }
 
 
-fun wrapChannelFuture(future: ChannelFuture): EventualResult<Unit> {
-    val result = BasicEventualResult<Unit>()
+fun wrapChannelFuture(future: ChannelFuture): Eventual<Unit> {
+    val result = Resolvable<Unit>()
     future.addListener {
         result.resolve(Unit)
     }
@@ -88,7 +88,7 @@ class NettyWebSocketChannel(private val context: ChannelHandlerContext):WebSocke
 
     override fun id() = context.channel().id().toString()
 
-    override fun writeAndFlush(frame: org.httpobjects.websockets.WebSocketFrame): EventualResult<Unit> {
+    override fun writeAndFlush(frame: org.httpobjects.websockets.WebSocketFrame): Eventual<Unit> {
         return wrapChannelFuture(context.channel().writeAndFlush(toNettyFrame(frame)))
     }
 }

@@ -1,9 +1,9 @@
 package org.httpobjects.websockets
 
-import org.httpobjects.eventual.EventualResult
+import org.httpobjects.eventual.Eventual
 
 interface WebSocketChannel {
     fun id():String
-    fun writeAndFlush(frame:WebSocketFrame): EventualResult<Unit>
-    fun close(): EventualResult<Unit>
+    fun writeAndFlush(frame:WebSocketFrame): Eventual<Unit>
+    fun close(): Eventual<Unit>
 }

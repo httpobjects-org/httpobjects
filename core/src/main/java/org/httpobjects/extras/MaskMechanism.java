@@ -1,17 +1,5 @@
 package org.httpobjects.extras;
 
-import org.httpobjects.*;
-import org.httpobjects.eventual.BasicEventualResult;
-import org.httpobjects.eventual.EventualResult;
-import org.httpobjects.path.Path;
-import org.httpobjects.path.PathParamName;
-import org.httpobjects.path.PathPattern;
-import org.httpobjects.util.HttpObjectUtil;
-import org.httpobjects.util.Method;
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class MaskMechanism {
 //
 //    public static final HttpObject mask(HttpObject thiss, HttpObject that) {

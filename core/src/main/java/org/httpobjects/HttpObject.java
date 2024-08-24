@@ -37,27 +37,19 @@
  */
 package org.httpobjects;
 
-import org.httpobjects.eventual.BasicEventualResult;
-import org.httpobjects.eventual.EventualResult;
-import org.httpobjects.path.Path;
-import org.httpobjects.path.PathParamName;
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.path.PathPattern;
 import org.httpobjects.path.SimplePathPattern;
-import org.httpobjects.util.HttpObjectUtil;
-import org.httpobjects.util.Method;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class HttpObject extends DSL{
 
     private final PathPattern pathPattern;
-    private final EventualResult<Response> defaultResponse;
+    private final Eventual<Response> defaultResponse;
 
     public HttpObject(PathPattern pathPattern, Response defaultResponse) {
         super();
         this.pathPattern = pathPattern;
-        this.defaultResponse = defaultResponse == null ? null : new BasicEventualResult(defaultResponse);
+        this.defaultResponse = defaultResponse == null ? null : Eventual.resolved(defaultResponse);
     }
 
     public HttpObject(String pathPattern, Response defaultResponse) {
@@ -76,13 +68,13 @@ public class HttpObject extends DSL{
         return pathPattern;
     }
 
-    public EventualResult<Response> delete(Request req){return defaultResponse;}
-    public EventualResult<Response> get(Request req){return defaultResponse;}
-    public EventualResult<Response> head(Request req){return defaultResponse;}
-    public EventualResult<Response> options(Request req){return defaultResponse;}
-    public EventualResult<Response> post(Request req){return defaultResponse;}
-    public EventualResult<Response> put(Request req){return defaultResponse;}
-    public EventualResult<Response> trace(Request req){return defaultResponse;}
-    public EventualResult<Response> patch(Request req){return defaultResponse;}
+    public Eventual<Response> delete(Request req){return defaultResponse;}
+    public Eventual<Response> get(Request req){return defaultResponse;}
+    public Eventual<Response> head(Request req){return defaultResponse;}
+    public Eventual<Response> options(Request req){return defaultResponse;}
+    public Eventual<Response> post(Request req){return defaultResponse;}
+    public Eventual<Response> put(Request req){return defaultResponse;}
+    public Eventual<Response> trace(Request req){return defaultResponse;}
+    public Eventual<Response> patch(Request req){return defaultResponse;}
 
 }

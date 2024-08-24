@@ -45,16 +45,15 @@ import org.httpobjects.HttpObject;
 import org.httpobjects.Representation;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.eventual.BasicEventualResult;
-import org.httpobjects.eventual.EventualResult;
+import org.httpobjects.eventual.Eventual;
 
 public class HttpObjectUtil {
 
-    public static EventualResult<Response> invokeMethod(HttpObject object, final Method m, final Request input) {
+    public static Eventual<Response> invokeMethod(HttpObject object, final Method m, final Request input) {
         if(m==null){
-            return new BasicEventualResult(HttpObject.NOT_IMPLEMENTED(HttpObject.Text("Not a method I support")));
+            return Eventual.resolved(HttpObject.NOT_IMPLEMENTED(HttpObject.Text("Not a method I support")));
         }else{
-            final EventualResult<Response> output;
+            final Eventual<Response> output;
             switch(m){
                 case GET:
                     output = object.get(input);
@@ -81,7 +80,7 @@ public class HttpObjectUtil {
                     output = object.trace(input);
                     break;
                 default:
-                    output = new BasicEventualResult(HttpObject.NOT_IMPLEMENTED());
+                    output = Eventual.resolved(HttpObject.NOT_IMPLEMENTED());
             }
             return output;
         }

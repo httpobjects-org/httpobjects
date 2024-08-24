@@ -1,6 +1,6 @@
 package org.httpobjects.websockets.test
 
-import org.httpobjects.eventual.EventualResult
+import org.httpobjects.eventual.Eventual
 import org.httpobjects.Request
 import org.httpobjects.path.SimplePathPattern
 import org.httpobjects.websockets.*
@@ -201,5 +201,5 @@ abstract class WebsocketsTests {
 interface StoppableWebsocketsTestServer {
     fun host():String
     fun port():Int
-    fun stop(): EventualResult<Unit>
+    fun stop(): Eventual<Unit>
 }

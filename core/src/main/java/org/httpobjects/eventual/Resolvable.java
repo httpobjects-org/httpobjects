@@ -3,28 +3,22 @@ package org.httpobjects.eventual;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BasicEventualResult<T> implements EventualResult<T> {
+public class Resolvable<T> implements Eventual<T> {
     private List<ResultHandler<T>> listeners  = new ArrayList<ResultHandler<T>>();
     private T resolution;
     private boolean hasResolved = false;
 
-    public BasicEventualResult(T resolution) {
-        this();
-        this.resolve(resolution);
-    }
-    public BasicEventualResult() {
+    public Resolvable() {
         System.out.println("created " + this);
     }
 
     @Override
     public void then(ResultHandler<T> fn) {
-
         if(hasResolved){
             fn.exec(this.resolution);
         }else{
             listeners.add(fn);
         }
-
     }
 
     @Override

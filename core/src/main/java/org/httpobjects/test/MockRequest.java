@@ -40,7 +40,7 @@ package org.httpobjects.test;
 import static org.httpobjects.DSL.Bytes;
 
 import org.httpobjects.*;
-import org.httpobjects.eventual.EventualResult;
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.path.Path;
@@ -92,7 +92,7 @@ public class MockRequest implements Request {
 	}
 
 	public Response invoke(){
-		final EventualResult<Response> r =  HttpObjectUtil.invokeMethod(object, method, this);
+		final Eventual<Response> r =  HttpObjectUtil.invokeMethod(object, method, this);
 		return r == null ? null : r.join();
 	}
 

@@ -2,7 +2,7 @@ package org.httpobjects.netty4.sockets
 
 import io.netty.channel.nio.NioEventLoopGroup
 import org.httpobjects.*
-import org.httpobjects.eventual.EventualResult
+import org.httpobjects.eventual.Eventual
 import org.httpobjects.netty4.ResponseCreationStrategy
 import org.httpobjects.netty4.buffer.InMemoryByteAccumulatorFactory
 import org.httpobjects.tck.PortFinder
@@ -39,7 +39,7 @@ class NettyWebsocketsEndToEndTest: WebsocketsTests() {
         return object:StoppableWebsocketsTestServer{
             override fun host() = "localhost"
             override fun port() = port
-            override fun stop(): EventualResult<Unit> {
+            override fun stop(): Eventual<Unit> {
                 return server.stop()
             }
         }

@@ -1,10 +1,5 @@
 package org.httpobjects.extras;
 
-import org.httpobjects.*;
-import org.httpobjects.eventual.EventualResult;
-import org.httpobjects.util.HttpObjectUtil;
-import org.httpobjects.util.Method;
-
 public class EventsMechanism {
 
 //    public interface Events<Id> {

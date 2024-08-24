@@ -1,7 +1,6 @@
 package org.httpobjects;
 
-import org.httpobjects.eventual.BasicEventualResult;
-import org.httpobjects.eventual.EventualResult;
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.path.PathPattern;
 import org.httpobjects.path.SimplePathPattern;
 
@@ -35,47 +34,47 @@ public class SyncHttpObject extends HttpObject {
     public Response patchSync(Request req){return defaultResponse;}
 
 
-    private <T> EventualResult<T> eventualIfNotNull(T r){
-        return r == null ? null : new BasicEventualResult<T>(r);
+    private <T> Eventual<T> eventualIfNotNull(T r){
+        return r == null ? null : Eventual.resolved(r);
     }
 
     @Override
-    public EventualResult<Response> get(Request req) {
+    public Eventual<Response> get(Request req) {
         return eventualIfNotNull(getSync(req));
     }
 
     @Override
-    public EventualResult<Response> post(Request req) {
+    public Eventual<Response> post(Request req) {
         return eventualIfNotNull(postSync(req));
     }
 
     @Override
-    public EventualResult<Response> put(Request req) {
+    public Eventual<Response> put(Request req) {
         return eventualIfNotNull(putSync(req));
     }
 
     @Override
-    public EventualResult<Response> delete(Request req) {
+    public Eventual<Response> delete(Request req) {
         return eventualIfNotNull(deleteSync(req));
     }
 
     @Override
-    public EventualResult<Response> options(Request req) {
+    public Eventual<Response> options(Request req) {
         return eventualIfNotNull(optionsSync(req));
     }
 
     @Override
-    public EventualResult<Response> head(Request req) {
+    public Eventual<Response> head(Request req) {
         return eventualIfNotNull(headSync(req));
     }
 
     @Override
-    public EventualResult<Response> trace(Request req) {
+    public Eventual<Response> trace(Request req) {
         return eventualIfNotNull(traceSync(req));
     }
 
     @Override
-    public EventualResult<Response> patch(Request req) {
+    public Eventual<Response> patch(Request req) {
         return eventualIfNotNull(patchSync(req));
     }
 

@@ -1,7 +1,6 @@
 package org.httpobjects;
 
-import org.httpobjects.eventual.BasicEventualResult;
-import org.httpobjects.eventual.EventualResult;
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.path.PathPattern;
 import org.httpobjects.path.SimplePathPattern;
 
@@ -57,42 +56,42 @@ class SyncWrapper extends HttpObject {
     }
 
     @Override
-    public EventualResult<Response> get(Request req) {
-        return new BasicEventualResult<Response>(target.get(req));
+    public Eventual<Response> get(Request req) {
+        return Eventual.resolved(target.get(req));
     }
 
     @Override
-    public EventualResult<Response> post(Request req) {
-        return new BasicEventualResult<Response>(target.post(req));
+    public Eventual<Response> post(Request req) {
+        return Eventual.resolved(target.post(req));
     }
 
     @Override
-    public EventualResult<Response> put(Request req) {
-        return new BasicEventualResult<Response>(target.put(req));
+    public Eventual<Response> put(Request req) {
+        return Eventual.resolved(target.put(req));
     }
 
     @Override
-    public EventualResult<Response> delete(Request req) {
-        return new BasicEventualResult<Response>(target.delete(req));
+    public Eventual<Response> delete(Request req) {
+        return Eventual.resolved(target.delete(req));
     }
 
     @Override
-    public EventualResult<Response> options(Request req) {
-        return new BasicEventualResult<Response>(target.options(req));
+    public Eventual<Response> options(Request req) {
+        return Eventual.resolved(target.options(req));
     }
 
     @Override
-    public EventualResult<Response> head(Request req) {
-        return new BasicEventualResult<Response>(target.head(req));
+    public Eventual<Response> head(Request req) {
+        return Eventual.resolved(target.head(req));
     }
 
     @Override
-    public EventualResult<Response> trace(Request req) {
-        return new BasicEventualResult<Response>(target.trace(req));
+    public Eventual<Response> trace(Request req) {
+        return Eventual.resolved(target.trace(req));
     }
 
     @Override
-    public EventualResult<Response> patch(Request req) {
-        return new BasicEventualResult<Response>(target.patch(req));
+    public Eventual<Response> patch(Request req) {
+        return Eventual.resolved(target.patch(req));
     }
 }

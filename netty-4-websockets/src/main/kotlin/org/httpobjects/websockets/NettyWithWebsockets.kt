@@ -9,10 +9,10 @@ import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.handler.codec.http.HttpRequestDecoder
 import io.netty.handler.codec.http.HttpResponseEncoder
 import io.netty.handler.ssl.SslContext
-import org.httpobjects.eventual.BasicEventualResult
+import org.httpobjects.eventual.Resolvable
 import org.httpobjects.DSL
 import org.httpobjects.ErrorHandler
-import org.httpobjects.eventual.EventualResult
+import org.httpobjects.eventual.Eventual
 import org.httpobjects.HttpObject
 import org.httpobjects.impl.HTLog
 import org.httpobjects.netty4.BasicLog
@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
 interface NettyWithWebsocketsServer{
-    fun stop(): EventualResult<Unit>
+    fun stop(): Eventual<Unit>
 }
 object NettyWithWebsockets {
     private val log = HTLog(this)
@@ -68,8 +68,8 @@ object NettyWithWebsockets {
         val bindFuture = b.bind(port).sync()
 
         return object:NettyWithWebsocketsServer{
-            override fun stop(): EventualResult<Unit> {
-                val result = BasicEventualResult<Unit>()
+            override fun stop(): Eventual<Unit> {
+                val result = Resolvable<Unit>()
 
                 val actions = listOf(
                     bossGroup.shutdownGracefully(),
