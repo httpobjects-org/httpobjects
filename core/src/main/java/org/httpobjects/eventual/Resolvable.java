@@ -55,8 +55,9 @@ public class Resolvable<T> implements Eventual<T> {
 
             for(ResultHandler<T> listener : this.listeners){
                 listener.exec(result);
-                this.listeners.remove(listener);
             }
+
+            listeners.clear();
 
             this.notifyAll();
         }
