@@ -40,6 +40,7 @@ package org.httpobjects.tck;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.methods.*;
 import org.httpobjects.*;
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.header.DefaultHeaderFieldVisitor;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
@@ -86,60 +87,60 @@ public abstract class IntegrationTest extends WireTest {
         portAllocation = PortFinder.allocateFreePort(this);
         port = portAllocation.port;
         serve(port,
-        new SyncHttpObject("/bigfiles"){
-            public Response postSync(Request req) {
-                return OK(Text("received " + HttpObjectUtil.toByteArray(req.representation()).length + " bytes"));
+        new HttpObject("/bigfiles"){
+            public Eventual<Response> post(Request req) {
+                return OK(Text("received " + HttpObjectUtil.toByteArray(req.representation()).length + " bytes")).resolved();
             }
         },
-        new SyncHttpObject("/app/inbox"){
-            public Response postSync(Request req) {
-                return OK(Text("Message Received"));
+        new HttpObject("/app/inbox"){
+            public Eventual<Response> post(Request req) {
+                return OK(Text("Message Received")).resolved();
             }
         },
-        new SyncHttpObject("/app/inbox/abc"){
-            public Response putSync(Request req) {
-                return OK(req.representation());
+        new HttpObject("/app/inbox/abc"){
+            public Eventual<Response> put(Request req) {
+                return OK(req.representation()).resolved();
             }
         },
-        new SyncHttpObject("/app"){
-            public Response getSync(Request req) {
-                return OK(Text("Welcome to the app"));
+        new HttpObject("/app"){
+            public Eventual<Response> get(Request req) {
+                return OK(Text("Welcome to the app")).resolved();
             }
         },
-        new SyncHttpObject("/app/message"){
-            public Response postSync(Request req) {
-                return SEE_OTHER(Location("/app"), SetCookie("name", "frank"));
+        new HttpObject("/app/message"){
+            public Eventual<Response> post(Request req) {
+                return SEE_OTHER(Location("/app"), SetCookie("name", "frank")).resolved();
             }
         },
-        new SyncHttpObject("/nothing", null){},
-        new SyncHttpObject("/secure"){
-            public Response getSync(Request req) {
+        new HttpObject("/nothing", null){},
+        new HttpObject("/secure"){
+            public Eventual<Response> get(Request req) {
                 AuthorizationField authorization = req.header().authorization();
                 if(authorization!=null && authorization.parse().method()==Method.Basic){
 
                     BasicCredentials creds = authorization.parse().basicCredentials();
                     if(creds.user().equals("Aladdin")&& creds.password().equals("open sesame")){
-                        return OK(Text("You're In!"));
+                        return OK(Text("You're In!")).resolved();
                     }
                 }
-                return UNAUTHORIZED(BasicAuthentication("secure area"), Text("You must first log-in"));
+                return UNAUTHORIZED(BasicAuthentication("secure area"), Text("You must first log-in")).resolved();
             }
         },
-        new SyncHttpObject("/echoUrl/{id}/{name}"){
+        new HttpObject("/echoUrl/{id}/{name}"){
             @Override
-            public Response getSync(Request req) {
+            public Eventual<Response> get(Request req) {
                 try {
                     final String query = req.query().toString();
-                    return OK(Text(req.path().toString() + query));
+                    return OK(Text(req.path().toString() + query)).resolved();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    return INTERNAL_SERVER_ERROR(e);
+                    return INTERNAL_SERVER_ERROR(e).resolved();
                 }
             }
         },
-        new SyncHttpObject("/echoQuery"){
+        new HttpObject("/echoQuery"){
             @Override
-            public Response getSync(Request req) {
+            public Eventual<Response> get(Request req) {
                 final StringBuffer text = new StringBuffer();
                 final Query query = req.query();
                 for(String name : query.paramNames()){
@@ -148,11 +149,11 @@ public abstract class IntegrationTest extends WireTest {
                     }
                     text.append(name + "=" + query.valueFor(name));
                 }
-                return OK(Text(text.toString()));
+                return OK(Text(text.toString())).resolved();
             }
         },
-        new SyncHttpObject("/echoCookies"){
-            public Response getSync(Request req) {
+        new HttpObject("/echoCookies"){
+            public Eventual<Response> get(Request req) {
 
                 final StringBuffer text = new StringBuffer();
                 for(HeaderField next : req.header().fields()){
@@ -168,47 +169,47 @@ public abstract class IntegrationTest extends WireTest {
                     });
                 }
 
-                return OK(Text(text.toString()));
+                return OK(Text(text.toString())).resolved();
             }
         },
-        new SyncHttpObject("/cookieSetter"){
-            public Response getSync(Request req){
+        new HttpObject("/cookieSetter"){
+            public Eventual<Response> get(Request req){
                 return OK(
                         Text("Here are some cookies!"),
                         new SetCookieField("name", "cookie monster", "sesamestreet.com"),
                         new SetCookieField("specialGuest", "mr rogers", "mrrogers.com", "/myNeighborhood", "Wed, 13-Jan-2021 22:23:01 GMT", true),
-                        new SetCookieField("oldInsecureCookie", "yes", "the90sIntranet.com", "/images/animatedGifs", "Wed, 13-Jan-1999 22:23:01 GMT", false));
+                        new SetCookieField("oldInsecureCookie", "yes", "the90sIntranet.com", "/images/animatedGifs", "Wed, 13-Jan-1999 22:23:01 GMT", false)).resolved();
             }
         },
-        new SyncHttpObject("/subpathEcho/{subPath*}"){
+        new HttpObject("/subpathEcho/{subPath*}"){
             @Override
-            public Response getSync(Request req) {
-                return OK(Text(req.path().valueFor("subPath")));
+            public Eventual<Response> get(Request req) {
+                return OK(Text(req.path().valueFor("subPath"))).resolved();
             }
         },
-        new SyncHttpObject("/echoHasRepresentation"){
+        new HttpObject("/echoHasRepresentation"){
             @Override
-            public Response postSync(Request req) {
-                return OK(Text(req.hasRepresentation() ? "yes" : "no"));
+            public Eventual<Response> post(Request req) {
+                return OK(Text(req.hasRepresentation() ? "yes" : "no")).resolved();
             }
         },
-        new SyncHttpObject("/pows/{name}/{rank}/{serialnumber}"){
+        new HttpObject("/pows/{name}/{rank}/{serialnumber}"){
             @Override
-            public Response getSync(Request req) {
+            public Eventual<Response> get(Request req) {
                 final Path path = req.path();
                 return OK(Text(
                         path.valueFor("rank") + " " +
                         path.valueFor("name") + ", " +
-                        path.valueFor("serialnumber")));
+                        path.valueFor("serialnumber"))).resolved();
             }
         },
-        new SyncHttpObject("/immutablecopy/{subpath*}"){
+        new HttpObject("/immutablecopy/{subpath*}"){
             @Override
-            public Response postSync(Request req) {
+            public Eventual<Response> post(Request req) {
                 Request r = req.immutableCopy();
                 final String firstPass = toString(r);
                 final String secondPass = toString(r);
-                return OK(Text(secondPass));
+                return OK(Text(secondPass)).resolved();
             }
 
             class LowercasedHeadersByName implements Comparator<HeaderField>{
@@ -236,33 +237,33 @@ public abstract class IntegrationTest extends WireTest {
                 return text.toString();
             }
         },
-        new SyncHttpObject("/patchme"){
-            public Response patchSync(org.httpobjects.Request req) {
+        new HttpObject("/patchme"){
+            public Eventual<Response> patch(org.httpobjects.Request req) {
                 try {
                     final String input = new String(HttpObjectUtil.toByteArray(req.representation()), "UTF-8");
-                    return OK(Text("You told me to patch!" + input));
+                    return OK(Text("You told me to patch!" + input)).resolved();
                 } catch (UnsupportedEncodingException e) {
-                    return INTERNAL_SERVER_ERROR(e);
+                    return INTERNAL_SERVER_ERROR(e).resolved();
                 }
             }
         },
-        new SyncHttpObject("/connectionInfo"){
-            public Response getSync(Request req) {
+        new HttpObject("/connectionInfo"){
+            public Eventual<Response> get(Request req) {
                 final ConnectionInfo connection = req.connectionInfo();
                 return OK(Text("Local " + connection.localAddress + ":" + connection.localPort + ", " +
-                               "Remote " + connection.remoteAddress + ":" + connection.remotePort));
+                               "Remote " + connection.remoteAddress + ":" + connection.remotePort)).resolved();
             }
         },
-        new SyncHttpObject("/head"){
+        new HttpObject("/head"){
         	@Override
-        	public Response headSync(Request req) {
-        		return OK(Text(""), new GenericHeaderField("foo", "bar"));
+        	public Eventual<Response> head(Request req) {
+        		return OK(Text(""), new GenericHeaderField("foo", "bar")).resolved();
         	}
         },
-        new SyncHttpObject("/options"){
+        new HttpObject("/options"){
             @Override
-            public Response optionsSync(Request req) {
-                return OK(Text(""), new GenericHeaderField("foo", "bar"));
+            public Eventual<Response> options(Request req) {
+                return OK(Text(""), new GenericHeaderField("foo", "bar")).resolved();
             }
         });
     }
