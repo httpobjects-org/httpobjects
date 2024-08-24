@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.*;
 import static io.netty.handler.codec.http.HttpHeaders.isKeepAlive;
@@ -125,11 +126,11 @@ public class Translate {
     }
 
 
-    public static ChannelFuture writeResponse(HttpRequest request, Channel sink, Response r) {
-        return writeResponse(isKeepAlive(request), sink ,r);
+    public static ChannelFuture writeResponse(HttpRequest request, Channel sink, Response r, final ResponseCreationStrategy executor) {
+        return writeResponse(isKeepAlive(request), sink ,r, executor);
     }
 
-    public static ChannelFuture writeResponse(boolean keepAlive, Channel sink, Response r) {
+    public static ChannelFuture writeResponse(boolean keepAlive, Channel sink, Response r, final ResponseCreationStrategy executor) {
 
 
         // Build the response object.
@@ -184,7 +185,7 @@ public class Translate {
                 PipedInputStream input = new PipedInputStream();
                 PipedOutputStream output = new PipedOutputStream(input);
 
-                new Thread(){
+                executor.doIt(new Runnable(){
                     @Override
                     public void run() {
                         try{
@@ -197,7 +198,7 @@ public class Translate {
                             t.printStackTrace();;
                         }
                     }
-                }.start();
+                });
 
 
                 final ChunkedStream data = new ChunkedStream(input, 1024 * 1024);

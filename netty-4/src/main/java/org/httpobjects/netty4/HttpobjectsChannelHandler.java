@@ -52,7 +52,8 @@ public class HttpobjectsChannelHandler extends SimpleChannelInboundHandler<Objec
                 Translate.writeResponse(
                         false,
                         ctx.channel(),
-                        DSL.BAD_REQUEST(DSL.Text("Trace " + traceId)));
+                        DSL.BAD_REQUEST(DSL.Text("Trace " + traceId)),
+                        responseCreator);
             }else{
                 this.currentRequest = new RequestAccumulator(request, bufferFactory, log, id, requestCounter);
 
@@ -84,7 +85,8 @@ public class HttpobjectsChannelHandler extends SimpleChannelInboundHandler<Objec
                                     Translate.writeResponse(
                                             currentRequest.beforeBody,
                                             ctx.channel(),
-                                            response);
+                                            response,
+                                            responseCreator);
                                     currentRequest.dispose();
                                 }
                             });
