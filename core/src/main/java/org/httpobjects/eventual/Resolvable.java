@@ -9,7 +9,11 @@ public class Resolvable<T> implements Eventual<T> {
     private boolean hasResolved = false;
 
     public Resolvable() {
-        System.out.println("created " + this);
+        debug("created ");
+    }
+
+    private void debug(String m){
+//        System.out.println("[Resolvable " + this + "] " + m);
     }
 
     @Override
@@ -26,9 +30,9 @@ public class Resolvable<T> implements Eventual<T> {
         synchronized (this){
             if(!this.hasResolved){
                 try{
-                    System.out.println("Waiting for result of " + this + "...");
-                        this.wait();
-                    System.out.println("Done waiting...");
+                    debug("Waiting for result ...");
+                    this.wait();
+                    debug("Done waiting");
 
                     return resolution;
                 }catch(Throwable t){
@@ -45,7 +49,7 @@ public class Resolvable<T> implements Eventual<T> {
             throw new RuntimeException("Someone tried to resolve this as null");
         }
         synchronized (this){
-            System.out.println("resolve() " + this + " as " + result);
+            debug("resolved as " + result);
             this.resolution = result;
             this.hasResolved = true;
 
