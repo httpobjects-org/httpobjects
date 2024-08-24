@@ -49,15 +49,4 @@ public final class LazyImmutableRep implements Representation {
         self.write(out);
     }
 
-    @Override
-    public String show() {
-        String show = self.show();
-        if (show.length() <= 80 ) return show;
-        else return show.substring(0, 77) + "...";
-    }
-
-    @Override
-    public boolean eq(Representation that) {
-        return self.eq(that);
-    }
 }

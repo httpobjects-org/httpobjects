@@ -71,13 +71,18 @@ public class Header {
         return Optional.ofNullable(field(key)).map(HeaderField::value);
     }
 
-    public String show() {
+	@Override
+    public String toString() {
 		String pairs = fields.stream().map(HeaderField::show)
 				.sorted().collect(Collectors.joining(","));
 		return "{" + pairs + "}";
 	}
 
+	@Override
+	public boolean equals(Object other){
+		return (other instanceof Header) && eq((Header)other);
+	}
 	public boolean eq(Header that) {
-		return this.show().equals(that.show());
+		return this.toString().equals(that.toString());
 	}
 }

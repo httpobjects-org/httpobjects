@@ -133,11 +133,6 @@ public class ResponseCode {
 	    return name + "(" + value + ")";
 	}
 
-	@Override
-	public boolean equals(Object other) {
-		return other == this;
-	}
-
 	private static class StandardResponseCode extends ResponseCode {
 
 		public StandardResponseCode(int value, String name) {
@@ -147,11 +142,4 @@ public class ResponseCode {
 
 	}
 
-	public String show() {
-		return toString();
-	}
-
-	public boolean eq(ResponseCode that) {
-		return this.show().equals(that.show());
-	}
 }

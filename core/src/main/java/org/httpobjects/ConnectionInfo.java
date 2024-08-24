@@ -60,7 +60,8 @@ public class ConnectionInfo {
         return value;
     }
 
-    public String show() {
+    @Override
+    public String toString() {
         return  "ConnectionInfo(" +
                 "localAddress = " + localAddress + "," +
                 "localPort = " + localPort + "," +
@@ -68,7 +69,11 @@ public class ConnectionInfo {
                 "remotePort = " + remotePort + ")";
     }
 
+    @Override
+    public boolean equals(Object that) {
+        return (that instanceof ConnectionInfo) && eq((ConnectionInfo) that);
+    }
     public boolean eq(ConnectionInfo that) {
-        return this.show().equals(that.show());
+        return this.toString().equals(that.toString());
     }
 }

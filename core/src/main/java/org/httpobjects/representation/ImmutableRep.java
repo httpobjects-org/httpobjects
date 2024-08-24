@@ -1,6 +1,7 @@
 package org.httpobjects.representation;
 
 import org.httpobjects.Representation;
+import org.httpobjects.header.HeaderField;
 import org.httpobjects.util.HttpObjectUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -44,13 +45,4 @@ public class ImmutableRep implements Representation {
         }
     }
 
-    @Override
-    public String show() {
-        return HttpObjectUtil.toUtf8(this);
-    }
-
-    @Override
-    public boolean eq(Representation that) {
-        return this.show().equals(that.show());
-    }
 }

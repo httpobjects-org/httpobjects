@@ -30,56 +30,6 @@ public class RequestTest {
         assertEquals(Optional.<String>empty(), result3);
     }
 
-    @Test
-    public void showTest() throws Exception {
-        // given
-        Request req1 = fooRequest();
-        Request req2 = barRequest();
-        String exp1 = "Request(" +
-                "method = POST," +
-                "header = {bariness:\"bar\",foocience:\"foo\"}," +
-                "path = /foo/bar/," +
-                "query = ?foo=bar," +
-                "representation = foo bar," +
-                "connectionInfo = ConnectionInfo(" +
-                "localAddress = 10.10.10.10,localPort = 40,remoteAddress = 20.20.20.20,remotePort = 80)" +
-                ")";
-        String exp2 = "Request(" +
-                "method = GET," +
-                "header = {bariness:\"bar\",foocience:\"foo\"}," +
-                "path = /foo/bar/," +
-                "query = ?foo=bar," +
-                "representation = ," +
-                "connectionInfo = ConnectionInfo(" +
-                "localAddress = 10.10.10.10,localPort = 40,remoteAddress = 20.20.20.20,remotePort = 80)" +
-                ")";
-
-        System.out.println(req1.show());
-        System.out.println(req2.show());
-
-        // when
-        String result1 = req1.show();
-        String result2 = req1.show();
-        String result3 = req2.show();
-
-        // then
-        assertEquals(exp1, result1);
-        assertEquals(exp1, result2);
-        assertEquals(exp2, result3);
-    }
-
-    @Test
-    public void eqTest() throws Exception {
-        // given
-        Request req1 = fooRequest();
-        Request req2 = fooRequest();
-        Request req3 = barRequest();
-
-        // then
-        assertEquals(true, req1.eq(req1));
-        assertEquals(true, req1.eq(req2));
-        assertEquals(false, req1.eq(req3));
-    }
 
     private Request fooRequest() {
         return new Request() {

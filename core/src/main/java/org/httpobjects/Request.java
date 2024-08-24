@@ -66,18 +66,4 @@ public interface Request {
         else return Optional.of(HttpObjectUtil.toString(representation(), charset.name()));
     }
 
-    default String show() {
-        String rep = representation() == null ? "" : representation().show();
-        return  "Request(" +
-                "method = " + method().show() + "," +
-                "header = " + header().show() + "," +
-                "path = " + path().show() + "," +
-                "query = " + query().show() + "," +
-                "representation = " + rep + "," +
-                "connectionInfo = " + connectionInfo().show() + ")";
-    }
-
-    default boolean eq(Request that) {
-        return  this.show().equals(that.show());
-    }
 }

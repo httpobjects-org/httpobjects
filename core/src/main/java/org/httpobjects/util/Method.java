@@ -48,11 +48,4 @@ public enum Method {
         }
     }
 
-    public String show() {
-        return toString();
-    }
-
-    public boolean eq(Method that) {
-        return this.show().equals(that.show());
-    }
 }

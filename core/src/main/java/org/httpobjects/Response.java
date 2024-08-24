@@ -73,29 +73,6 @@ public final class Response {
 		return header;
 	}
 
-	public String show() {
-		return  "Response(" +
-				"code = " + code.show() + "," +
-				"header = " + showHeader(header) + "," +
-				"representation = " + representation.show() + ")";
-	}
-
-	public boolean eq(Response that) {
-		return  this.code.eq(that.code) &&
-				eqHeader(this.header, that.header) &&
-				this.representation.eq(that.representation);
-	}
-
-	private static String showHeader(HeaderField[] header) {
-		String fields = stream(header).map(HeaderField::show)
-				.sorted().collect(Collectors.joining(","));
-		return "{" + fields + "}";
-	}
-
-	private static boolean eqHeader(HeaderField[] left, HeaderField[] right) {
-		return showHeader(left).equals(showHeader(right));
-	}
-
 	public Eventual<Response> resolved(){
 		return Eventual.resolved(this);
 	}

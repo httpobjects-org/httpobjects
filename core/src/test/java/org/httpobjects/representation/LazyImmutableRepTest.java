@@ -60,43 +60,6 @@ public class LazyImmutableRepTest {
         assertEquals("bar", string(out2.toByteArray()));
     }
 
-    @Test
-    public void showTest() throws Exception {
-        // given
-        LazyImmutableRep rep = new LazyImmutableRep(text, in("baz"));
-        String bigString = "Lorem ipsum dolor sit amet, " +
-                "consectetur adipiscing elit, " +
-                "sed do eiusmod tempor incididunt " +
-                "ut labore et dolore magna aliqua.";
-        LazyImmutableRep bigRep = new LazyImmutableRep(text, in(bigString));
-
-        // when
-        String show1 = rep.show();
-        String show2 = rep.show();
-        String show3 = bigRep.show();
-
-        // then
-        assertEquals("baz", show1);
-        assertEquals("baz", show2);
-        assertEquals(bigString.substring(0, 77) + "...", show3);
-    }
-
-    @Test
-    public void eqTest() throws Exception {
-        // given
-        LazyImmutableRep us1 = new LazyImmutableRep(text, in("foo"));
-        LazyImmutableRep us2 = new LazyImmutableRep(text, in("foo"));
-        LazyImmutableRep us3 = new LazyImmutableRep(text, in("bar"));
-        Representation them = new BinaryRepresentation(text, in("foo"));
-
-        // then
-        assertEquals(true, us1.eq(us1));
-        assertEquals(true, us1.eq(us2));
-        assertEquals(false, us1.eq(us3));
-        assertEquals(false, us1.eq(them));
-        assertEquals(false, them.eq(us1));
-    }
-
     private static String text = "text/plain";
 
     private static InputStream in(String str) {

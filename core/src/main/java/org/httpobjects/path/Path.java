@@ -37,6 +37,8 @@
  */
 package org.httpobjects.path;
 
+import org.httpobjects.header.HeaderField;
+
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -75,11 +77,12 @@ public class Path {
         return Optional.ofNullable(valueFor(key));
     }
 
-    public String show() {
-		return toString();
+	@Override
+	public boolean equals(Object other){
+		return (other instanceof Path) && eq((Path)other);
 	}
 
 	public boolean eq(Path that) {
-		return this.show().equals(that.show());
+		return this.toString().equals(that.toString());
 	}
 }

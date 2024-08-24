@@ -51,6 +51,11 @@ public abstract class HeaderField {
 		return name() + ":\"" + value() + "\"";
 	}
 
+	@Override
+	public boolean equals(Object other){
+		return (other instanceof HeaderField) && eq((HeaderField)other);
+	}
+
 	public final boolean eq(HeaderField that) {
 		return  this.name().equals(that.name()) &&
 				this.value().equals(that.value());

@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.httpobjects.path.Path;
 import org.httpobjects.util.RequestQueryUtil;
 
 public final class Query {
@@ -79,11 +80,12 @@ public final class Query {
         return new ArrayList<String>(parse().keySet());
     }
 
-    public String show() {
-        return toString();
+    @Override
+    public boolean equals(Object other){
+        return (other instanceof Query) && eq((Query)other);
     }
 
     public boolean eq(Query that) {
-        return this.show().equals(that.show());
+        return this.toString().equals(that.toString());
     }
 }

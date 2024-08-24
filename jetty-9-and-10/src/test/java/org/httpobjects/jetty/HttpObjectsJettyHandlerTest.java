@@ -19,7 +19,7 @@ public class HttpObjectsJettyHandlerTest {
         HttpObject resource = new HttpObject("/", DSL.allowed(Method.POST)) {
             @Override
             public Eventual<Response> post(Request req) {
-                System.out.print(req.show());
+                System.out.print(req);
                 if (req.body().get().equals("body")) return OK(Text("We did it!")).resolved();
                 else return BAD_REQUEST().resolved();
             }
