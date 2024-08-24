@@ -2,8 +2,8 @@ package org.httpobjects.netty4;
 
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.httpobjects.*;
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.netty4.buffer.InMemoryByteAccumulatorFactory;
-import org.httpobjects.migrate.SyncHttpObject;
 import org.httpobjects.tck.PortAllocation;
 import org.httpobjects.tck.PortFinder;
 import org.httpobjects.tck.WireTest;
@@ -23,9 +23,9 @@ public class Netty4ExceptionHandlingTest extends WireTest {
         portAllocation = PortFinder.allocateFreePort(this);
         server = BasicNetty4Server.serve(
                 portAllocation.port,
-                Arrays.asList(new SyncHttpObject("/explode"){
+                Arrays.asList(new HttpObject("/explode"){
                     @Override
-                    public Response getSync(Request req) {
+                    public Eventual<Response> get(Request req) {
                         throw new RuntimeException("Boo!");
                     }
                 }),

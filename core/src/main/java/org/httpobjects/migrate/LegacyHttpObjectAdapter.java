@@ -5,6 +5,7 @@ import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.eventual.Eventual;
 
+@Deprecated
 public class LegacyHttpObjectAdapter extends HttpObject {
     private final LegacyHttpObject target;
 

@@ -45,9 +45,10 @@ import java.io.InputStream;
 
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.migrate.SyncHttpObject;
+import org.httpobjects.HttpObject;
+import org.httpobjects.eventual.Eventual;
 
-public class FilesystemResourcesObject  extends SyncHttpObject {
+public class FilesystemResourcesObject  extends HttpObject {
 	private final File relativeTo;
 	
 	public FilesystemResourcesObject(String pathPattern, File relativeTo) {
@@ -56,7 +57,7 @@ public class FilesystemResourcesObject  extends SyncHttpObject {
 	}
 	
 	@Override
-	public Response getSync(Request req) {
+	public Eventual<Response> get(Request req) {
 		final String resource = req.path().valueFor("resource");
 		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
 		
@@ -67,7 +68,7 @@ public class FilesystemResourcesObject  extends SyncHttpObject {
 		}
 		
 		if(path.exists() && path.isFile()){
-			return OK(Bytes(mimeTypeFor(resource), openStream(path)));
+			return OK(Bytes(mimeTypeFor(resource), openStream(path))).resolved();
 		}else{
 			return null;
 		}

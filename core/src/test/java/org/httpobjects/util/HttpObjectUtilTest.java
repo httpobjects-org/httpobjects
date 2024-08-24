@@ -46,15 +46,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.httpobjects.*;
-import org.httpobjects.migrate.SyncHttpObject;
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.test.MockRequest;
 import org.junit.Test;
 
 public class HttpObjectUtilTest {
 
-    class PatchTestingObject extends SyncHttpObject {
+    class PatchTestingObject extends HttpObject {
         final Response response;
-        final List<Request> requestsRecieved = new ArrayList<Request>();
+        final List<Request> requestsReceived = new ArrayList<Request>();
         
         public PatchTestingObject(String pathPattern, Response response) {
             super(pathPattern);
@@ -62,9 +62,9 @@ public class HttpObjectUtilTest {
         }
 
         @Override
-        public Response patchSync(Request req) {
-            requestsRecieved.add(req);
-            return response;
+        public Eventual<Response> patch(Request req) {
+            requestsReceived.add(req);
+            return response.resolved();
         }
     }
 
@@ -82,8 +82,8 @@ public class HttpObjectUtilTest {
         // then
         assertNotNull(result);
         assertTrue(expectedResponse == result);
-        assertEquals(1, o.requestsRecieved.size());
-        assertTrue(input == o.requestsRecieved.get(0));
+        assertEquals(1, o.requestsReceived.size());
+        assertTrue(input == o.requestsReceived.get(0));
 
     }
 

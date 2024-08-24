@@ -2,11 +2,11 @@ package org.httpobjects.client;
 
 import org.httpobjects.*;
 import org.httpobjects.client.HttpClient.RemoteObject;
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.netty.HttpobjectsNettySupport;
 import org.httpobjects.netty.HttpobjectsNettySupport.ServerWrapper;
-import org.httpobjects.migrate.SyncHttpObject;
 import org.httpobjects.tck.PortFinder;
 import org.httpobjects.test.HttpObjectAssert;
 import org.httpobjects.util.HttpObjectUtil;
@@ -54,10 +54,10 @@ public class ApacheCommons4xHttpClientTest {
     public void returnsResponses() throws Exception {
         // given
         final ServerWrapper server = serve(
-                new SyncHttpObject("/some/resource/with/headers") {
+                new HttpObject("/some/resource/with/headers") {
                     @Override
-                    public Response getSync(Request req) {
-                        return OK(Text("You GET it"), new GenericHeaderField("a-custom-header-name", "a-custom-header-value"));
+                    public Eventual<Response> get(Request req) {
+                        return OK(Text("You GET it"), new GenericHeaderField("a-custom-header-name", "a-custom-header-value")).resolved();
                     }
                 });
         try {
@@ -197,7 +197,7 @@ public class ApacheCommons4xHttpClientTest {
         }
     }
 
-    private static class MethodEchoer extends SyncHttpObject {
+    private static class MethodEchoer extends HttpObject {
         public MethodEchoer(String pattern) {
             super(pattern);
         }
@@ -207,93 +207,93 @@ public class ApacheCommons4xHttpClientTest {
         }
 
         @Override
-        public Response deleteSync(Request req) {
-            return make("delete");
+        public Eventual<Response> delete(Request req) {
+            return make("delete").resolved();
         }
 
         @Override
-        public Response getSync(Request req) {
-            return make("get");
+        public Eventual<Response> get(Request req) {
+            return make("get").resolved();
         }
 
         @Override
-        public Response headSync(Request req) {
-            return make("head");
+        public Eventual<Response> head(Request req) {
+            return make("head").resolved();
         }
 
         @Override
-        public Response optionsSync(Request req) {
-            return make("options");
+        public Eventual<Response> options(Request req) {
+            return make("options").resolved();
         }
 
         @Override
-        public Response postSync(Request req) {
-            return make("post");
+        public Eventual<Response> post(Request req) {
+            return make("post").resolved();
         }
 
         @Override
-        public Response putSync(Request req) {
-            return make("put");
+        public Eventual<Response> put(Request req) {
+            return make("put").resolved();
         }
 
         @Override
-        public Response traceSync(Request req) {
-            return make("trace");
+        public Eventual<Response> trace(Request req) {
+            return make("trace").resolved();
         }
 
         @Override
-        public Response patchSync(Request req) {
-            return make("patch");
+        public Eventual<Response> patch(Request req) {
+            return make("patch").resolved();
         }
     }
 
-    private static class Echoer extends SyncHttpObject {
+    private static class Echoer extends HttpObject {
 
         public Echoer(String pathPattern) {
             super(pathPattern);
         }
 
         @Override
-        public Response deleteSync(Request req) {
+        public Eventual<Response> delete(Request req) {
             return make("delete", req);
         }
 
         @Override
-        public Response getSync(Request req) {
+        public Eventual<Response> get(Request req) {
             return make("get", req);
         }
 
         @Override
-        public Response headSync(Request req) {
+        public Eventual<Response> head(Request req) {
             return make("head", req);
         }
 
         @Override
-        public Response optionsSync(Request req) {
+        public Eventual<Response> options(Request req) {
             return make("options", req);
         }
 
         @Override
-        public Response postSync(Request req) {
+        public Eventual<Response> post(Request req) {
             return make("post", req);
         }
 
         @Override
-        public Response putSync(Request req) {
+        public Eventual<Response> put(Request req) {
             return make("put", req);
         }
 
         @Override
-        public Response traceSync(Request req) {
+        public Eventual<Response> trace(Request req) {
             return make("trace", req);
         }
 
         @Override
-        public Response patchSync(Request req) {
+        public Eventual<Response> patch(Request req) {
             return make("patch", req);
         }
 
-        private Response make(final String method, final Request req) {
+        private Eventual<Response> make(final String method, final Request req) {
             try {
                 final StringBuffer text = new StringBuffer(method.toUpperCase() + " " + req.path().toString() + req.query().toString());
                 for (HeaderField field : req.header().fields()) {
@@ -305,7 +305,7 @@ public class ApacheCommons4xHttpClientTest {
                 if (r != null) {
                     text.append("\n" + HttpObjectUtil.toAscii(r));
                 }
-                return OK(Text(text.toString()), new GenericHeaderField("body", URLEncoder.encode(text.toString(), "UTF8")));
+                return OK(Text(text.toString()), new GenericHeaderField("body", URLEncoder.encode(text.toString(), "UTF8"))).resolved();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

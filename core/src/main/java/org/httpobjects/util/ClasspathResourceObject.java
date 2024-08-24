@@ -37,11 +37,12 @@
  */
 package org.httpobjects.util;
 
+import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.migrate.SyncHttpObject;
+import org.httpobjects.eventual.Eventual;
 
-public class ClasspathResourceObject extends SyncHttpObject {
+public class ClasspathResourceObject extends HttpObject {
 	private final Class<?> clazz;
 	private final String contentType, resourceName;
 
@@ -57,8 +58,8 @@ public class ClasspathResourceObject extends SyncHttpObject {
 	}
 
 	@Override
-	public Response getSync(Request req) {
-		return OK(FromClasspath(contentType, resourceName, clazz));
+	public Eventual<Response> get(Request req) {
+		return OK(FromClasspath(contentType, resourceName, clazz)).resolved();
 	}
 
 }

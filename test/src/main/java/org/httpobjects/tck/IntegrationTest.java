@@ -51,7 +51,6 @@ import org.httpobjects.header.request.credentials.BasicCredentials;
 import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField.Method;
 import org.httpobjects.path.Path;
-import org.httpobjects.migrate.SyncHttpObject;
 import org.httpobjects.util.HttpObjectUtil;
 import org.junit.*;
 

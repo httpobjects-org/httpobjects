@@ -3,7 +3,7 @@ package org.httpobjects.jetty;
 import org.httpobjects.*;
 import org.httpobjects.client.ApacheCommons4xHttpClient;
 import org.httpobjects.client.HttpClient;
-import org.httpobjects.migrate.SyncHttpObject;
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.tck.PortFinder;
 import org.httpobjects.util.Method;
 
@@ -16,12 +16,12 @@ public class HttpObjectsJettyHandlerTest {
     @Test
     public void requestBodyShouldBeReusable() {
         // given
-        HttpObject resource = new SyncHttpObject("/", DSL.allowed(Method.POST)) {
+        HttpObject resource = new HttpObject("/", DSL.allowed(Method.POST)) {
             @Override
-            public Response postSync(Request req) {
+            public Eventual<Response> post(Request req) {
                 System.out.print(req.show());
-                if (req.body().get().equals("body")) return OK(Text("We did it!"));
-                else return BAD_REQUEST();
+                if (req.body().get().equals("body")) return OK(Text("We did it!")).resolved();
+                else return BAD_REQUEST().resolved();
             }
         };
         int port = PortFinder.findFreePort();

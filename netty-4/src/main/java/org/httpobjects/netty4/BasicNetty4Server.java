@@ -16,7 +16,6 @@ import org.httpobjects.HttpObject;
 import org.httpobjects.eventual.Eventual;
 import org.httpobjects.netty4.buffer.ByteAccumulatorFactory;
 import org.httpobjects.netty4.buffer.InMemoryByteAccumulatorFactory;
-import org.httpobjects.migrate.SyncHttpObject;
 import org.httpobjects.util.SimpleErrorHandler;
 
 /**

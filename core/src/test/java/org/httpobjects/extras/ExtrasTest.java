@@ -1,9 +1,9 @@
 package org.httpobjects.extras;
 
 import org.httpobjects.*;
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.path.Path;
-import org.httpobjects.migrate.SyncHttpObject;
 import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 import org.junit.Assert;
@@ -62,9 +62,9 @@ public class ExtrasTest {
     public void decorateShouldApplyDecoratorOnEvents() throws Exception {
         // given
         SampleEvents decorator = new SampleEvents();
-        HttpObject resource = new SyncHttpObject("/", allowed(Method.GET, Method.POST)) {
-            @Override public Response getSync(Request req) { return OK(Text("You Got!")); }
-            @Override public Response postSync(Request req) { return OK(Text("You Post!")); }
+        HttpObject resource = new HttpObject("/", allowed(Method.GET, Method.POST)) {
+            @Override public Eventual<Response> get(Request req) { return OK(Text("You Got!")).resolved(); }
+            @Override public Eventual<Response> post(Request req) { return OK(Text("You Post!")).resolved(); }
         };
         HttpObject decorated = EventsMechanism.onEvents(resource, decorator);
         Request getReq = request("/", Method.GET);
@@ -86,8 +86,8 @@ public class ExtrasTest {
         // given
         SampleEvents decorator = new SampleEvents();
         RuntimeException error = new RuntimeException();
-        HttpObject resource = new SyncHttpObject("/", allowed(Method.GET)) {
-            @Override public Response getSync(Request req) { throw error; }
+        HttpObject resource = new HttpObject("/", allowed(Method.GET)) {
+            @Override public Eventual<Response> get(Request req) { throw error; }
         };
         HttpObject decorated = EventsMechanism.onEvents(resource, decorator);
         Object result;

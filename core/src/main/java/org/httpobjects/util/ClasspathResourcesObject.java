@@ -41,13 +41,14 @@ import java.io.InputStream;
 
 import org.httpobjects.Request;
 import org.httpobjects.Response;
-import org.httpobjects.migrate.SyncHttpObject;
+import org.httpobjects.HttpObject;
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.impl.fn.FunctionalJava;
 import org.httpobjects.util.impl.ClassResourceLoader;
 import org.httpobjects.util.impl.ResourceLoader;
 import org.httpobjects.util.impl.WrapperForInsecureClassloader;
 
-public class ClasspathResourcesObject  extends SyncHttpObject {
+public class ClasspathResourcesObject  extends HttpObject {
     private static final String PATH_VAR_NAME = "resource";
 	private final ResourceLoader loader;
 	private final String prefix;
@@ -77,14 +78,14 @@ public class ClasspathResourcesObject  extends SyncHttpObject {
 	}
 
 	@Override
-	public Response getSync(Request req) {
+	public Eventual<Response> get(Request req) {
 		final String resource = req.path().valueFor(PATH_VAR_NAME);
 		if(isNullOrEmpty(resource) ||  resource.endsWith("/")) return null;
 		
 		final InputStream data = loader.getResourceAsStream(prefix + resource);
 		
 		if(data!=null){
-			return OK(Bytes(mimeTypeFor(resource), data));
+			return OK(Bytes(mimeTypeFor(resource), data)).resolved();
 		}else{
 			return null;
 		}
