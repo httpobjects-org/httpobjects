@@ -29,10 +29,8 @@ class NettyWebsocketsEndToEndTest: WebsocketsTests() {
             responseStrategy = ResponseCreationStrategy.synchronous(),
             ssl = null,
             buffers = InMemoryByteAccumulatorFactory(),
-            errorHandler = object:ErrorHandler{
-                override fun createErrorResponse(p0: HttpObject?, p1: Method?, p2: Throwable?): Response {
-                    return DSL.INTERNAL_SERVER_ERROR(DSL.Text("Not sure what to do there..."))
-                }
+            errorHandler = { target, method, throwable ->
+                DSL.INTERNAL_SERVER_ERROR(DSL.Text("Not sure what to do there...")).resolved()
             },
         )
 

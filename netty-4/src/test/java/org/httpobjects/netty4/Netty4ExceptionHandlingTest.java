@@ -32,8 +32,8 @@ public class Netty4ExceptionHandlingTest extends WireTest {
                 ResponseCreationStrategy.synchronous(),
                 new ErrorHandler(){
                     @Override
-                    public Response createErrorResponse(HttpObject next, Method m, Throwable t) {
-                        return DSL.INTERNAL_SERVER_ERROR(DSL.Text("There was an error"));
+                    public Eventual<Response> createErrorResponse(HttpObject next, Method m, Throwable t) {
+                        return DSL.INTERNAL_SERVER_ERROR(DSL.Text("There was an error")).resolved();
                     }
                 },
                 new InMemoryByteAccumulatorFactory(),

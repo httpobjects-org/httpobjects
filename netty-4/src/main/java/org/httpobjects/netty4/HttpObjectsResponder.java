@@ -33,10 +33,10 @@ public class HttpObjectsResponder{
 					Request in = Translate.readRequest(pattern, request, connectionInfo);
 					out = HttpObjectUtil.invokeMethod(match, m, in);
 				}catch(Throwable t){
-					out = Eventual.resolved(errorHandler.createErrorResponse(
+					out = errorHandler.createErrorResponse(
 							next,
 							m,
-							t));
+							t);
 				}
 				if(out!=null) return out;
 			}

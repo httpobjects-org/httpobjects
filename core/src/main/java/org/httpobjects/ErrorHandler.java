@@ -1,7 +1,8 @@
 package org.httpobjects;
 
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.util.Method;
 
 public interface ErrorHandler {
-    Response createErrorResponse(HttpObject next, Method m, Throwable t);
+    Eventual<Response> createErrorResponse(HttpObject next, Method m, Throwable t);
 }
