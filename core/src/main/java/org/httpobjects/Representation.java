@@ -39,6 +39,7 @@ package org.httpobjects;
 
 import java.io.OutputStream;
 
+// TODO: make a way to write using async IO
 public interface Representation {
     String contentType();
 
