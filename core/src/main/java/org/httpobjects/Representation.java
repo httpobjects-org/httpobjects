@@ -44,7 +44,6 @@ public interface Representation {
     String contentType();
 
     void write(OutputStream out);
-
     default Long length(){
         return null;
     }
