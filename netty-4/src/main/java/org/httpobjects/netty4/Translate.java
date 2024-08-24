@@ -140,7 +140,7 @@ public class Translate {
 
 
 
-        Long contentLength;
+        Number contentLength;
         if(r.hasRepresentation()){
             contentLength = r.representation().length();
             try{

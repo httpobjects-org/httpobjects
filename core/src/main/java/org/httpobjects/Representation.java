@@ -53,7 +53,7 @@ public interface Representation {
     /**
      * @return the content-length in bytes if available; otherwise, null
      */
-    default Long length(){ return null; }
+    default Number length(){ return null; }
 
 }
 
