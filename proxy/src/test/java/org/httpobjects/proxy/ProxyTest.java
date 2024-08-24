@@ -43,12 +43,12 @@ import org.httpobjects.Representation;
 import org.httpobjects.ResponseCode;
 import org.httpobjects.client.ApacheCommons4xHttpClient;
 import org.httpobjects.client.HttpClient;
+import org.httpobjects.eventual.Eventual;
 import org.httpobjects.header.DefaultHeaderFieldVisitor;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.jetty.HttpObjectsJettyHandler;
-import org.httpobjects.migrate.SyncHttpObject;
 import org.httpobjects.tck.PortAllocation;
 import org.httpobjects.tck.PortFinder;
 import org.httpobjects.test.HttpObjectAssert;
@@ -93,44 +93,44 @@ public class ProxyTest {
     }
     private void foo(){
         jetty = HttpObjectsJettyHandler.launchServer(port,
-        			new SyncHttpObject("/") {
-                        public Response getSync(Request req) {
-                            return OK(Text("this is the root page"));
+        			new HttpObject("/") {
+                        public Eventual<Response> get(Request req) {
+                            return OK(Text("this is the root page")).resolved();
                         }
         			},
-                new SyncHttpObject("/frog") {
-                    public Response getSync(Request req) {
+                new HttpObject("/frog") {
+                    public Eventual<Response> get(Request req) {
                         String response = "Kermit";
                         String q = req.query().toString();
                         if (q != null) {
                             response += q;
                         }
-                        return OK(Text(response));
+                        return OK(Text(response)).resolved();
                     }
 
-                    public Response patchSync(Request req) {
+                    public Eventual<Response> patch(Request req) {
                         final String response = HttpObjectUtil.toAscii(req.representation()) + " patched";
 
-                        return OK(Text(response));
+                        return OK(Text(response)).resolved();
                     }
 
                     @Override
-                    public Response putSync(Request req) {
+                    public Eventual<Response> put(Request req) {
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
                         req.representation().write(out);
                         String textualRepresentation = new String(out.toByteArray());
-                        return OK(Text(textualRepresentation));
+                        return OK(Text(textualRepresentation)).resolved();
                     }
                 },
-                new SyncHttpObject("/superOptions") {
+                new HttpObject("/superOptions") {
                     @Override
-                    public Response optionsSync(Request req) {
-                        return OK(Json(""));
+                    public Eventual<Response> options(Request req) {
+                        return OK(Json("")).resolved();
                     }
                 },
-                new SyncHttpObject("/requirescustomheader") {
+                new HttpObject("/requirescustomheader") {
                     @Override
-                    public Response getSync(Request req) {
+                    public Eventual<Response> get(Request req) {
                         boolean hasIt = false;
                         for (HeaderField field : req.header().fields()) {
                             boolean found = field.accept(new DefaultHeaderFieldVisitor<Boolean>() {
@@ -149,77 +149,77 @@ public class ProxyTest {
                         }
 
                         if (hasIt) {
-                            return OK(Text("Found it"));
+                            return OK(Text("Found it")).resolved();
                         } else {
-                            return BAD_REQUEST();
+                            return BAD_REQUEST().resolved();
                         }
                     }
                 },
-                new SyncHttpObject("/notme") {
-                    public Response getSync(Request req) {
-                        return SEE_OTHER(Location("/me"));
+                new HttpObject("/notme") {
+                    public Eventual<Response> get(Request req) {
+                        return SEE_OTHER(Location("/me")).resolved();
                     }
                 },
-                new SyncHttpObject("/me") {
-                    public Response getSync(Request req) {
-                        return OK(Text("It's me!"));
+                new HttpObject("/me") {
+                    public Eventual<Response> get(Request req) {
+                        return OK(Text("It's me!")).resolved();
                     }
                 },
-                new SyncHttpObject("/setcookies") {
-                    public Response getSync(Request req) {
-                        return OK(Text("Here is a tasty cookie"), HttpObject.SetCookie("id", "1234"));
+                new HttpObject("/setcookies") {
+                    public Eventual<Response> get(Request req) {
+                        return OK(Text("Here is a tasty cookie"), HttpObject.SetCookie("id", "1234")).resolved();
                     }
                 },
-                new SyncHttpObject("/piggy") {
-                    public Response getSync(Request req) {
-                        return OK(Text("Oh, kermie!"));
+                new HttpObject("/piggy") {
+                    public Eventual<Response> get(Request req) {
+                        return OK(Text("Oh, kermie!")).resolved();
                     }
                 },
-                new SyncHttpObject("/echo") {
-                    public Response getSync(Request req) {
-                        return OK(Bytes(req.representation().contentType(), new byte[]{}));
+                new HttpObject("/echo") {
+                    public Eventual<Response> get(Request req) {
+                        return OK(Bytes(req.representation().contentType(), new byte[]{})).resolved();
                     }
                 },
-                new SyncHttpObject("/noresponse") {
+                new HttpObject("/noresponse") {
                     @Override
-                    public Response putSync(Request req) {
-                        return new Response(ResponseCode.NO_CONTENT, null);
+                    public Eventual<Response> put(Request req) {
+                        return new Response(ResponseCode.NO_CONTENT, null).resolved();
                     }
                 },
-                new SyncHttpObject("/characters") {
+                new HttpObject("/characters") {
                     @Override
-                    public Response postSync(Request req) {
+                    public Eventual<Response> post(Request req) {
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
                         req.representation().write(out);
                         String textualRepresentation = new String(out.toByteArray());
                         if (textualRepresentation.equals("Oh, kermie!")) {
-                            return SEE_OTHER(Location("/piggy"), Text(textualRepresentation));
+                            return SEE_OTHER(Location("/piggy"), Text(textualRepresentation)).resolved();
                         } else {
                             return null;
                         }
                     }
                 },
-                new SyncHttpObject("/queryStringEcho") {
-                    public Response getSync(Request req) {
-                        return OK(Text(req.query().toString()));
+                new HttpObject("/queryStringEcho") {
+                    public Eventual<Response> get(Request req) {
+                        return OK(Text(req.query().toString())).resolved();
                     }
                 },
-                new SyncHttpObject("/contentTypeEcho") {
-                    public Response getSync(Request req) {
+                new HttpObject("/contentTypeEcho") {
+                    public Eventual<Response> get(Request req) {
                         String requestContentType = req.representation().contentType();
 
-                        return OK(Text(requestContentType == null ? "null" : requestContentType));
+                        return OK(Text(requestContentType == null ? "null" : requestContentType)).resolved();
                     }
                 },
-                  new SyncHttpObject("/headerEcho"){
-                      public Response getSync(Request req) {
+                  new HttpObject("/headerEcho"){
+                      public Eventual<Response> get(Request req) {
                           StringBuilder sb = new StringBuilder();
 
                           for (HeaderField field : req.header().fields()) {
                               sb.append(String.format("%s=%s\n",field.name(),field.value()));
                           }
 
-                          return OK(Text(sb.toString()));
+                          return OK(Text(sb.toString())).resolved();
                       }
                   });
     }
