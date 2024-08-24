@@ -25,6 +25,16 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <!--
+             THIS IS IMPORTANT: IT ENSURES THAT ALL CODE IS RELATIVELY MEMORY-EFFICIENT
+             -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-Xmx64M</argLine>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
