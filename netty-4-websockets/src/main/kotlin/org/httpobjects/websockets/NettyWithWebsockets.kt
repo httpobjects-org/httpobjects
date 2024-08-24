@@ -9,11 +9,12 @@ import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.handler.codec.http.HttpRequestDecoder
 import io.netty.handler.codec.http.HttpResponseEncoder
 import io.netty.handler.ssl.SslContext
-import org.httpobjects.eventual.Resolvable
+import io.netty.handler.stream.ChunkedWriteHandler
 import org.httpobjects.DSL
 import org.httpobjects.ErrorHandler
-import org.httpobjects.eventual.Eventual
 import org.httpobjects.HttpObject
+import org.httpobjects.eventual.Eventual
+import org.httpobjects.eventual.Resolvable
 import org.httpobjects.impl.HTLog
 import org.httpobjects.netty4.BasicLog
 import org.httpobjects.netty4.HttpObjectsResponder
@@ -60,8 +61,8 @@ object NettyWithWebsockets {
                     }
                     p.addLast(HttpRequestDecoder())
                     p.addLast(HttpResponseEncoder())
+                    p.addLast(ChunkedWriteHandler())
                     p.addLast(HttpObjectsPlusWebsocketsHandler(websocketsSessionHandlers, httpobjectsRequestHandler, responseStrategy, buffers, log))
-//                    p.addLast(HttpobjectsChannelHandler(httpobjectsRequestHandler, buffers))
                 }
             })
 

@@ -54,7 +54,12 @@ import org.httpobjects.path.Path;
 import org.httpobjects.util.HttpObjectUtil;
 import org.junit.*;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -69,7 +74,6 @@ public abstract class IntegrationTest extends WireTest {
 
     protected abstract void serve(int port, HttpObject ... objects);
     protected abstract void stopServing();
-
 
     protected int port = -1;
     private PortAllocation portAllocation = null;
@@ -112,6 +116,37 @@ public abstract class IntegrationTest extends WireTest {
             }
         },
         new HttpObject("/nothing", null){},
+        new HttpObject("/files/{chunksize}/{chunks}"){
+            public Eventual<Response> get(Request req) {
+                final Integer chunkSize = Integer.parseInt(req.path().valueFor("chunksize"));
+                final Long numChunks = Long.parseLong(req.path().valueFor("chunks"));
+                System.out.println("Generating " + numChunks + " chunks of size " + chunkSize);
+
+                final ProgressReporter reporter = new ProgressReporter("serve write", BigInteger.valueOf(chunkSize).multiply(BigInteger.valueOf(numChunks)), null);
+
+                final byte[] chunk = new byte[chunkSize];
+
+                return OK(new Representation() {
+                    @Override
+                    public String contentType() {
+                        return "application/binary";
+                    }
+
+                    @Override
+                    public void write(OutputStream out) {
+                        try{
+                            for(long x=0; x < numChunks; x++){
+                                out.write(chunk);
+                                reporter.progressMade( x * chunkSize);
+                            }
+                            System.out.println("Done writing response");
+                        }catch (Throwable t){
+                            throw new RuntimeException(t);
+                        }
+                    }
+                }).resolved();
+            }
+        },
         new HttpObject("/secure"){
             public Eventual<Response> get(Request req) {
                 AuthorizationField authorization = req.header().authorization();
@@ -455,6 +490,54 @@ public abstract class IntegrationTest extends WireTest {
         get.setRequestHeader("Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
         assertResource(get, "You're In!", 200);
     }
+
+    private String printSizeInGb(BigInteger numBytes){
+        final BigDecimal numBytesInOneGb = BigDecimal.valueOf(1024L * 1024L * 1024L);
+
+        return new BigDecimal(numBytes).divide(numBytesInOneGb).toString();
+    }
+
+    @Test
+    public void worksOnLargeFiles() throws Throwable{
+        // given
+        final Long chunkSize = 1024L * 1024L;
+        final Long numChunks = 1000L; // 1 gb ... this should be coupled with a limit on the JVM size when the tests run ... will make sure things are streaming and not buffering intro ram
+        final String uri = "http://localhost:" + port + "/files/" + chunkSize + "/" + numChunks;
+        final BigInteger expectedNumBytesRead = BigInteger.valueOf(numChunks).multiply(BigInteger.valueOf(chunkSize));
+        System.out.println("URL is " + uri);
+        System.out.println("printSizeInGb is " + printSizeInGb(expectedNumBytesRead));
+        final GetMethod request = new GetMethod(uri);
+        final HttpClient client = new HttpClient();
+        final int responseCode = client.executeMethod(request);
+
+        // when
+        final BigInteger numBytesRead = streamSize(request.getResponseBodyAsStream(), expectedNumBytesRead);
+
+        // then
+        assertEquals(200, responseCode);
+        assertEquals(expectedNumBytesRead, numBytesRead);
+    }
+
+    private static BigInteger streamSize(InputStream data, BigInteger expectedSize) throws IOException {
+        final ProgressReporter reporter = new ProgressReporter("client read", expectedSize, null);
+        BigInteger totalBytesRead = BigInteger.ZERO;
+
+        final byte[] buffer = new byte[1024];
+        boolean keepGoing = true;
+        do{
+            final int numRead = data.read(buffer);
+            if(numRead==-1){
+                keepGoing=false;
+            }else{
+                totalBytesRead = totalBytesRead.add(BigInteger.valueOf(numRead));
+                reporter.progressMade(totalBytesRead);
+            }
+        }while(keepGoing);
+
+        return totalBytesRead;
+    }
+
+
 
     @Test
     public void nullResponsesAreTreatedAsNotFound(){

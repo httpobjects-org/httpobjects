@@ -24,6 +24,7 @@ import org.httpobjects.netty.http.HttpChannelHandler;
 import org.httpobjects.path.Path;
 import org.httpobjects.path.PathPattern;
 import org.httpobjects.representation.ImmutableRep;
+import org.httpobjects.representation.InputStreamRepresentation;
 import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 import org.jboss.netty.handler.codec.http.HttpChunkTrailer;
@@ -132,9 +133,8 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 			@Override
 			public Representation representation() {
 				String contentType = request.headers().get("ContentType");
-				InputStream data = body != null ? body.toStream() :
-						new ByteArrayInputStream("".getBytes());
-				return new ImmutableRep(contentType, data);
+				InputStream data = body != null ? body.toStream() : new ByteArrayInputStream("".getBytes());
+				return new InputStreamRepresentation(contentType, data);
 			}
 		};
 	}

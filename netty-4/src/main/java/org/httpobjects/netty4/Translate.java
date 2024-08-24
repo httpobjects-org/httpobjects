@@ -1,14 +1,12 @@
 package org.httpobjects.netty4;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.channel.*;
+import io.netty.handler.codec.http.*;
+import io.netty.handler.stream.ChunkedInput;
+import io.netty.handler.stream.ChunkedStream;
 import org.httpobjects.*;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.AuthorizationField;
@@ -16,13 +14,10 @@ import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.netty4.buffer.ByteAccumulator;
 import org.httpobjects.path.Path;
 import org.httpobjects.path.PathPattern;
-import org.httpobjects.representation.ImmutableRep;
+import org.httpobjects.representation.InputStreamRepresentation;
 import org.httpobjects.util.Method;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -123,9 +118,8 @@ public class Translate {
             @Override
             public Representation representation() {
                 String contentType = beforeBody.headers().get("ContentType");
-                InputStream data = body != null ? body.toStream() :
-                        new ByteArrayInputStream("".getBytes());
-                return new ImmutableRep(contentType, data);
+                InputStream data = body != null ? body.toStream() : new ByteArrayInputStream("".getBytes());
+                return new InputStreamRepresentation(contentType, data);
             }
         };
     }
@@ -141,34 +135,90 @@ public class Translate {
         // Build the response object.
         HttpResponseStatus status = HttpResponseStatus.valueOf(r.code().value());
 
-        DefaultFullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, status);
+        DefaultHttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
 
-        final byte[] data;
+
+
+        Long contentLength;
         if(r.hasRepresentation()){
-            data = read(r);
-            response.content().writeBytes(data);
-            if(r.representation().contentType() != null)
-                response.headers().set(CONTENT_TYPE, r.representation().contentType());
+            contentLength = r.representation().length();
+            try{
+                if(r.representation().contentType() != null){
+                    response.headers().set(CONTENT_TYPE, r.representation().contentType());
+                }
+
+            }catch (Throwable t){
+                throw new RuntimeException(t);
+            }
         }else{
-            data = new byte[0];
+            contentLength = 0L;
         }
+
+        if(contentLength!=null){
+            response.headers().set(CONTENT_LENGTH, contentLength);
+        }else{
+            response.headers().set("Transfer-Encoding", "chunked");
+        }
+
 
         for(HeaderField field : r.header()){
             response.headers().add(field.name(), field.value());
         }
 
+
         if (keepAlive) {
-            // Add 'Content-Length' header only for a keep-alive connection.
-            response.headers().set(CONTENT_LENGTH, data.length);
             // Add keep alive header as per:
             // - http://www.w3.org/Protocols/HTTP/1.1/draft-ietf-http-v11-spec-01.html#Connection
             response.headers().set(CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
         }
 
+
         try{
 
-            // Write the response.
-            ChannelFuture writeFuture = sink.writeAndFlush(response);
+            ChannelFuture headerFuture = sink.writeAndFlush(response);
+
+            ChannelFuture writeFuture;
+            if(r.hasRepresentation()){
+                System.out.println("Writing more stuff");
+
+                PipedInputStream input = new PipedInputStream();
+                PipedOutputStream output = new PipedOutputStream(input);
+
+                new Thread(){
+                    @Override
+                    public void run() {
+                        try{
+                            System.out.println("Copying the output");
+                            r.representation().write(output);
+                            output.flush();
+                            output.close();
+                            System.out.println("Done copying the output");
+                        }catch (Exception t){
+                            t.printStackTrace();;
+                        }
+                    }
+                }.start();
+
+
+                final ChunkedStream data = new ChunkedStream(input, 1024 * 1024);
+                if(contentLength!=null){
+                    System.out.println("Using normal");
+                    writeFuture = sink.writeAndFlush(data);
+                }else{
+                    System.out.println("Using chunked");
+                    writeFuture = sink.writeAndFlush(new HttpChunkedInput(data));
+                }
+
+                writeFuture.addListener(new ChannelFutureListener() {
+                    @Override
+                    public void operationComplete(ChannelFuture future) throws Exception {
+                        System.out.println("done writing response body");
+                    }
+                });
+            }else{
+                writeFuture = headerFuture;
+            }
+
 
             // Close the non-keep-alive connection after the write operation is done.
             if (!keepAlive) {

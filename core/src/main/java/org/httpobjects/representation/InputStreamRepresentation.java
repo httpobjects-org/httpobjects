@@ -1,28 +1,28 @@
 /**
  * Copyright (C) 2011, 2012 Commission Junction Inc.
- * <p/>
+ *
  * This file is part of httpobjects.
- * <p/>
+ *
  * httpobjects is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- * <p/>
+ *
  * httpobjects is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
- * <p/>
+ *
  * You should have received a copy of the GNU General Public License
  * along with httpobjects; see the file COPYING.  If not, write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA.
- * <p/>
+ *
  * Linking this library statically or dynamically with other modules is
  * making a combined work based on this library.  Thus, the terms and
  * conditions of the GNU General Public License cover the whole
  * combination.
- * <p/>
+ *
  * As a special exception, the copyright holders of this library give you
  * permission to link this library with independent modules to produce an
  * executable, regardless of the license terms of these independent
@@ -35,17 +35,44 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects;
+package org.httpobjects.representation;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
-// TODO: make a way to write using async IO
-public interface Representation {
-    String contentType();
+import org.httpobjects.Representation;
 
-    void write(OutputStream out);
+public class InputStreamRepresentation implements Representation {
+	private final String contentType;
+	private final InputStream data;
+	
+	public InputStreamRepresentation(String contentType, InputStream data) {
+		super();
+		this.contentType = contentType;
+		if(data==null) throw new NullPointerException("Stream is null");
+		this.data = data;
+	}
 
-    default Long length(){
-        return null;
-    }
+	@Override
+	public String contentType() {
+		return contentType;
+	}
+	
+	@Override
+	public void write(OutputStream out) {
+		try {
+			byte[] buffer = new byte[1024];
+			for(int x=data.read(buffer);x!=-1;x=data.read(buffer)){
+				try{
+				    out.write(buffer, 0, x);
+				}catch(Exception err){
+				    throw new RuntimeException("Error writing representation.  This is probably because the connection to the remote host was closed.", err);
+				}
+			}
+			data.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

@@ -20,7 +20,9 @@ public class WireTest {
                                 int expectedResponseCode, HeaderSpec ... header) {
         try {
             HttpClient client = new HttpClient();
+            System.out.println(method.getName() + " " + method.getURI());
             int response = client.executeMethod(method);
+            System.out.println(method.getName() + " " + method.getURI() + ": " + response);
 
             Assert.assertEquals(expectedResponseCode, response);
             if(expectedBody!=null) Assert.assertEquals(expectedBody, method.getResponseBodyAsString());

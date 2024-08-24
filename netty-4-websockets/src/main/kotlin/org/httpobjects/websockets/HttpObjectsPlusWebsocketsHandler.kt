@@ -19,7 +19,7 @@ import java.io.ByteArrayInputStream
 class HttpObjectsPlusWebsocketsHandler(
     private val sessionsHandlers:List<WebSocketObject>,
     responder:HttpObjectsResponder,
-    responseCreator:ResponseCreationStrategy,
+    private val responseCreator:ResponseCreationStrategy,
     buffers:ByteAccumulatorFactory,
     log:org.httpobjects.netty4.Log) : HttpobjectsChannelHandler(responseCreator, responder, buffers, log) {
 
@@ -56,7 +56,7 @@ class HttpObjectsPlusWebsocketsHandler(
                         //Do the Handshake to upgrade connection from HTTP to WebSocket protocol
                         handleHandshake(ctx, msg)
                     }else if(initiationResult.response != null){
-                        Translate.writeResponse(msg, ctx.channel(), initiationResult.response)
+                        Translate.writeResponse(msg, ctx.channel(), initiationResult.response, responseCreator)
                     }else{
                         super.channelRead(ctx, msg)
                     }

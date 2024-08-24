@@ -35,44 +35,33 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.httpobjects.representation;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+package org.httpobjects.netty4.sockets;
 
-import org.httpobjects.Representation;
+import kotlin.Unit;
+import org.httpobjects.HttpObject;
+import org.httpobjects.eventual.Eventual;
+import org.httpobjects.netty4.BasicNetty4Server;
+import org.httpobjects.netty4.ResponseCreationStrategy;
+import org.httpobjects.netty4.buffer.InMemoryByteAccumulatorFactory;
+import org.httpobjects.tck.IntegrationTest;
+import org.httpobjects.websockets.NettyWithWebsockets;
+import org.httpobjects.websockets.NettyWithWebsocketsServer;
 
-public class BinaryRepresentation implements Representation {
-	private final String contentType;
-	private final InputStream data;
-	
-	public BinaryRepresentation(String contentType, InputStream data) {
-		super();
-		this.contentType = contentType;
-		if(data==null) throw new NullPointerException("Stream is null");
-		this.data = data;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.concurrent.Executors;
+
+class NettyWithWebsocketsTest: IntegrationTest() {
+	private var server:NettyWithWebsocketsServer? = null;
+
+	override fun serve(port: Int, vararg objects: HttpObject) {
+		server = NettyWithWebsockets.serveSimpleHttp(port, objects.toList(), emptyList());
 	}
 
-	@Override
-	public String contentType() {
-		return contentType;
-	}
-	
-	@Override
-	public void write(OutputStream out) {
-		try {
-			byte[] buffer = new byte[1024];
-			for(int x=data.read(buffer);x!=-1;x=data.read(buffer)){
-				try{
-				    out.write(buffer, 0, x);
-				}catch(Exception err){
-				    throw new RuntimeException("Error writing representation.  This is probably because the connection to the remote host was closed.", err);
-				}
-			}
-			data.close();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+	override fun stopServing() {
+		server?.stop()?.then {
+			println("Stopped")
 		}
 	}
 }

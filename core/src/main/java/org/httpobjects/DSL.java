@@ -37,11 +37,7 @@
  */
 package org.httpobjects;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,7 +47,8 @@ import org.httpobjects.header.response.AllowField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField;
-import org.httpobjects.representation.ImmutableRep;
+import org.httpobjects.representation.ByteArrayRepresentation;
+import org.httpobjects.representation.InputStreamRepresentation;
 import org.httpobjects.util.ClasspathResourcesObject;
 import org.httpobjects.util.Method;
 import org.httpobjects.util.impl.ClassResourceLoader;
@@ -135,15 +132,15 @@ public class DSL {
      */
 
     public static final Representation Csv(String text){
-        return new ImmutableRep(CONTENT_TYPE_CSV, new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
+        return new ByteArrayRepresentation(CONTENT_TYPE_CSV, getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING));
     }
 
     public static final Representation Html(String text){
-        return new ImmutableRep(CONTENT_TYPE_HTML, new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
+        return new ByteArrayRepresentation(CONTENT_TYPE_HTML, getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING));
     }
 
     public static final Representation Text(String text){
-        return new ImmutableRep(CONTENT_TYPE_TEXT_PLAIN, new ByteArrayInputStream(getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING)));
+        return new ByteArrayRepresentation(CONTENT_TYPE_TEXT_PLAIN, getBytes(text, MOST_WIDELY_SUPPORTED_ENCODING));
     }
 
     public static final Representation Json(String text){
@@ -151,7 +148,7 @@ public class DSL {
     }
 
     public static final Representation Json(InputStream text){
-        return new ImmutableRep(CONTENT_TYPE_JSON, text);
+        return new InputStreamRepresentation(CONTENT_TYPE_JSON, text);
     }
 
     public static final Representation HtmlFromClasspath(String name, Object context){
@@ -172,21 +169,21 @@ public class DSL {
         return Bytes(contentType, stream);
     }
 
-    public static final Representation FromClasspath(String contentType, String name, Object context){
+    public static Representation FromClasspath(String contentType, String name, Object context){
         return FromClasspath(contentType, name, context.getClass());
     }
 
-    public static final Representation Bytes(String contentType, byte[] data){
-        return new ImmutableRep(contentType, new ByteArrayInputStream(data));
+    public static Representation Bytes(String contentType, byte[] data){
+        return new ByteArrayRepresentation(contentType, data);
     }
 
-    public static final Representation Bytes(String contentType, InputStream data){
-        return new ImmutableRep(contentType, data);
+    public static Representation Bytes(String contentType, InputStream data){
+        return new InputStreamRepresentation(contentType, data);
     }
 
-    public static final Representation File(String contentType, java.io.File path){
+    public static Representation File(String contentType, java.io.File path){
         try {
-            return Bytes("", new FileInputStream(path));
+            return new InputStreamRepresentation(contentType, new FileInputStream(path));
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }

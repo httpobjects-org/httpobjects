@@ -92,7 +92,6 @@ public class HttpobjectsChannelHandler extends SimpleChannelInboundHandler<Objec
                     });
                 }
             }
-
         }
     }
 

@@ -10,6 +10,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.ssl.SslContext;
+import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.util.concurrent.Future;
 import org.httpobjects.*;
 import org.httpobjects.HttpObject;
@@ -59,22 +60,23 @@ public interface BasicNetty4Server {
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-//                      .handler(new LoggingHandler(LogLevel.INFO))
-                      .childHandler(new ChannelInitializer() {
-                        @Override
-                        protected void initChannel(Channel ch) throws Exception {
-                            ChannelPipeline p = ch.pipeline();
+                .channel(NioServerSocketChannel.class)
+                //                      .handler(new LoggingHandler(LogLevel.INFO))
+                .childHandler(new ChannelInitializer() {
+                    @Override
+                    protected void initChannel(Channel ch)  {
+                        ChannelPipeline p = ch.pipeline();
 
-                            if(sslContext!=null){
-                                p.addLast(sslContext.newHandler(ch.alloc()));
-                            }
-
-                            p.addLast(new HttpRequestDecoder());
-                            p.addLast(new HttpResponseEncoder());
-                            p.addLast(new HttpobjectsChannelHandler(responseCreationStrategy, httpobjectsRequestHandler, buffers, log));
+                        if(sslContext!=null){
+                            p.addLast(sslContext.newHandler(ch.alloc()));
                         }
-                    });
+
+                        p.addLast(new HttpRequestDecoder());
+                        p.addLast(new HttpResponseEncoder());
+                        p.addLast(new ChunkedWriteHandler());
+                        p.addLast(new HttpobjectsChannelHandler(responseCreationStrategy, httpobjectsRequestHandler, buffers, log));
+                    }
+                });
 
             b.bind(port).sync();
 

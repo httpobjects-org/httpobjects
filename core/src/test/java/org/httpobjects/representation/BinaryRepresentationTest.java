@@ -61,7 +61,7 @@ public class BinaryRepresentationTest {
                 throw connectionException;
             }
         };
-        BinaryRepresentation r = new BinaryRepresentation("foo/bar", in);
+        InputStreamRepresentation r = new InputStreamRepresentation("foo/bar", in);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         
         // when
@@ -82,7 +82,7 @@ public class BinaryRepresentationTest {
     public void wrapsOutputExceptionsWithAHelpfulMessage() {
         // given
         final EOFException connectionException = new EOFException();
-        BinaryRepresentation r = new BinaryRepresentation("foo/bar", new ByteArrayInputStream(DSL.getBytes("foobar", StandardCharset.UTF_8)));
+        InputStreamRepresentation r = new InputStreamRepresentation("foo/bar", new ByteArrayInputStream(DSL.getBytes("foobar", StandardCharset.UTF_8)));
         OutputStream out = new OutputStream() {
             @Override
             public void write(int b) throws IOException {
