@@ -3,6 +3,7 @@ package org.httpobjects.eventual;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class Resolvable<T> implements Eventual<T> {
     private List<Consumer<T>> listeners  = new ArrayList<Consumer<T>>();
@@ -24,6 +25,17 @@ public class Resolvable<T> implements Eventual<T> {
         }else{
             listeners.add(fn);
         }
+    }
+
+    @Override
+    public <R> Eventual<R> map(Function<T, R> fn) {
+        final Resolvable<R> result = new Resolvable<>();
+
+        this.then(v -> {
+            result.resolve(fn.apply(v));
+        });
+
+        return result;
     }
 
     @Override
