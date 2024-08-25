@@ -515,7 +515,4 @@ public class ProxyTest {
         assertEquals(representation, "this is the root page");
     }
 
-
-
-
 }
