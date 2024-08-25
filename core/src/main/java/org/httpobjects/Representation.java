@@ -42,8 +42,7 @@ import org.httpobjects.data.DataSource;
 public interface Representation {
     String contentType();
 
-    // New Data Mechanism
-    default DataSource data(){ return null; };
+    DataSource data();
 
     /**
      * @return the content-length in bytes if available; otherwise, null
