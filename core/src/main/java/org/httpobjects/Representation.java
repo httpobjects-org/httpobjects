@@ -42,6 +42,7 @@ import org.httpobjects.data.DataSource;
 public interface Representation {
     String contentType();
 
+
     DataSource data();
 
     /**
