@@ -60,7 +60,6 @@ public class ApacheCommonsMultipartReader extends MultipartReader {
         }
     }
 
-    private final byte[] boundary;
     private final UsableMultipartStream stream;
 
     public ApacheCommonsMultipartReader(Representation r) {
@@ -70,7 +69,7 @@ public class ApacheCommonsMultipartReader extends MultipartReader {
     public ApacheCommonsMultipartReader(String contentTypeHeaderValue, InputStream representation) {
         try {
             System.out.println(contentTypeHeaderValue);
-            this.boundary = getBoundary(contentTypeHeaderValue);
+            byte[] boundary = getBoundary(contentTypeHeaderValue);
             this. stream = new UsableMultipartStream(representation, boundary);
             if(!stream.skipPreamble()) throw new RuntimeException("Couldn't find a part to store");
         } catch (IOException e) {
