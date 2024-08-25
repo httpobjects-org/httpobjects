@@ -39,16 +39,16 @@ public interface DataSource {
      * For when the consumer controls the thread
      */
 
-    Eventual<DataSession> readAsync();
+//    Eventual<DataSession> readAsync();
     Eventual<InputStream> readInputStreamAsync();
-    Eventual<ReadableByteChannel> readChannelAsync();
+//    Eventual<ReadableByteChannel> readChannelAsync();
 
     /* PULL MECHANISMS
      * ------------------
      * For when the producer controls the thread.  These return an Eventual with the total number of bytes read.
      */
-    Eventual<BigInteger> writeAsync(DataDest dest);
-    Eventual<BigInteger> writeAsync(WritableByteChannel dest);
+//    Eventual<BigInteger> writeAsync(DataDest dest);
+//    Eventual<BigInteger> writeAsync(WritableByteChannel dest);
     void writeSync(OutputStream out);
 
     /* IN-MEMORY
