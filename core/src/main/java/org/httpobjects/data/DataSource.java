@@ -55,6 +55,9 @@ public interface DataSource {
      *  These don't scale.
      */
     String decodeToUTF8(int maxBytes);
+    default String decodeToUTF8Unbounded(){
+        return decodeToAscii(Integer.MAX_VALUE);
+    }
     String decodeToAscii(int maxBytes);
     default String decodeToAsciiUnbounded(){
         return decodeToAscii(Integer.MAX_VALUE);
