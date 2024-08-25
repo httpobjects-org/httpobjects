@@ -52,7 +52,7 @@ public class ApacheCommonsMultipartReader extends MultipartReader {
     private static byte[] readRepresentationIntoMemory(Representation r){
         try {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            r.write(buffer);
+            r.data().writeSync(buffer);
             buffer.close();
             return buffer.toByteArray();
         } catch (IOException e) {

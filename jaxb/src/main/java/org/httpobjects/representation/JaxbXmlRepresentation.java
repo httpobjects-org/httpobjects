@@ -43,6 +43,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import org.httpobjects.Representation;
+import org.httpobjects.data.DataSource;
+import org.httpobjects.data.OutputStreamDataSource;
 
 public class JaxbXmlRepresentation implements Representation {
 	private final Object obj;
@@ -58,14 +60,16 @@ public class JaxbXmlRepresentation implements Representation {
 	public String contentType() {
 		return "text/xml";
 	}
-	
+
 	@Override
-	public void write(OutputStream out) {
-		try {
-			jaxb.createMarshaller().marshal(obj, out);
-		} catch (JAXBException e) {
-			throw new RuntimeException(e);
-		}
+	public DataSource data() {
+		return new OutputStreamDataSource(out->{
+			try {
+				jaxb.createMarshaller().marshal(obj, out);
+			} catch (JAXBException e) {
+				throw new RuntimeException(e);
+			}
+		});
 	}
 	
 }
