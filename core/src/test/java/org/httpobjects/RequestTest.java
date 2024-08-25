@@ -13,31 +13,15 @@ import static org.junit.Assert.*;
 public class RequestTest {
 
     @Test
-    public void bodyUtf8StringUnboundedTest() throws Exception {
+    public void bodyUtf8StringUnbounded() throws Exception {
         // given
-        Request req1 = fooRequest();
-        Request req2 = barRequest();
-
-        // when
-        Optional<String> result1 = req1.bodyUtf8StringUnbounded();
-        Optional<String> result2 = req1.bodyUtf8StringUnbounded();
-        Optional<String> result3 = req2.bodyUtf8StringUnbounded();
-
-        // then
-        assertEquals(Optional.of("foo bar"), result1);
-        assertEquals(Optional.of("foo bar"), result2);
-        assertEquals(Optional.<String>empty(), result3);
-    }
-
-
-    private Request fooRequest() {
-        return new Request() {
+        Request req1 = new Request() {
             @Override public Query query() { return new Query("?foo=bar"); }
             @Override public Path path() { return new Path("/foo/bar/"); }
             @Override public RequestHeader header() {
                 return new RequestHeader(
-                    new GenericHeaderField("foocience", "foo"),
-                    new GenericHeaderField("bariness", "bar")
+                        new GenericHeaderField("foocience", "foo"),
+                        new GenericHeaderField("bariness", "bar")
                 );
             }
             @Override public ConnectionInfo connectionInfo() {
@@ -48,10 +32,19 @@ public class RequestTest {
             @Override public Request immutableCopy() { return this; }
             @Override public Method method() { return Method.POST; }
         };
+        
+        // when
+        Optional<String> result1 = req1.bodyUtf8StringUnbounded();
+
+        // then
+        assertEquals(Optional.of("foo bar"), result1);
     }
 
-    private Request barRequest() {
-        return new Request() {
+
+    @Test
+    public void bodyUtf8StringUnboundedTestEmptyOptional() throws Exception {
+        // given
+        Request req2 = new Request() {
             @Override public Query query() { return new Query("?foo=bar"); }
             @Override public Path path() { return new Path("/foo/bar/"); }
             @Override public RequestHeader header() {
@@ -68,5 +61,13 @@ public class RequestTest {
             @Override public Request immutableCopy() { return this; }
             @Override public Method method() { return Method.GET; }
         };
+
+        // when
+        Optional<String> result3 = req2.bodyUtf8StringUnbounded();
+
+        // then
+        assertEquals(Optional.<String>empty(), result3);
     }
+
+
 }

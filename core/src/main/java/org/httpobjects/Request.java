@@ -55,10 +55,10 @@ public interface Request {
     Request immutableCopy();
 
     default Optional<String> bodyUtf8StringUnbounded() {
-        if(hasRepresentation()){
+        if(!hasRepresentation()){
             return Optional.empty();
         }else{
-            return Optional.of(representation().data().decodeToUTF8(Integer.MAX_VALUE));
+            return Optional.ofNullable(representation()).map(it -> it.data().decodeToUTF8(Integer.MAX_VALUE));
         }
     }
 
