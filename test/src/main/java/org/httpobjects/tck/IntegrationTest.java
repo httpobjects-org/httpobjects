@@ -93,7 +93,7 @@ public abstract class IntegrationTest extends WireTest {
         serve(port,
         new HttpObject("/bigfiles"){
             public Eventual<Response> post(Request req) {
-                return OK(Text("received " + HttpObjectUtil.toByteArray(req.representation()).length + " bytes")).resolved();
+                return OK(Text("received " + req.representation().data().readToMemoryUnbounded().length + " bytes")).resolved();
             }
         },
         new HttpObject("/app/inbox"){
@@ -277,7 +277,7 @@ public abstract class IntegrationTest extends WireTest {
         new HttpObject("/patchme"){
             public Eventual<Response> patch(org.httpobjects.Request req) {
                 try {
-                    final String input = new String(HttpObjectUtil.toByteArray(req.representation()), "UTF-8");
+                    final String input = new String(req.representation().data().readToMemoryUnbounded(), "UTF-8");
                     return OK(Text("You told me to patch!" + input)).resolved();
                 } catch (UnsupportedEncodingException e) {
                     return INTERNAL_SERVER_ERROR(e).resolved();

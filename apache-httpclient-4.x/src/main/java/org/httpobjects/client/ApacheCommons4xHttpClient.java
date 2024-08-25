@@ -158,7 +158,7 @@ public final class ApacheCommons4xHttpClient implements HttpClient {
 	}
 
 	private AbstractHttpEntity translate(final Representation representation) {
-		final AbstractHttpEntity entity = new ByteArrayEntity(HttpObjectUtil.toByteArray(representation));
+		final AbstractHttpEntity entity = new ByteArrayEntity(representation.data().readToMemoryUnbounded());
 
 		entity.setContentType(representation.contentType());
 

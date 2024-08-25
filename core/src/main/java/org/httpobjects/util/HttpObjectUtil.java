@@ -53,11 +53,6 @@ public class HttpObjectUtil {
     }
 
     @Deprecated
-    public static byte[] toByteArray(Representation r){
-        return r.data().readToMemory(Integer.MAX_VALUE);
-    }
-
-    @Deprecated
     public static String toAscii(Representation r){
         return r.data().decodeToAscii(Integer.MAX_VALUE);
     }

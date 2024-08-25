@@ -58,5 +58,8 @@ public interface DataSource {
     String decodeToAscii(int maxBytes);
     String decodeToString(int maxBytes, Charset charset);
     byte[] readToMemory(int maxBytes);
+    default byte[] readToMemoryUnbounded(){
+        return readToMemory(Integer.MAX_VALUE);
+    }
 
 }
