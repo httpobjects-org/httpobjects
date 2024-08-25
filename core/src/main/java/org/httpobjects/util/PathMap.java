@@ -79,7 +79,6 @@ public class PathMap {
         return new PathMap(routes).resolveNoShadows();
     }
 
-
     public static FailableResult<List<HttpObject>> validateNoShadows(final List<PathMapEntry> routes){
         return new PathMap(routes).validateNoShadows();
     }
