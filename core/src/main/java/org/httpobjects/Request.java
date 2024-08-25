@@ -58,7 +58,7 @@ public interface Request {
         if(!hasRepresentation()){
             return Optional.empty();
         }else{
-            return Optional.ofNullable(representation()).map(it -> it.data().decodeToUTF8(Integer.MAX_VALUE));
+            return Optional.ofNullable(representation()).map(it -> it.data().decodeToUTF8Unbounded());
         }
     }
 
