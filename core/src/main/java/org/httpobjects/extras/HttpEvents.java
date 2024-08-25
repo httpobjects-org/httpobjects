@@ -4,7 +4,6 @@ import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
 import org.httpobjects.eventual.Eventual;
-import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 
 public class HttpEvents {
@@ -22,7 +21,7 @@ public class HttpEvents {
             private Eventual<Response> dec(Method method, Request req) {
                 try {
                     Id id = eventObserver.onRequest(req);
-                    Eventual<Response> e = HttpObjectUtil.invokeMethod(resource, method, req);
+                    Eventual<Response> e = Method.invokeMethod(resource, method, req);
                     if(e!=null){
                         e.then(new Eventual.ResultHandler<Response>() {
                             @Override

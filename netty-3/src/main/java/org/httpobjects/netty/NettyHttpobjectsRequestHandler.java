@@ -23,9 +23,7 @@ import org.httpobjects.netty.http.ByteAccumulator;
 import org.httpobjects.netty.http.HttpChannelHandler;
 import org.httpobjects.path.Path;
 import org.httpobjects.path.PathPattern;
-import org.httpobjects.representation.ImmutableRep;
 import org.httpobjects.representation.InputStreamRepresentation;
-import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 import org.jboss.netty.handler.codec.http.HttpChunkTrailer;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
@@ -52,7 +50,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 				match = next;
 				Request in = readRequest(pattern, request, lastChunk, body, connectionInfo);
 				Method m = Method.fromString(request.getMethod().getName());
-				Eventual<Response> out = HttpObjectUtil.invokeMethod(match, m, in);
+				Eventual<Response> out = Method.invokeMethod(match, m, in);
 				if(out!=null) return out;
 			}
 		}

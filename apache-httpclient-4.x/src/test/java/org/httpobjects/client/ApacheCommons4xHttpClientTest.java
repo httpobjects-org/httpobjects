@@ -9,7 +9,6 @@ import org.httpobjects.netty.HttpobjectsNettySupport;
 import org.httpobjects.netty.HttpobjectsNettySupport.ServerWrapper;
 import org.httpobjects.tck.PortFinder;
 import org.httpobjects.test.HttpObjectAssert;
-import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 import org.junit.Test;
 
@@ -303,7 +302,7 @@ public class ApacheCommons4xHttpClientTest {
                 }
                 final Representation r = req.representation();
                 if (r != null) {
-                    text.append("\n" + HttpObjectUtil.toAscii(r));
+                    text.append("\n" + r.data().decodeToAsciiUnbounded());
                 }
                 return OK(Text(text.toString()), new GenericHeaderField("body", URLEncoder.encode(text.toString(), "UTF8"))).resolved();
             } catch (Exception e) {

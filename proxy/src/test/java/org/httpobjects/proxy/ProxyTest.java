@@ -53,7 +53,6 @@ import org.httpobjects.tck.PortAllocation;
 import org.httpobjects.tck.PortFinder;
 import org.httpobjects.test.HttpObjectAssert;
 import org.httpobjects.test.MockRequest;
-import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 import org.junit.After;
 import org.junit.Before;
@@ -109,7 +108,7 @@ public class ProxyTest {
                     }
 
                     public Eventual<Response> patch(Request req) {
-                        final String response = HttpObjectUtil.toAscii(req.representation()) + " patched";
+                        final String response = req.representation().data().decodeToAsciiUnbounded() + " patched";
 
                         return OK(Text(response)).resolved();
                     }
@@ -244,7 +243,7 @@ public class ProxyTest {
         Response output = request.invoke();
 
         // THEN:
-        String representation = HttpObjectUtil.toAscii(output.representation());
+        String representation = output.representation().data().decodeToAsciiUnbounded();
         System.out.println("representation = " + representation);
 
         assertThat(representation, containsString("x-forwarded-host=dummy-remote-host-value"));
@@ -492,7 +491,7 @@ public class ProxyTest {
         Response output = input.invoke();
 
         // then
-        String representation = HttpObjectUtil.toAscii(output.representation());
+        String representation = output.representation().data().decodeToAsciiUnbounded();
         System.out.println("representation = " + representation);
 
         assertThat(representation, containsString("x-forwarded-for=dummy-remote-ip-address"));
@@ -510,7 +509,7 @@ public class ProxyTest {
         Response output = input.invoke();
 
         // then
-        String representation = HttpObjectUtil.toAscii(output.representation());
+        String representation = output.representation().data().decodeToAsciiUnbounded();
         System.out.println("representation = " + representation);
 
         assertEquals(representation, "this is the root page");

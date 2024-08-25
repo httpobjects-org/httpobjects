@@ -50,9 +50,9 @@ import org.httpobjects.eventual.Eventual;
 import org.httpobjects.test.MockRequest;
 import org.junit.Test;
 
-public class HttpObjectUtilTest {
+public class MiscTest {
 
-    class PatchTestingObject extends HttpObject {
+    static class PatchTestingObject extends HttpObject {
         final Response response;
         final List<Request> requestsReceived = new ArrayList<Request>();
         

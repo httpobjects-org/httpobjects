@@ -59,7 +59,6 @@ import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField;
 import org.httpobjects.servlet.impl.ImmutableRequestImpl;
-import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 
 public class ServletMethodInvoker {
@@ -117,7 +116,7 @@ public class ServletMethodInvoker {
 		if(m==null){
 			System.out.println("WARNING: not a method I know about: " + r.getMethod());
 		}
-		final Eventual<Response> eventual = HttpObjectUtil.invokeMethod(object, m, input);
+		final Eventual<Response> eventual = Method.invokeMethod(object, m, input);
 
 		return eventual == null ? null : eventual.join();
 	}

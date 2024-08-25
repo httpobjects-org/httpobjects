@@ -44,7 +44,6 @@ import org.httpobjects.eventual.Eventual;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.path.Path;
-import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 
 public class MockRequest implements Request {
@@ -92,7 +91,7 @@ public class MockRequest implements Request {
 	}
 
 	public Response invoke(){
-		final Eventual<Response> r =  HttpObjectUtil.invokeMethod(object, method, this);
+		final Eventual<Response> r =  Method.invokeMethod(object, method, this);
 		return r == null ? null : r.join();
 	}
 

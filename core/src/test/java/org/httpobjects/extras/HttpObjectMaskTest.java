@@ -3,7 +3,6 @@ package org.httpobjects.extras;
 import org.httpobjects.*;
 import org.httpobjects.header.request.RequestHeader;
 import org.httpobjects.path.Path;
-import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 import org.junit.Assert;
 import org.junit.Test;

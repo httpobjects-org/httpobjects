@@ -24,7 +24,6 @@ import org.httpobjects.impl.fn.Fn;
 import org.httpobjects.impl.fn.FunctionalJava;
 import org.httpobjects.impl.fn.Seq;
 import org.httpobjects.representation.ImmutableRep;
-import org.httpobjects.util.HttpObjectUtil;
 
 public final class ApacheCommons4xHttpClient implements HttpClient {
 	private final org.apache.http.client.HttpClient client;

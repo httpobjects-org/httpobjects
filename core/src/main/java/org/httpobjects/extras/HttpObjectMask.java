@@ -5,7 +5,6 @@ import org.httpobjects.eventual.Eventual;
 import org.httpobjects.path.Path;
 import org.httpobjects.path.PathParamName;
 import org.httpobjects.path.PathPattern;
-import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 
 import java.util.ArrayList;
@@ -61,9 +60,9 @@ public class HttpObjectMask {
 
             private Eventual<Response> match(Method method, Request req) {
                 if (left.pattern().matches(req.path().toString())) {
-                    return HttpObjectUtil.invokeMethod(left, method, req);
+                    return Method.invokeMethod(left, method, req);
                 } else if (right.pattern().matches(req.path().toString())) {
-                    return HttpObjectUtil.invokeMethod(right, method, req);
+                    return Method.invokeMethod(right, method, req);
                 } else {
                     return Eventual.resolved(notFound);
                 }

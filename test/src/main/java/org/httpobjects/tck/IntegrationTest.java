@@ -53,7 +53,6 @@ import org.httpobjects.header.request.credentials.BasicCredentials;
 import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField.Method;
 import org.httpobjects.path.Path;
-import org.httpobjects.util.HttpObjectUtil;
 import org.junit.*;
 
 import java.io.IOException;
@@ -64,7 +63,6 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static org.httpobjects.util.HttpObjectUtil.toAscii;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -264,7 +262,7 @@ public abstract class IntegrationTest extends WireTest {
             private String toString(Request r){
                 return "URI: " + r.path().toString() + "?" + r.query().toString() + "\n" +
                         toString(r.header().fields()) +
-                        toAscii(r.representation());
+                        r.representation().data().decodeToAsciiUnbounded();
             }
             private String toString(List<HeaderField> fields){
                 StringBuffer text = new StringBuffer();

@@ -41,7 +41,6 @@ import static org.junit.Assert.*;
 
 import org.httpobjects.test.MockRequest;
 import org.httpobjects.util.ClasspathResourcesObject;
-import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 import org.junit.Test;
 
@@ -70,7 +69,7 @@ public class DSLTest {
     	// then
     	assertEquals("/bar/{resource*}", object.pattern().raw());
     	Response response = new MockRequest(object, Method.GET, "/bar/a.txt").invoke();
-    	assertEquals("hello", HttpObjectUtil.toAscii(response.representation()));
+    	assertEquals("hello", response.representation().data().decodeToAsciiUnbounded());
     }
 
     @Test
@@ -83,7 +82,7 @@ public class DSLTest {
     	// then
     	assertEquals("/bar/{resource*}", object.pattern().raw());
     	Response response = new MockRequest(object, Method.GET, "/bar/util/ClasspathResourcesObjectTest_resources/a.txt").invoke();
-    	assertEquals("hello", HttpObjectUtil.toAscii(response.representation()));
+    	assertEquals("hello", response.representation().data().decodeToAsciiUnbounded());
     }
 
     @Test

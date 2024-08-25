@@ -37,6 +37,7 @@
  */
 package org.httpobjects.util;
 
+import org.httpobjects.DSL;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
@@ -79,6 +80,14 @@ public enum Method {
             return Method.valueOf(text);
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    public static Eventual<Response> invokeMethod(HttpObject object, final Method m, final Request input) {
+        if(m==null){
+            return DSL.NOT_IMPLEMENTED(HttpObject.Text("Not a method I support")).resolved();
+        }else{
+            return m.invoke(object, input);
         }
     }
 

@@ -50,7 +50,6 @@ import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.Cookie;
 import org.httpobjects.header.request.CookieField;
-import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 import org.junit.Test;
 
@@ -84,7 +83,7 @@ public class MockRequestTest {
         // then
         assertEquals("/messages/welcome", r.path().toString());
         assertEquals("?foo=bar", r.query().toString());
-        assertEquals("hello world", HttpObjectUtil.toAscii(r.representation()));
+        assertEquals("hello world", r.representation().data().decodeToAsciiUnbounded());
         
         final List<HeaderField> fields = r.header().fields();
         assertEquals(2, fields.size());

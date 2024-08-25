@@ -51,7 +51,6 @@ import org.httpobjects.header.response.AllowField;
 import org.httpobjects.header.response.LocationField;
 import org.httpobjects.header.response.SetCookieField;
 import org.httpobjects.header.response.WWWAuthenticateField;
-import org.httpobjects.util.HttpObjectUtil;
 import org.httpobjects.util.Method;
 
 import java.io.IOException;
@@ -108,7 +107,7 @@ public class HttpObjectsJettyHandler extends org.eclipse.jetty.server.handler.Ab
             System.out.println("WARNING: not a method I know about: " + r.getMethod());
         }
 
-        return HttpObjectUtil.invokeMethod(object, m, input);
+        return Method.invokeMethod(object, m, input);
     }
 
     private void returnResponse(Eventual<org.httpobjects.Response> eventualResponse, final Response resp)  {
