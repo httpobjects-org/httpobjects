@@ -1,5 +1,6 @@
 package org.httpobjects.eventual;
 
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -22,6 +23,16 @@ public interface Eventual<T> {
         final Resolvable<T> r = new Resolvable<T>();
 
         r.resolve(action.get());
+
+        return r;
+    }
+
+    public static <T> Eventual<T> resolveAsyncTo(Executor executor, Supplier<T> action){
+        final Resolvable<T> r = new Resolvable<T>();
+
+        executor.execute(()->{
+            r.resolve(action.get());
+        });
 
         return r;
     }

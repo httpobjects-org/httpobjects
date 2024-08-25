@@ -93,6 +93,19 @@ public class ResolvableTest {
 
         final Eventual<Integer> initial = Eventual.resolveTo(()-> 77);
 
+        // when
+        final Integer result = initial.join();
+
+        // then
+        assertEquals(Integer.valueOf(77), result);
+    }
+
+
+    @Test
+    public void resolveToAsync(){
+        // given
+        final Executor executor = Executors.newCachedThreadPool();
+        final Eventual<Integer> initial = Eventual.resolveAsyncTo(executor, ()-> 77);
 
         // when
         final Integer result = initial.join();
