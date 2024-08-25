@@ -19,7 +19,7 @@ public interface Eventual<T> {
 
         return r;
     }
-    
+
     static <T> Eventual<T> resolveTo(Supplier<T> action){
         final Resolvable<T> r = new Resolvable<T>();
 
