@@ -3,6 +3,7 @@ package org.httpobjects.data;
 import org.httpobjects.eventual.Eventual;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
@@ -10,13 +11,22 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public class OutputStreamDataSource implements DataSource{
+    private static final Executor DEFAULT_THREAD_POOL = Executors.newCachedThreadPool();
     private final Consumer<OutputStream> consumer;
+    private final Executor executor;
+
+    public OutputStreamDataSource(Consumer<OutputStream> consumer, Executor executor) {
+        this.consumer = consumer;
+        this.executor = executor;
+    }
 
     public OutputStreamDataSource(Consumer<OutputStream> consumer) {
-        this.consumer = consumer;
+        this(consumer, DEFAULT_THREAD_POOL);
     }
 
     private <T> T notSupported(){
@@ -30,7 +40,11 @@ public class OutputStreamDataSource implements DataSource{
 
     @Override
     public Eventual<InputStream> readInputStreamAsync() {
-        return notSupported();
+        try {
+            return Eventual.resolved(DataSetUtil.pumpDataToInputStream(consumer, executor));
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
     }
 
     @Override

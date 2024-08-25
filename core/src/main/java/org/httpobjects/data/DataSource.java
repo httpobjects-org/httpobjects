@@ -60,22 +60,3 @@ public interface DataSource {
     byte[] readToMemory(int maxBytes);
 
 }
-
-
-/*
- * Then, implement default implementations for the main types of data sources
- *   - Streams (InputStream/OutputStream)
- *   -
- */
-//class OutputStreamDataAccess implements DataAccess {
-//    public OutputStreamDataAccess(Supplier<OutputStream> outputs){}
-//}
-//
-//class InputStreamDataAccess implements DataAccess {
-//    public InputStreamDataAccess(Supplier<InpuStream> inputs){}
-//}
-//
-//class ByteChannelDataAccess implements DataAccess {
-//    public InputStreamDataAccess(Supplier<InpuStream> inputs){}
-//}
-

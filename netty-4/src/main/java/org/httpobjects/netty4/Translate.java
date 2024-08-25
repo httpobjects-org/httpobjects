@@ -179,26 +179,32 @@ public class Translate {
             ChannelFuture headerFuture = sink.writeAndFlush(response);
 
             ChannelFuture writeFuture;
+
             if(r.hasRepresentation()){
                 System.out.println("Writing more stuff");
 
-                final InputStream input = pumpDataToInputStream(r.representation(), executor);
+                ChannelPromise aggregateWritePromise = sink.newPromise();
 
-                final ChunkedStream dataChunks = new ChunkedStream(input, 1024 * 1024);
-                if(contentLength!=null){
-                    System.out.println("Using normal");
-                    writeFuture = sink.writeAndFlush(dataChunks);
-                }else{
-                    System.out.println("Using chunked");
-                    writeFuture = sink.writeAndFlush(new HttpChunkedInput(dataChunks));
-                }
+                r.representation().data().readInputStreamAsync().then(input ->{
 
-                writeFuture.addListener(new ChannelFutureListener() {
-                    @Override
-                    public void operationComplete(ChannelFuture future) throws Exception {
-                        System.out.println("done writing response body");
+                    final ChunkedStream dataChunks = new ChunkedStream(input, 1024 * 1024);
+
+                    final ChannelFuture actualWritePromise;
+                    if(contentLength!=null){
+                        System.out.println("Using normal");
+                        actualWritePromise = sink.writeAndFlush(dataChunks);
+                    }else{
+                        System.out.println("Using chunked");
+                        actualWritePromise = sink.writeAndFlush(new HttpChunkedInput(dataChunks));
                     }
+
+                    actualWritePromise.addListener((ChannelFutureListener) future -> {
+                        aggregateWritePromise.setSuccess();
+                        System.out.println("done writing response body");
+                    });
                 });
+
+                writeFuture = aggregateWritePromise;
             }else{
                 writeFuture = headerFuture;
             }
@@ -215,27 +221,6 @@ public class Translate {
         }
     }
 
-    // TODO: this is a good candidate to move out into the core utils
-    private static PipedInputStream pumpDataToInputStream(Representation r, ResponseCreationStrategy executor) throws IOException {
-        PipedInputStream input = new PipedInputStream();
-        PipedOutputStream output = new PipedOutputStream(input);
-
-        executor.doIt(new Runnable(){
-            @Override
-            public void run() {
-                try{
-                    System.out.println("Copying the output");
-                    r.data().writeSync(output);
-                    output.flush();
-                    output.close();
-                    System.out.println("Done copying the output");
-                }catch (Exception t){
-                    t.printStackTrace();;
-                }
-            }
-        });
-        return input;
-    }
 
     private static final ChannelFutureListener WRITE_EMPTY_BUFFER = new ChannelFutureListener() {
         @Override
