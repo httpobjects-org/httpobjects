@@ -39,9 +39,10 @@ package org.httpobjects.representation;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import org.httpobjects.Representation;
+import org.httpobjects.data.DataSource;
+import org.httpobjects.data.OutputStreamDataSource;
 
 public class InputStreamRepresentation implements Representation {
 	private final String contentType;
@@ -58,21 +59,23 @@ public class InputStreamRepresentation implements Representation {
 	public String contentType() {
 		return contentType;
 	}
-	
+
 	@Override
-	public void write(OutputStream out) {
-		try {
-			byte[] buffer = new byte[1024];
-			for(int x=data.read(buffer);x!=-1;x=data.read(buffer)){
-				try{
-				    out.write(buffer, 0, x);
-				}catch(Exception err){
-				    throw new RuntimeException("Error writing representation.  This is probably because the connection to the remote host was closed.", err);
+	public DataSource data() {
+		return new OutputStreamDataSource(out -> {
+			try {
+				byte[] buffer = new byte[1024];
+				for(int x=data.read(buffer);x!=-1;x=data.read(buffer)){
+					try{
+						out.write(buffer, 0, x);
+					}catch(Exception err){
+						throw new RuntimeException("Error writing representation.  This is probably because the connection to the remote host was closed.", err);
+					}
 				}
+				data.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
-			data.close();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		});
 	}
 }

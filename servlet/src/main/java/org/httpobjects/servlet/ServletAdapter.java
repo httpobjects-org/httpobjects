@@ -67,7 +67,7 @@ public final class ServletAdapter extends HttpServlet {
 		
 		if(r.hasRepresentation()){
 			OutputStream out = resp.getOutputStream();
-			r.representation().write(out);
+			r.representation().data().writeSync(out);
 			out.close();
 		}
 	}

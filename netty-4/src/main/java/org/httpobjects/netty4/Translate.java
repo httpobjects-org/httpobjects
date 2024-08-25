@@ -225,7 +225,7 @@ public class Translate {
             public void run() {
                 try{
                     System.out.println("Copying the output");
-                    r.write(output);
+                    r.data().writeSync(output);
                     output.flush();
                     output.close();
                     System.out.println("Done copying the output");
@@ -248,7 +248,7 @@ public class Translate {
     private static byte[] read(Response out) {
         try {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            out.representation().write(stream);
+            out.representation().data().writeSync(stream);
             stream.close();
             return stream.toByteArray();
         } catch (IOException e) {

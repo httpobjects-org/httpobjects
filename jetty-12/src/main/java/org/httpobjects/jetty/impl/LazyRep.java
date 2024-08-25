@@ -1,10 +1,11 @@
 package org.httpobjects.jetty.impl;
 
 import org.httpobjects.Representation;
+import org.httpobjects.data.DataSource;
+import org.httpobjects.data.OutputStreamDataSource;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 public class LazyRep implements Representation {
@@ -43,12 +44,14 @@ public class LazyRep implements Representation {
     }
 
     @Override
-    public void write(OutputStream out) {
-        try {
-            out.write(getData());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public DataSource data() {
+        return new OutputStreamDataSource(out -> {
+            try {
+                out.write(getData());
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        });
     }
 
     public String toString() {

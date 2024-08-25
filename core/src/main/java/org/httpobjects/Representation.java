@@ -39,13 +39,8 @@ package org.httpobjects;
 
 import org.httpobjects.data.DataSource;
 
-import java.io.OutputStream;
-
 public interface Representation {
     String contentType();
-
-    @Deprecated
-    void write(OutputStream out);
 
     // New Data Mechanism
     default DataSource data(){ return null; };

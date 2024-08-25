@@ -117,7 +117,7 @@ public class ProxyTest {
                     @Override
                     public Eventual<Response> put(Request req) {
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
-                        req.representation().write(out);
+                        req.representation().data().writeSync(out);
                         String textualRepresentation = new String(out.toByteArray());
                         return OK(Text(textualRepresentation)).resolved();
                     }
@@ -190,7 +190,7 @@ public class ProxyTest {
                     @Override
                     public Eventual<Response> post(Request req) {
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
-                        req.representation().write(out);
+                        req.representation().data().writeSync(out);
                         String textualRepresentation = new String(out.toByteArray());
                         if (textualRepresentation.equals("Oh, kermie!")) {
                             return SEE_OTHER(Location("/piggy"), Text(textualRepresentation)).resolved();

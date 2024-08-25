@@ -67,7 +67,7 @@ public class BinaryRepresentationTest {
         // when
         Throwable err = null;
         try {
-            r.write(out);
+            r.data().writeSync(out);
         } catch (Exception e) {
             err = e;
         }
@@ -93,7 +93,7 @@ public class BinaryRepresentationTest {
         // when
         Throwable err = null;
         try {
-            r.write(out);
+            r.data().writeSync(out);
         } catch (Exception e) {
             err = e;
         }

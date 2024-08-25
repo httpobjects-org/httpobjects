@@ -49,14 +49,15 @@ public interface DataSource {
      */
     Eventual<BigInteger> writeAsync(DataDest dest);
     Eventual<BigInteger> writeAsync(WritableByteChannel dest);
-    Eventual<BigInteger> writeAsync(OutputStream out);
+    void writeSync(OutputStream out);
 
     /* IN-MEMORY
      *  These don't scale.
      */
-    Eventual<String> decodeToUTF8(long maxCharacters);
-    Eventual<String> decode(long maxCharacters, Charset charset);
-    Eventual<byte[]> readToMemory(int maxBytes);
+    String decodeToUTF8(int maxBytes);
+    String decodeToAscii(int maxBytes);
+    String decodeToString(int maxBytes, Charset charset);
+    byte[] readToMemory(int maxBytes);
 
 }
 

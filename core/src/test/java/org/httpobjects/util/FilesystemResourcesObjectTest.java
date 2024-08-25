@@ -96,7 +96,7 @@ public class FilesystemResourcesObjectTest {
 
     private static String toString(Representation representation) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        representation.write(out);
+        representation.data().writeSync(out);
         return new String(out.toByteArray());
     }
 }

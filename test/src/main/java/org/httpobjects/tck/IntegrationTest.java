@@ -40,6 +40,8 @@ package org.httpobjects.tck;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.methods.*;
 import org.httpobjects.*;
+import org.httpobjects.data.DataSource;
+import org.httpobjects.data.OutputStreamDataSource;
 import org.httpobjects.eventual.Eventual;
 import org.httpobjects.header.DefaultHeaderFieldVisitor;
 import org.httpobjects.header.GenericHeaderField;
@@ -56,7 +58,6 @@ import org.junit.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -133,16 +134,18 @@ public abstract class IntegrationTest extends WireTest {
                     }
 
                     @Override
-                    public void write(OutputStream out) {
-                        try{
-                            for(long x=0; x < numChunks; x++){
-                                out.write(chunk);
-                                reporter.progressMade( x * chunkSize);
+                    public DataSource data() {
+                        return new OutputStreamDataSource(out->{
+                            try{
+                                for(long x=0; x < numChunks; x++){
+                                    out.write(chunk);
+                                    reporter.progressMade( x * chunkSize);
+                                }
+                                System.out.println("Done writing response");
+                            }catch (Throwable t){
+                                throw new RuntimeException(t);
                             }
-                            System.out.println("Done writing response");
-                        }catch (Throwable t){
-                            throw new RuntimeException(t);
-                        }
+                        });
                     }
                 }).resolved();
             }

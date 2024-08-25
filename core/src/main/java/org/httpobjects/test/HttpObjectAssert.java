@@ -223,9 +223,7 @@ public class HttpObjectAssert {
 		}
 		
 		private String textOf(org.httpobjects.Representation r){
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			r.write(out);
-			return new String(out.toByteArray());
+			return r.data().decodeToUTF8(Integer.MAX_VALUE);
 		}
 
 		public String asString() {

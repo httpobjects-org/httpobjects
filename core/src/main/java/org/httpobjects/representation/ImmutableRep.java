@@ -1,14 +1,12 @@
 package org.httpobjects.representation;
 
 import org.httpobjects.Representation;
-import org.httpobjects.header.HeaderField;
-import org.httpobjects.util.HttpObjectUtil;
+import org.httpobjects.data.DataSource;
+import org.httpobjects.data.OutputStreamDataSource;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
 
 public class ImmutableRep implements Representation {
 
@@ -37,12 +35,14 @@ public class ImmutableRep implements Representation {
     }
 
     @Override
-    public void write(OutputStream out) {
-        try {
-            out.write(representation);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public DataSource data() {
+        return new OutputStreamDataSource(out -> {
+            try {
+                out.write(representation);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
 }

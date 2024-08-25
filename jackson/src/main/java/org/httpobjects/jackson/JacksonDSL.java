@@ -49,6 +49,8 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.httpobjects.data.DataSource;
+import org.httpobjects.data.OutputStreamDataSource;
 
 
 public class JacksonDSL {
@@ -71,7 +73,7 @@ public class JacksonDSL {
         }
 
         public <T> T to(Class<T> convertTo) throws IOException {
-            representation.write(byteStream);
+            representation.data().writeSync(byteStream);
             return objectMapper.readValue(new ByteArrayInputStream(byteStream.toByteArray()), convertTo);
         }
     }
@@ -82,16 +84,18 @@ public class JacksonDSL {
 
     public static Representation JacksonJson(final Object object, final ObjectMapper jackson) {
     	return new Representation() {
-			
+
 			@Override
-			public void write(OutputStream out) {
-				try {
-					jackson.writeValue(out, object);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
+			public DataSource data() {
+				return new OutputStreamDataSource(out->{
+					try {
+						jackson.writeValue(out, object);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				});
 			}
-			
+
 			@Override
 			public String contentType() {
 				return DSL.CONTENT_TYPE_JSON;
@@ -103,24 +107,28 @@ public class JacksonDSL {
     	
     	return new Representation() {
     		private final ObjectMapper mapper = new ObjectMapper();
+
+
 			@Override
-			public void write(OutputStream out) {
-				JsonGenerator generator=null;
-				try{
-					JsonFactory jsonFactory = mapper.getFactory();
-	                generator = jsonFactory.createGenerator(out, JsonEncoding.UTF8);
-	                generator.writeStartArray();
-	                for(String obj:stream){
-	                    generator.writeTree(mapper.readTree(obj));
-	                }
-	                generator.writeEndArray();
-	            }catch(Exception e){
-	                throw new RuntimeException(e);
-	            }finally{
-	                try{
-	                    generator.close();
-	                }catch(Exception e){/*Give Up.*/}
-	            }
+			public DataSource data() {
+				return new OutputStreamDataSource(out->{
+					JsonGenerator generator=null;
+					try{
+						JsonFactory jsonFactory = mapper.getFactory();
+						generator = jsonFactory.createGenerator(out, JsonEncoding.UTF8);
+						generator.writeStartArray();
+						for(String obj:stream){
+							generator.writeTree(mapper.readTree(obj));
+						}
+						generator.writeEndArray();
+					}catch(Exception e){
+						throw new RuntimeException(e);
+					}finally{
+						try{
+							generator.close();
+						}catch(Exception e){/*Give Up.*/}
+					}
+				});
 			}
 			
 			@Override

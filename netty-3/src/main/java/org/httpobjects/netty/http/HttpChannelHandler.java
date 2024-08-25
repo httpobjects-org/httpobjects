@@ -138,7 +138,7 @@ public class HttpChannelHandler extends SimpleChannelUpstreamHandler {
     private byte[] read(Response out) {
         try {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            out.representation().write(stream);
+            out.representation().data().writeSync(stream);
             stream.close();
             return stream.toByteArray();
         } catch (IOException e) {

@@ -39,6 +39,8 @@ package org.httpobjects.proxy;
 
 import org.httpobjects.*;
 import org.httpobjects.client.HttpClient;
+import org.httpobjects.data.DataSource;
+import org.httpobjects.data.OutputStreamDataSource;
 import org.httpobjects.eventual.Eventual;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.response.LocationField;
@@ -49,7 +51,6 @@ import org.httpobjects.path.RegexPathPattern;
 import org.httpobjects.HttpObject;
 import org.httpobjects.util.Method;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -226,9 +227,12 @@ public class Proxy extends HttpObject {
             }
 
             @Override
-            public void write(OutputStream out) {
-                response.representation().write(out);
+            public DataSource data() {
+                return new OutputStreamDataSource(out->{
+                    response.representation().data().writeSync(out);
+                });
             }
+
         } : null,
         headersReturned.toArray(new HeaderField[]{}));
     }

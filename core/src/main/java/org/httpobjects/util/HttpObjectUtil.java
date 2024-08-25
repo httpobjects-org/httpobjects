@@ -40,6 +40,7 @@ package org.httpobjects.util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import org.httpobjects.*;
 import org.httpobjects.eventual.Eventual;
@@ -83,30 +84,23 @@ public class HttpObjectUtil {
         }
     }
 
+    @Deprecated
     public static byte[] toByteArray(Representation r){
-        try {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            r.write(out);
-            out.close();
-            return out.toByteArray();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return r.data().readToMemory(Integer.MAX_VALUE);
     }
 
+    @Deprecated
     public static String toAscii(Representation r){
-        return toString(r, "ascii");
+        return r.data().decodeToAscii(Integer.MAX_VALUE);
     }
 
+    @Deprecated
     public static String toUtf8(Representation r) {
-        return toString(r, "utf-8");
+        return r.data().decodeToUTF8(Integer.MAX_VALUE);
     }
 
+    @Deprecated
     public static String toString(Representation r, String charsetName){
-        try {
-            return new String(toByteArray(r), charsetName);
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        return r.data().decodeToString(Integer.MAX_VALUE, Charset.forName(charsetName));
     }
 }

@@ -177,7 +177,7 @@ public class HttpObjectsJettyHandler extends org.eclipse.jetty.server.handler.Ab
                         }
 
                         final OutputStream out = Content.Sink.asOutputStream(resp);
-                        r.representation().write(out);
+                        r.representation().data().writeSync(out);
                         out.close();
                     }else{
                         resp.write(

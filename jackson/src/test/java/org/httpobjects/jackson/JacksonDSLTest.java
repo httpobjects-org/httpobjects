@@ -56,7 +56,7 @@ public class JacksonDSLTest {
         RandomBean input = new RandomBean("Hello");
 
         // when
-        JacksonDSL.JacksonJson(input).write(outputStream);
+        JacksonDSL.JacksonJson(input).data().writeSync(outputStream);
 
         // then
         assertEquals(outputStream.toString(), "{\"message\":\"Hello\"}");
@@ -69,7 +69,7 @@ public class JacksonDSLTest {
         List<String> strings = Arrays.asList("{\"message\":\"Hello\"}", "{\"message\":\"Goodbye\"}");
 
         // when
-        JacksonDSL.JsonStream(strings).write(outputStream);
+        JacksonDSL.JsonStream(strings).data().writeSync(outputStream);
 
         // then
         assertEquals(outputStream.toString(), "[{\"message\":\"Hello\"},{\"message\":\"Goodbye\"}]");

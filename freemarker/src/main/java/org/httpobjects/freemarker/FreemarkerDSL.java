@@ -37,7 +37,6 @@
  */
 package org.httpobjects.freemarker;
 
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
@@ -45,6 +44,8 @@ import org.httpobjects.Representation;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import org.httpobjects.data.DataSource;
+import org.httpobjects.data.OutputStreamDataSource;
 
 public final class FreemarkerDSL {
 	public static Representation FreemarkerTemplate(final String template, final Object model, final Configuration config){
@@ -52,17 +53,19 @@ public final class FreemarkerDSL {
 	}
 	public static Representation FreemarkerTemplate(final String contentType, final String template, final Object model, final Configuration config){
 		return new Representation() {
-			
+
 			@Override
-			public void write(OutputStream out) {
-				try {
-					Template t = config.getTemplate(template);
-					Writer w = new OutputStreamWriter(out, t.getEncoding());
-					config.getTemplate(template).process(model, w);
-					w.close();
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
+			public DataSource data() {
+				return new OutputStreamDataSource(out -> {
+					try {
+						Template t = config.getTemplate(template);
+						Writer w = new OutputStreamWriter(out, t.getEncoding());
+						config.getTemplate(template).process(model, w);
+						w.close();
+					} catch (Throwable t) {
+						throw new RuntimeException(t);
+					}
+				});
 			}
 			
 			@Override
