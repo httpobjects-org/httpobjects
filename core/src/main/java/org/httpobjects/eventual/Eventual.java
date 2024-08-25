@@ -18,7 +18,7 @@ public interface Eventual<T> {
 
         return r;
     }
-    public static <T> Eventual<T> of(Supplier<T> action){
+    public static <T> Eventual<T> resolveTo(Supplier<T> action){
         final Resolvable<T> r = new Resolvable<T>();
 
         r.resolve(action.get());

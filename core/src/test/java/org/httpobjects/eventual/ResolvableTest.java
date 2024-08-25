@@ -2,9 +2,9 @@ package org.httpobjects.eventual;
 
 import org.junit.Test;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
 
@@ -88,10 +88,11 @@ public class ResolvableTest {
 
 
     @Test
-    public void of(){
+    public void resolveTo(){
         // given
 
-        final Eventual<Integer> initial = Eventual.of(()-> 77);
+        final Eventual<Integer> initial = Eventual.resolveTo(()-> 77);
+
 
         // when
         final Integer result = initial.join();
