@@ -51,6 +51,7 @@ import org.httpobjects.StandardCharset;
 import org.junit.Test;
 
 public class BinaryRepresentationTest {
+
     @Test
     public void leavesInputExceptionsAlone() {
         // given

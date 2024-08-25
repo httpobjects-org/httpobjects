@@ -32,7 +32,7 @@ public class RequestTest {
             @Override public Request immutableCopy() { return this; }
             @Override public Method method() { return Method.POST; }
         };
-        
+
         // when
         Optional<String> result1 = req1.bodyUtf8StringUnbounded();
 
