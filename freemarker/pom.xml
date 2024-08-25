@@ -5,7 +5,7 @@
     <parent>
         <artifactId>httpobjects-pom</artifactId>
         <groupId>org.httpobjects.pom</groupId>
-        <version>1.0.0.pre1</version>
+        <version>1.0.0.pre2-SNAPSHOT</version>
     </parent>
 
     <groupId>org.httpobjects.freemarker</groupId>
