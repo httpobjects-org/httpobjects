@@ -1,13 +1,11 @@
 package org.httpobjects.eventual;
 
+import java.util.function.Consumer;
+
 public interface Eventual<T> {
-    void then(ResultHandler<T> fn);
+    void then(Consumer<T> fn);
 
     T join();
-
-    interface ResultHandler<T> {
-          void exec(T r);
-     }
 
     public static <T> Eventual<T> resolved(T resolution){
         final Resolvable<T> r = new Resolvable<T>();

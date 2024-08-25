@@ -112,86 +112,80 @@ public class HttpObjectsJettyHandler extends org.eclipse.jetty.server.handler.Ab
 
     private void returnResponse(Eventual<org.httpobjects.Response> eventualResponse, final Response resp)  {
 
-        eventualResponse.then(new Eventual.ResultHandler<org.httpobjects.Response>() {
-            @Override
-            public void exec(org.httpobjects.Response r) {
+        eventualResponse.then(r -> {
+            try {
+                resp.setStatus(r.code().value());
 
+                for(HeaderField next : r.header()){
+                    next.accept(new HeaderFieldVisitor() {
 
-                try {
-                    resp.setStatus(r.code().value());
-
-                    for(HeaderField next : r.header()){
-                        next.accept(new HeaderFieldVisitor() {
-
-                            @Override
-                            public Void visit(CookieField cookieField) {
-                                resp.getHeaders().add(cookieField.name(), cookieField.value());
-                                return null;
-                            }
-
-                            @Override
-                            public Void visit(GenericHeaderField other) {
-                                // TODO: This might not work right with multiple headers of the same name
-                                resp.getHeaders().add(other.name(), other.value());
-                                return null;
-                            }
-
-                            @Override
-                            public Void visit(AllowField allowField) {
-                                resp.getHeaders().add(allowField.name(), allowField.value());
-                                return null;
-                            }
-
-                            @Override
-                            public Void visit(LocationField location) {
-                                resp.getHeaders().add(location.name(), location.value());
-                                return null;
-                            }
-
-                            @Override
-                            public Void visit(SetCookieField setCookieField) {
-                                resp.getHeaders().add(setCookieField.name(), setCookieField.value());
-                                return null;
-                            }
-
-                            @Override
-                            public Void visit(WWWAuthenticateField wwwAuthorizationField) {
-                                resp.getHeaders().add(wwwAuthorizationField.name(), wwwAuthorizationField.value());
-                                return null;
-                            }
-                            @Override
-                            public Void visit(AuthorizationField authorizationField) {
-                                throw new RuntimeException("Illegal header for request: " + authorizationField.getClass());
-                            }
-
-                        });
-                    }
-
-                    addDefaultHeadersAsApplicable(r, resp);
-
-                    if(r.hasRepresentation()){
-                        final String contentType = r.representation().contentType();
-                        if(contentType!=null){
-                            resp.getHeaders().add("Content-Type", contentType);
+                        @Override
+                        public Void visit(CookieField cookieField) {
+                            resp.getHeaders().add(cookieField.name(), cookieField.value());
+                            return null;
                         }
 
-                        final OutputStream out = Content.Sink.asOutputStream(resp);
-                        r.representation().data().writeSync(out);
-                        out.close();
-                    }else{
-                        resp.write(
-                            true,
-                            ByteBuffer.wrap(new byte[]{}),
-                            new Callback(){}
-                        );
-                    }
+                        @Override
+                        public Void visit(GenericHeaderField other) {
+                            // TODO: This might not work right with multiple headers of the same name
+                            resp.getHeaders().add(other.name(), other.value());
+                            return null;
+                        }
 
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                        @Override
+                        public Void visit(AllowField allowField) {
+                            resp.getHeaders().add(allowField.name(), allowField.value());
+                            return null;
+                        }
+
+                        @Override
+                        public Void visit(LocationField location) {
+                            resp.getHeaders().add(location.name(), location.value());
+                            return null;
+                        }
+
+                        @Override
+                        public Void visit(SetCookieField setCookieField) {
+                            resp.getHeaders().add(setCookieField.name(), setCookieField.value());
+                            return null;
+                        }
+
+                        @Override
+                        public Void visit(WWWAuthenticateField wwwAuthorizationField) {
+                            resp.getHeaders().add(wwwAuthorizationField.name(), wwwAuthorizationField.value());
+                            return null;
+                        }
+                        @Override
+                        public Void visit(AuthorizationField authorizationField) {
+                            throw new RuntimeException("Illegal header for request: " + authorizationField.getClass());
+                        }
+
+                    });
                 }
 
+                addDefaultHeadersAsApplicable(r, resp);
 
+                if(r.hasRepresentation()){
+                    final String contentType = r.representation().contentType();
+                    if(contentType!=null){
+                        resp.getHeaders().add("Content-Type", contentType);
+                    }
+
+                    final OutputStream out = Content.Sink.asOutputStream(resp);
+                    r.representation().data().writeSync(out);
+                    out.close();
+                }else{
+                    resp.write(
+                        true,
+                        ByteBuffer.wrap(new byte[]{}),
+                        new Callback(){}
+                    );
+                }
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
+
         });
     }
 

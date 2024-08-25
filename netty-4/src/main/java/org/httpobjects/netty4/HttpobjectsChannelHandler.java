@@ -78,17 +78,13 @@ public class HttpobjectsChannelHandler extends SimpleChannelInboundHandler<Objec
                     responseCreator.doIt(new Runnable() {
                         @Override
                         public void run() {
-                            responder.respond(currentRequest, Translate.connectionInfo(ctx)).then(new Eventual.ResultHandler<Response>() {
-                                @Override
-                                public void exec(Response response) {
-
-                                    Translate.writeResponse(
-                                            currentRequest.beforeBody,
-                                            ctx.channel(),
-                                            response,
-                                            responseCreator);
-                                    currentRequest.dispose();
-                                }
+                            responder.respond(currentRequest, Translate.connectionInfo(ctx)).then(response -> {
+                                Translate.writeResponse(
+                                        currentRequest.beforeBody,
+                                        ctx.channel(),
+                                        response,
+                                        responseCreator);
+                                currentRequest.dispose();
                             });
                         }
                     });

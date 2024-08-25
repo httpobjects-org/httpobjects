@@ -2,9 +2,10 @@ package org.httpobjects.eventual;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class Resolvable<T> implements Eventual<T> {
-    private List<ResultHandler<T>> listeners  = new ArrayList<ResultHandler<T>>();
+    private List<Consumer<T>> listeners  = new ArrayList<Consumer<T>>();
     private T resolution;
     private boolean hasResolved = false;
 
@@ -17,9 +18,9 @@ public class Resolvable<T> implements Eventual<T> {
     }
 
     @Override
-    public void then(ResultHandler<T> fn) {
+    public void then(Consumer<T> fn) {
         if(hasResolved){
-            fn.exec(this.resolution);
+            fn.accept(this.resolution);
         }else{
             listeners.add(fn);
         }
@@ -53,8 +54,8 @@ public class Resolvable<T> implements Eventual<T> {
             this.resolution = result;
             this.hasResolved = true;
 
-            for(ResultHandler<T> listener : this.listeners){
-                listener.exec(result);
+            for(Consumer<T> listener : this.listeners){
+                listener.accept(result);
             }
 
             listeners.clear();

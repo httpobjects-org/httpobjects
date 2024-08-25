@@ -23,11 +23,8 @@ public class HttpEvents {
                     Id id = eventObserver.onRequest(req);
                     Eventual<Response> e = Method.invokeMethod(resource, method, req);
                     if(e!=null){
-                        e.then(new Eventual.ResultHandler<Response>() {
-                            @Override
-                            public void exec(Response res) {
-                                eventObserver.onResponse(id, res);
-                            }
+                        e.then(res ->{
+                            eventObserver.onResponse(id, res);
                         });
                     }
                     return  e;

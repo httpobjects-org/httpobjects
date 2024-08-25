@@ -16,32 +16,24 @@ class Demo {
             }
         });
 
-        data.readInputStreamAsync().then(new Eventual.ResultHandler<InputStream>() {
-            @Override
-            public void exec(InputStream input) {
-                try{
-                    readStream(input);
-                    input.close();
-                }catch (Throwable t){
-                    throw new RuntimeException(t);
-                }
+        data.readInputStreamAsync().then(input -> {
+            try{
+                readStream(input);
+                input.close();
+            }catch (Throwable t){
+                throw new RuntimeException(t);
             }
         });
 
-        data.readAsync().then(new Eventual.ResultHandler<DataSession>() {
-            @Override
-            public void exec(DataSession ds) {
+        data.readAsync().then(ds -> {
 //        ds.read() until return is -1
-                ds.release();
-            }
+            ds.release();
+
         });
 
 
-        data.readChannelAsync().then(new Eventual.ResultHandler<ReadableByteChannel>() {
-            @Override
-            public void exec(ReadableByteChannel channel) {
+        data.readChannelAsync().then(channel -> {
 
-            }
         });
     }
 
