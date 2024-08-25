@@ -91,7 +91,7 @@ public class HttpObjectUtilTest {
     public void representationToAscii() {
         // given
         Representation body = Text("Hello World!");
-        String actual = HttpObjectUtil.toAscii(body);
+        String actual = body.data().decodeToAscii(Integer.MAX_VALUE);
         assertThat(actual, is("Hello World!"));
     }
 
@@ -99,7 +99,7 @@ public class HttpObjectUtilTest {
     public void representationToUtf8() {
         // given
         Representation body = Text("Hello World!");
-        String actual = HttpObjectUtil.toUtf8(body);
+        String actual = body.data().decodeToUTF8(Integer.MAX_VALUE);;
         assertThat(actual, is("Hello World!"));
     }
 
@@ -107,7 +107,7 @@ public class HttpObjectUtilTest {
     public void representationToString() {
         // given
         Representation body = Text("Hello World!");
-        String actual = HttpObjectUtil.toString(body, "UTF-8");
+        String actual = body.data().decodeToUTF8(Integer.MAX_VALUE);
         assertThat(actual, is("Hello World!"));
     }
 }

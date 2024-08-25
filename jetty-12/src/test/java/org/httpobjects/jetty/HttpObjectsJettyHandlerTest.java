@@ -20,7 +20,7 @@ public class HttpObjectsJettyHandlerTest {
             @Override
             public Eventual<Response> post(Request req) {
                 System.out.print(req);
-                if (req.body().get().equals("body")) return OK(Text("We did it!")).resolved();
+                if (req.bodyUtf8StringUnbounded().get().equals("body")) return OK(Text("We did it!")).resolved();
                 else return BAD_REQUEST().resolved();
             }
         };

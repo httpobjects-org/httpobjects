@@ -6,7 +6,6 @@ import org.httpobjects.path.Path;
 import org.httpobjects.util.Method;
 import org.junit.Test;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
@@ -14,15 +13,15 @@ import static org.junit.Assert.*;
 public class RequestTest {
 
     @Test
-    public void bodyTest() throws Exception {
+    public void bodyUtf8StringUnboundedTest() throws Exception {
         // given
         Request req1 = fooRequest();
         Request req2 = barRequest();
 
         // when
-        Optional<String> result1 = req1.body(StandardCharsets.UTF_8);
-        Optional<String> result2 = req1.body();
-        Optional<String> result3 = req2.body();
+        Optional<String> result1 = req1.bodyUtf8StringUnbounded();
+        Optional<String> result2 = req1.bodyUtf8StringUnbounded();
+        Optional<String> result3 = req2.bodyUtf8StringUnbounded();
 
         // then
         assertEquals(Optional.of("foo bar"), result1);

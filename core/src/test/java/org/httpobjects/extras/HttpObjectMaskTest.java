@@ -50,7 +50,7 @@ public class HttpObjectMaskTest {
         // then
         Assert.assertEquals(ResponseCode.NOT_FOUND, maybe404.code());
         assertEquals("Not Found",
-                HttpObjectUtil.toUtf8(maybe404.representation()));
+                maybe404.representation().data().decodeToUTF8(Integer.MAX_VALUE));
     }
 
     private Request request(String path, Method method) {

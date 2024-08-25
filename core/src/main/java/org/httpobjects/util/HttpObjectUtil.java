@@ -37,8 +37,6 @@
  */
 package org.httpobjects.util;
 
-import java.nio.charset.Charset;
-
 import org.httpobjects.*;
 import org.httpobjects.eventual.Eventual;
 
@@ -64,13 +62,4 @@ public class HttpObjectUtil {
         return r.data().decodeToAscii(Integer.MAX_VALUE);
     }
 
-    @Deprecated
-    public static String toUtf8(Representation r) {
-        return r.data().decodeToUTF8(Integer.MAX_VALUE);
-    }
-
-    @Deprecated
-    public static String toString(Representation r, String charsetName){
-        return r.data().decodeToString(Integer.MAX_VALUE, Charset.forName(charsetName));
-    }
 }

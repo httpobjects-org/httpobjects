@@ -57,7 +57,7 @@ public class DSLTest {
     	// then
     	assertEquals("/{resource*}", object.pattern().raw());
     	Response response = new MockRequest(object, Method.GET, "/a.txt").invoke();
-    	assertEquals("hello", HttpObjectUtil.toAscii(response.representation()));
+    	assertEquals("hello", response.representation().data().decodeToAscii(Integer.MAX_VALUE));
     }
 
     @Test
