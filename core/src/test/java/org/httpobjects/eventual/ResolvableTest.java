@@ -3,6 +3,8 @@ package org.httpobjects.eventual;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
 
@@ -51,5 +53,36 @@ public class ResolvableTest {
 
         // then
         assertEquals("77", result.get());
+    }
+
+
+    // TODO: consider moving into the library ... maybe with an Executor as an argument?
+    private <T> Eventual<T> delayed(T t, Long millis){
+        final Resolvable<T> r2 = new Resolvable<>();
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(millis);
+                r2.resolve(t);
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
+        }).start();;
+
+        return r2;
+    }
+
+    @Test
+    public void flatMap(){
+        // given
+
+        final Resolvable<Integer> initial = new Resolvable<>();
+        final Eventual<String> derived = initial.flatMap((v) -> delayed(v.toString(), 1000L));
+
+        // when
+        initial.resolve(77);
+
+        // then
+        assertEquals("77", derived.join());
     }
 }

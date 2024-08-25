@@ -7,6 +7,7 @@ import java.util.function.Function;
 public interface Eventual<T> {
     void then(Consumer<T> fn);
     <R> Eventual<R> map(Function<T, R> fn);
+    <R> Eventual<R> flatMap(Function<T, Eventual<R>> fn);
 
     T join();
 

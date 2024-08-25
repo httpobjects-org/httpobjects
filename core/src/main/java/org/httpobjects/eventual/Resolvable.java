@@ -39,6 +39,18 @@ public class Resolvable<T> implements Eventual<T> {
     }
 
     @Override
+    public <R> Eventual<R> flatMap(Function<T, Eventual<R>> fn) {
+
+        final Resolvable<R> result = new Resolvable<>();
+
+        this.then(v -> {
+            fn.apply(v).then(result::resolve);
+        });
+
+        return result;
+    }
+
+    @Override
     public T join() {
         synchronized (this){
             if(!this.hasResolved){
