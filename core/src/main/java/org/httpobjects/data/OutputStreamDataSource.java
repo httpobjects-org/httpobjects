@@ -3,7 +3,6 @@ package org.httpobjects.data;
 import org.httpobjects.eventual.Eventual;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
