@@ -61,5 +61,12 @@ public interface Request {
             return Optional.ofNullable(representation()).map(it -> it.data().decodeToUTF8Unbounded());
         }
     }
+    default Optional<byte[]> bodyReadToMemoryUnbounded() {
+        if(!hasRepresentation()){
+            return Optional.empty();
+        }else{
+            return Optional.ofNullable(representation()).map(it -> it.data().readToMemoryUnbounded());
+        }
+    }
 
 }
