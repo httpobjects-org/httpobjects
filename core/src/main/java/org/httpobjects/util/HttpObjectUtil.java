@@ -37,50 +37,20 @@
  */
 package org.httpobjects.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 import org.httpobjects.*;
 import org.httpobjects.eventual.Eventual;
 
+@Deprecated
 public class HttpObjectUtil {
 
+    @Deprecated
     public static Eventual<Response> invokeMethod(HttpObject object, final Method m, final Request input) {
         if(m==null){
             return DSL.NOT_IMPLEMENTED(HttpObject.Text("Not a method I support")).resolved();
         }else{
-            final Eventual<Response> output;
-            switch(m){
-                case GET:
-                    output = object.get(input);
-                    break;
-                case DELETE:
-                    output = object.delete(input);
-                    break;
-                case POST:
-                    output = object.post(input);
-                    break;
-                case PUT:
-                    output = object.put(input);
-                    break;
-                case PATCH:
-                    output = object.patch(input);
-                    break;
-                case HEAD:
-                    output = object.head(input);
-                    break;
-                case OPTIONS:
-                    output = object.options(input);
-                    break;
-                case TRACE:
-                    output = object.trace(input);
-                    break;
-                default:
-                    output = DSL.NOT_IMPLEMENTED().resolved();
-            }
-            return output;
+            return m.invoke(object, input);
         }
     }
 
