@@ -12,14 +12,15 @@ public interface Eventual<T> {
 
     T join();
 
-    public static <T> Eventual<T> resolved(T resolution){
+    static <T> Eventual<T> resolved(T resolution){
         final Resolvable<T> r = new Resolvable<T>();
 
         r.resolve(resolution);
 
         return r;
     }
-    public static <T> Eventual<T> resolveTo(Supplier<T> action){
+    
+    static <T> Eventual<T> resolveTo(Supplier<T> action){
         final Resolvable<T> r = new Resolvable<T>();
 
         r.resolve(action.get());
@@ -27,7 +28,7 @@ public interface Eventual<T> {
         return r;
     }
 
-    public static <T> Eventual<T> resolveAsyncTo(Executor executor, Supplier<T> action){
+    static <T> Eventual<T> resolveAsyncTo(Executor executor, Supplier<T> action){
         final Resolvable<T> r = new Resolvable<T>();
 
         executor.execute(()->{
