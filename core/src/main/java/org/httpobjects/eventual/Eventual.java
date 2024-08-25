@@ -1,8 +1,8 @@
 package org.httpobjects.eventual;
 
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public interface Eventual<T> {
     void then(Consumer<T> fn);
@@ -15,6 +15,13 @@ public interface Eventual<T> {
         final Resolvable<T> r = new Resolvable<T>();
 
         r.resolve(resolution);
+
+        return r;
+    }
+    public static <T> Eventual<T> of(Supplier<T> action){
+        final Resolvable<T> r = new Resolvable<T>();
+
+        r.resolve(action.get());
 
         return r;
     }

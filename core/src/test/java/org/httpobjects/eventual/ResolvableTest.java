@@ -85,4 +85,18 @@ public class ResolvableTest {
         // then
         assertEquals("77", derived.join());
     }
+
+
+    @Test
+    public void of(){
+        // given
+
+        final Eventual<Integer> initial = Eventual.of(()-> 77);
+
+        // when
+        final Integer result = initial.join();
+
+        // then
+        assertEquals(Integer.valueOf(77), result);
+    }
 }
