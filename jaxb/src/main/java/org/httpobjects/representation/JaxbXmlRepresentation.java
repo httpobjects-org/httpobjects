@@ -37,8 +37,6 @@
  */
 package org.httpobjects.representation;
 
-import java.io.OutputStream;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
