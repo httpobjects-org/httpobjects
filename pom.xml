@@ -151,6 +151,7 @@
         <module>websockets</module>
         <module>websockets-test</module>
         <module>netty-4-websockets</module>
+        <module>kotlin</module>
     </modules>
     <dependencies>
         <dependency>

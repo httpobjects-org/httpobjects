@@ -5,6 +5,8 @@ import org.httpobjects.impl.fn.FunctionalJava;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class FailableResult<T> {
     private final T validated;
@@ -20,11 +22,18 @@ public class FailableResult<T> {
         else return errors;
     }
 
-    public T getOrThrow(){
+    public T getOrThrow(Consumer<String> errorConsumer){
+
         if(!isSuccess()){
-            throw new RuntimeException(FunctionalJava.asSeq(errors).mkstring("\n").toString());
+            final String message = FunctionalJava.asSeq(errors).mkstring("\n").toString();
+            errorConsumer.accept(message);
+            throw new RuntimeException(message);
         }
         return validated;
+    }
+
+    public T getOrThrow(){
+        return getOrThrow(err->{});
     }
 
     public boolean isSuccess(){
