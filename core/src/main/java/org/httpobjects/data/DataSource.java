@@ -8,6 +8,7 @@ import java.math.BigInteger;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * This represents the data in a representation.  It attempts to unify the multitude of ways to provide/consume data,
@@ -41,9 +42,9 @@ public interface DataSource {
 
 //    Eventual<DataSession> readAsync();
     Eventual<InputStream> readInputStreamAsync();
-//    Eventual<ReadableByteChannel> readChannelAsync();
+    Eventual<ReadableByteChannel> readChannelAsync();
 
-    /* PULL MECHANISMS
+    /* PUSH MECHANISMS
      * ------------------
      * For when the producer controls the thread.  These return an Eventual with the total number of bytes read.
      */
@@ -54,18 +55,27 @@ public interface DataSource {
     /* IN-MEMORY
      *  These don't scale.
      */
-    String decodeToUTF8(int maxBytes);
+    boolean enforcesLimits();
     default String decodeToUTF8Unbounded(){
-        return decodeToAscii(Integer.MAX_VALUE);
+        return decodeToAscii(null);
     }
-    String decodeToAscii(int maxBytes);
     default String decodeToAsciiUnbounded(){
-        return decodeToAscii(Integer.MAX_VALUE);
+        return decodeToAscii(null);
     }
-    String decodeToString(int maxBytes, Charset charset);
-    byte[] readToMemory(int maxBytes);
+    default String decodeToUTF8(Integer maxBytes) {
+        return decodeToString(maxBytes, StandardCharsets.UTF_8);
+    }
+    default String decodeToAscii(Integer maxBytes) {
+        return decodeToString(maxBytes, StandardCharsets.US_ASCII);
+    }
+    default String decodeToString(Integer maxBytes, Charset charset) {
+        return new String(readToMemory(maxBytes), charset);
+    }
+
+
+    byte[] readToMemory(Integer maxBytes);
     default byte[] readToMemoryUnbounded(){
-        return readToMemory(Integer.MAX_VALUE);
+        return readToMemory(null);
     }
 
 }

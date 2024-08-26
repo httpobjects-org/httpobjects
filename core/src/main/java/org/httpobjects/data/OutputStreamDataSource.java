@@ -5,11 +5,8 @@ import org.httpobjects.eventual.Eventual;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.math.BigInteger;
+import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -28,15 +25,6 @@ public class OutputStreamDataSource implements DataSource{
         this(consumer, DEFAULT_THREAD_POOL);
     }
 
-    private <T> T notSupported(){
-        throw new RuntimeException("not supported");
-    }
-
-//    @Override
-//    public Eventual<DataSession> readAsync() {
-//        return notSupported();
-//    }
-
     @Override
     public Eventual<InputStream> readInputStreamAsync() {
         try {
@@ -46,20 +34,10 @@ public class OutputStreamDataSource implements DataSource{
         }
     }
 
-//    @Override
-//    public Eventual<ReadableByteChannel> readChannelAsync() {
-//        return notSupported();
-//    }
-//
-//    @Override
-//    public Eventual<BigInteger> writeAsync(DataDest dest) {
-//        return notSupported();
-//    }
-//
-//    @Override
-//    public Eventual<BigInteger> writeAsync(WritableByteChannel dest) {
-//        return notSupported();
-//    }
+    @Override
+    public Eventual<ReadableByteChannel> readChannelAsync() {
+        return readInputStreamAsync().map(Channels::newChannel);
+    }
 
     @Override
     public void writeSync(OutputStream out) {
@@ -67,22 +45,7 @@ public class OutputStreamDataSource implements DataSource{
     }
 
     @Override
-    public String decodeToUTF8(int maxBytes) {
-        return decodeToString(maxBytes, StandardCharsets.UTF_8);
-    }
-
-    @Override
-    public String decodeToAscii(int maxBytes) {
-        return decodeToString(maxBytes, StandardCharsets.US_ASCII);
-    }
-
-    @Override
-    public String decodeToString(int maxBytes, Charset charset) {
-        return new String(readToMemory(maxBytes), charset);
-    }
-
-    @Override
-    public byte[] readToMemory(int maxBytes) {
+    public byte[] readToMemory(Integer maxBytes) {
         try{
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             writeSync(out);
@@ -91,5 +54,11 @@ public class OutputStreamDataSource implements DataSource{
         }catch (Throwable t){
             throw new RuntimeException(t);
         }
+    }
+
+    @Override
+    public boolean enforcesLimits() {
+        // todo - we should make it possible for implementors to take-on the burden of limit enforcement
+        return false;
     }
 }
