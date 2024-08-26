@@ -8,27 +8,48 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static org.httpobjects.data.DataSetUtil.readAllBytes;
 
 public class OutputStreamDataSource implements DataSource{
     private static final Executor DEFAULT_THREAD_POOL = Executors.newCachedThreadPool();
-    private final Consumer<OutputStream> consumer;
+    private final BiConsumer<OutputStream, Long> consumer;
+    private final boolean supportsLimits;
     private final Executor executor;
 
-    public OutputStreamDataSource(Consumer<OutputStream> consumer, Executor executor) {
+    private OutputStreamDataSource(BiConsumer<OutputStream, Long> consumer, Executor executor, boolean supportsLimits) {
         this.consumer = consumer;
         this.executor = executor;
+        this.supportsLimits = supportsLimits;
     }
+    public OutputStreamDataSource(BiConsumer<OutputStream, Long> consumer, Executor executor) {
+        this(consumer, executor,true);
+    }
+
+    public OutputStreamDataSource(BiConsumer<OutputStream, Long> consumer) {
+        this(consumer, DEFAULT_THREAD_POOL);
+    }
+
+    public OutputStreamDataSource(Consumer<OutputStream> consumer, Executor executor) {
+        this((out, limit)-> consumer.accept(out), executor, false);
+    }
+
 
     public OutputStreamDataSource(Consumer<OutputStream> consumer) {
         this(consumer, DEFAULT_THREAD_POOL);
     }
 
+
+
     @Override
     public Eventual<InputStream> readInputStreamAsync() {
-        return Eventual.resolved(DataSetUtil.pumpDataToInputStream(consumer, executor));
+        return Eventual.resolved(DataSetUtil.pumpDataToInputStream(out -> consumer.accept(out, null), executor));
+    }
+
+    private Long toLongOrNull(Integer maxBytes){
+        return maxBytes == null ? null : maxBytes.longValue();
     }
 
     @Override
@@ -38,17 +59,18 @@ public class OutputStreamDataSource implements DataSource{
 
     @Override
     public void writeSync(OutputStream out) {
-        consumer.accept(out);
+        consumer.accept(out, null);
     }
 
     @Override
     public byte[] readToMemory(Integer maxBytes) {
-        return readAllBytes(consumer);
+        return readAllBytes(out -> {
+            consumer.accept(out, toLongOrNull(maxBytes));
+        });
     }
 
     @Override
     public boolean enforcesLimits() {
-        // todo - we should make it possible for implementors to take-on the burden of limit enforcement
-        return false;
+        return supportsLimits;
     }
 }
