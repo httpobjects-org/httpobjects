@@ -2,7 +2,6 @@ package org.httpobjects.data;
 
 import org.httpobjects.eventual.Eventual;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.Channels;
@@ -10,6 +9,8 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+
+import static org.httpobjects.data.DataSetUtil.readAllBytes;
 
 public class OutputStreamDataSource implements DataSource{
     private static final Executor DEFAULT_THREAD_POOL = Executors.newCachedThreadPool();
@@ -27,11 +28,7 @@ public class OutputStreamDataSource implements DataSource{
 
     @Override
     public Eventual<InputStream> readInputStreamAsync() {
-        try {
-            return Eventual.resolved(DataSetUtil.pumpDataToInputStream(consumer, executor));
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
-        }
+        return Eventual.resolved(DataSetUtil.pumpDataToInputStream(consumer, executor));
     }
 
     @Override
@@ -46,14 +43,7 @@ public class OutputStreamDataSource implements DataSource{
 
     @Override
     public byte[] readToMemory(Integer maxBytes) {
-        try{
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            writeSync(out);
-            out.close();
-            return out.toByteArray();
-        }catch (Throwable t){
-            throw new RuntimeException(t);
-        }
+        return readAllBytes(consumer);
     }
 
     @Override

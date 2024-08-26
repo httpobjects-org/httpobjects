@@ -8,27 +8,41 @@ import java.util.function.Consumer;
 
 public class DataSetUtil {
 
-    public static PipedInputStream pumpDataToInputStream(Consumer<OutputStream> consumer, Executor executor) throws IOException {
-        PipedInputStream input = new PipedInputStream();
-        PipedOutputStream output = new PipedOutputStream(input);
+    public static PipedInputStream pumpDataToInputStream(Consumer<OutputStream> consumer, Executor executor){
+        try{
+            PipedInputStream input = new PipedInputStream();
+            PipedOutputStream output = new PipedOutputStream(input);
 
-        executor.execute(new Runnable(){
-            @Override
-            public void run() {
-                try{
-                    System.out.println("Copying the output");
-                    consumer.accept(output);
-                    output.flush();
-                    output.close();
-                    System.out.println("Done copying the output");
-                }catch (Exception t){
-                    t.printStackTrace();;
+            executor.execute(new Runnable(){
+                @Override
+                public void run() {
+                    try{
+                        System.out.println("Copying the output");
+                        consumer.accept(output);
+                        output.flush();
+                        output.close();
+                        System.out.println("Done copying the output");
+                    }catch (Exception t){
+                        t.printStackTrace();;
+                    }
                 }
-            }
-        });
-        return input;
+            });
+            return input;
+        }catch (Throwable t){
+            throw new RuntimeException(t);
+        }
     }
 
+    public static byte[] readAllBytes(Consumer<OutputStream> source){
+        try{
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            source.accept(out);
+            out.close();
+            return out.toByteArray();
+        }catch (Throwable t){
+            throw new RuntimeException(t);
+        }
+    }
 
     public static byte[] readAllBytes(InputStream input, byte[] buffer) {
         try{
