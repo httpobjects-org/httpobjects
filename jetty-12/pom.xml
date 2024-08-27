@@ -25,24 +25,6 @@
             <version>${pom.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.36</version> <!-- TODO: Update to 2.x series? 1.7.x last released in 2022 -->
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version> <!-- TODO: Update to 2.x series? 1.x last released in 2012 -->
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version> <!-- TODO: Update to 5.x series? 3.x last released in 2007 -->
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.httpobjects.test</groupId>
             <artifactId>httpobjects-test</artifactId>
             <version>${pom.version}</version>

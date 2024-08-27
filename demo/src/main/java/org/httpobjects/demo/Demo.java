@@ -45,9 +45,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.httpobjects.HttpObject;
 import org.httpobjects.Request;
 import org.httpobjects.Response;
@@ -61,8 +58,6 @@ import org.mortbay.jetty.servlet.ServletHandler;
 
 public class Demo {
 	public static void main(String[] args) throws Exception {
-		BasicConfigurator.configure();
-		Logger.getRootLogger().setLevel(Level.INFO);
 		final boolean useJetty = true;
 		
 		HttpObject[] objects = {
