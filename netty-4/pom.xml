@@ -25,6 +25,16 @@
                     </excludes>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+
             <!--
              THIS IS IMPORTANT: IT ENSURES THAT ALL CODE IS RELATIVELY MEMORY-EFFICIENT
              -->
