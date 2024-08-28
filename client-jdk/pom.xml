@@ -1,0 +1,49 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>httpobjects-pom</artifactId>
+        <groupId>org.httpobjects.pom</groupId>
+        <version>1.0.0.pre3-SNAPSHOT</version>
+    </parent>
+
+    <groupId>org.httpobjects.client-jdk</groupId>
+    <artifactId>client-jdk</artifactId>
+
+    <name>${artifactId}</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.httpobjects.client</groupId>
+            <artifactId>httpobjects-client</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.httpobjects.netty</groupId>
+            <artifactId>httpobjects-netty-3</artifactId>
+            <version>${pom.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.httpobjects.test</groupId>
+            <artifactId>httpobjects-test</artifactId>
+            <version>${pom.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>
