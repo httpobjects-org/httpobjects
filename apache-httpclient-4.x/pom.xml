@@ -50,6 +50,12 @@
             <version>${pom.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.httpobjects.test.client</groupId>
+            <artifactId>client-test</artifactId>
+            <version>${pom.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

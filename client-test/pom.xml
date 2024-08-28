@@ -8,8 +8,8 @@
         <version>1.0.0.pre3-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.httpobjects.client-jdk</groupId>
-    <artifactId>client-jdk</artifactId>
+    <groupId>org.httpobjects.test.client</groupId>
+    <artifactId>client-test</artifactId>
 
     <name>${artifactId}</name>
 
@@ -33,10 +33,19 @@
             <version>${pom.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.httpobjects.test.client</groupId>
-            <artifactId>client-test</artifactId>
+            <groupId>org.httpobjects.netty</groupId>
+            <artifactId>httpobjects-netty-3</artifactId>
             <version>${pom.version}</version>
-            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.httpobjects.test</groupId>
+            <artifactId>httpobjects-test</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
         </dependency>
     </dependencies>
 

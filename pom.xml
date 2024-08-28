@@ -153,6 +153,7 @@
         <module>netty-4-websockets</module>
         <module>kotlin</module>
         <module>client-jdk</module>
+        <module>client-test</module>
     </modules>
     <dependencies>
         <dependency>
