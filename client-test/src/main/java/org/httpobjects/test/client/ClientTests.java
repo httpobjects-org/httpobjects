@@ -17,7 +17,6 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 import static org.httpobjects.DSL.Text;
-import static org.junit.Assert.assertEquals;
 
 public abstract class ClientTests {
 
