@@ -176,7 +176,7 @@ public class Translate {
             ChannelFuture writeFuture;
 
             if(r.hasRepresentation()){
-                System.out.println("Writing more stuff");
+//                System.out.println("Writing more stuff");
 
                 ChannelPromise aggregateWritePromise = sink.newPromise();
 
@@ -186,16 +186,16 @@ public class Translate {
 
                     final ChannelFuture actualWritePromise;
                     if(contentLength!=null){
-                        System.out.println("Using normal");
+//                        System.out.println("Using normal");
                         actualWritePromise = sink.writeAndFlush(dataChunks);
                     }else{
-                        System.out.println("Using chunked");
+//                        System.out.println("Using chunked");
                         actualWritePromise = sink.writeAndFlush(new HttpChunkedInput(dataChunks));
                     }
 
                     actualWritePromise.addListener((ChannelFutureListener) future -> {
                         aggregateWritePromise.setSuccess();
-                        System.out.println("done writing response body");
+//                        System.out.println("done writing response body");
                     });
                 });
 
