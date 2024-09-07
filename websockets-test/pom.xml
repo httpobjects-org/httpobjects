@@ -5,7 +5,7 @@
     <parent>
         <artifactId>httpobjects-pom</artifactId>
         <groupId>org.httpobjects.pom</groupId>
-        <version>1.0.0.pre4</version>
+        <version>1.0.0.pre5-SNAPSHOT</version>
     </parent>
 
     <groupId>org.httpobjects.websockets.test</groupId>
