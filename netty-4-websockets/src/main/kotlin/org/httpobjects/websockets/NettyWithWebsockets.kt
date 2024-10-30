@@ -103,7 +103,7 @@ object NettyWithWebsockets {
             buffers = InMemoryByteAccumulatorFactory(),
             ssl = null,
             errorHandler = { target, method, throwable ->
-                DSL.INTERNAL_SERVER_ERROR(DSL.Text("Not sure what to do there...")).resolved()
+                DSL.INTERNAL_SERVER_ERROR(DSL.Text("There was an internal error")).resolved()
            },
         )
     }
