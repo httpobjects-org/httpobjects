@@ -23,13 +23,8 @@
 
         <dependency>
             <groupId>org.httpobjects.jetty</groupId>
-            <artifactId>httpobjects-jetty-12</artifactId>
+            <artifactId>httpobjects-jetty-9-and-10</artifactId>
             <version>${pom.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>12.0.12</version>
         </dependency>
 
         <dependency>
@@ -42,10 +37,11 @@
             <artifactId>httpobjects-freemarker</artifactId>
             <version>${pom.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty</artifactId>
-            <version>6.1.26</version> <!-- TODO: Remove support for Jetty 8 and below as they are long EOL -->
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+            <version>10.0.22</version>
         </dependency>
     </dependencies>
 </project>

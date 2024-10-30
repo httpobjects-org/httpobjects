@@ -51,10 +51,11 @@ import org.httpobjects.Response;
 import org.httpobjects.eventual.Eventual;
 import org.httpobjects.jetty.HttpObjectsJettyHandler;
 import org.httpobjects.servlet.ServletFilter;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.FilterHolder;
-import org.mortbay.jetty.servlet.ServletHandler;
+
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.FilterHolder;
+import org.eclipse.jetty.servlet.ServletHandler;
+import static org.eclipse.jetty.servlet.FilterMapping.DEFAULT;
 
 public class Demo {
 	public static void main(String[] args) throws Exception {
@@ -103,7 +104,7 @@ public class Demo {
 
 		ServletHandler servletHandler = new ServletHandler();
 		ServletFilter filter = new ServletFilter(objects);
-		servletHandler.addFilterWithMapping(new FilterHolder(filter), "/*", Handler.DEFAULT);
+		servletHandler.addFilterWithMapping(new FilterHolder(filter), "/*", DEFAULT);
 		servletHandler.addServletWithMapping(WelcomeServlet.class, "/*");
 		s.setHandler(servletHandler);
 		
