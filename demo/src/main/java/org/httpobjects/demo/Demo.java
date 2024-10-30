@@ -73,30 +73,10 @@ public class Demo {
 		};
 		
 		if(useJetty){
-			serveViaJettyHandler(objects);
+			HttpObjectsJettyHandler.launchServer(8080, objects);
 		}else{
 			serveViaServletFilter(objects);
 		}
-	}
-	
-	
-	public static class Person {
-		String name = "Stu";
-		String[] aliases = {"Stew", "schtugh"};
-		String birthdate = "2011-01-01";
-		
-		public String getName() {
-			return name;
-		}
-		public String[] getAliases() {
-			return aliases;
-		}
-		public String getBirthdate() {
-			return birthdate;
-		}
-	}
-	private static void serveViaJettyHandler(HttpObject[] objects) {
-		HttpObjectsJettyHandler.launchServer(8080, objects);
 	}
 
 	private static void serveViaServletFilter(HttpObject ... objects) throws Exception {
@@ -111,7 +91,6 @@ public class Demo {
 		s.start();
 	}
 	
-	@SuppressWarnings("serial")
 	public static class WelcomeServlet extends HttpServlet {
 		@Override
 		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
