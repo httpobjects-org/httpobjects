@@ -44,12 +44,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>12.0.12</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.httpobjects.apache-httpclient-4.x</groupId>
             <artifactId>httpobjects-apache-httpclient-4.x</artifactId>
             <version>${pom.version}</version>
