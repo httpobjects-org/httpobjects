@@ -32,7 +32,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.9.10.20210106</version> <!-- TODO: Update to 2.17.x series? 2.9.x last released in 2021 -->
+                <version>2.18.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
