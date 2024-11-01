@@ -39,12 +39,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.httpobjects.netty</groupId>
-            <artifactId>httpobjects-netty-3</artifactId>
-            <version>${pom.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.httpobjects.test</groupId>
             <artifactId>httpobjects-test</artifactId>
             <version>${pom.version}</version>
