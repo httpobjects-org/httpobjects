@@ -23,7 +23,7 @@ fun toNettyFrame(frame: org.httpobjects.websockets.WebSocketFrame): WebSocketFra
 
     return when(frame){
         is org.httpobjects.websockets.BinaryWebSocketFrame -> BinaryWebSocketFrame(data(frame))
-        is org.httpobjects.websockets.CloseWebSocketFrame -> TODO("NOT IMPLEMENTED")
+        is org.httpobjects.websockets.CloseWebSocketFrame -> CloseWebSocketFrame(frame.statusCode(), frame.reasonText())
         is org.httpobjects.websockets.ContinuationWebSocketFrame -> TODO("NOT IMPLEMENTED")
         is org.httpobjects.websockets.PingWebSocketFrame -> PingWebSocketFrame(data(frame))
         is org.httpobjects.websockets.PongWebSocketFrame -> PongWebSocketFrame(data(frame))

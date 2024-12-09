@@ -4,6 +4,13 @@ import org.httpobjects.websockets.*
 import java.nio.charset.Charset
 
 
+class BasicGarbageCollectedCloseFrame(private val statusCode:Int, val reasonText:String):CloseWebSocketFrame{
+    override fun statusCode() = statusCode
+    override fun reasonText() = reasonText
+    override fun release() {}
+    override fun retain() {}
+}
+
 class BasicGarbageCollectedBinaryWebSocketFrame(private val data:FrameData):BinaryWebSocketFrame{
     override fun data() = data
     override fun release() {}
