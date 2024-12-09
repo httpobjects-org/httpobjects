@@ -1,5 +1,6 @@
 package org.httpobjects;
 
+import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,11 +18,24 @@ public class DateTimeRFC6265 {
         SATURDAY("Sat"),
         SUNDAY("Sun");
 
-        static DayOfWeek getForAbbreviation(String abbreviation){
+        public static DayOfWeek getForAbbreviation(String abbreviation){
             for(DayOfWeek next : DayOfWeek.values()){
                 if(next.abbreviation.toLowerCase().equals(abbreviation.toLowerCase())) return next;
             }
             return null;
+        }
+
+        public static DateTimeRFC6265.DayOfWeek getForDayNumStartingSunday(int i){
+            switch (i){
+                case 1 : return DateTimeRFC6265.DayOfWeek.SUNDAY;
+                case 2 : return  DateTimeRFC6265.DayOfWeek.MONDAY;
+                case 3 : return  DateTimeRFC6265.DayOfWeek.TUESDAY;
+                case 4 : return  DateTimeRFC6265.DayOfWeek.WEDNESDAY;
+                case 5 : return  DateTimeRFC6265.DayOfWeek.THURSDAY;
+                case 6 : return  DateTimeRFC6265.DayOfWeek.FRIDAY;
+                case 7 : return  DateTimeRFC6265.DayOfWeek.SATURDAY;
+                default: throw new RuntimeException("bad week day: " + i);
+            }
         }
 
         private final String abbreviation;
@@ -113,5 +127,18 @@ public class DateTimeRFC6265 {
     @Override
     public boolean equals(Object o){
         return o instanceof DateTimeRFC6265 && o.toString().equals(toString());
+    }
+
+    public static DateTimeRFC6265 fromCalendar(java.util.Calendar c) {
+            return new DateTimeRFC6265(
+                DateTimeRFC6265.DayOfWeek.getForDayNumStartingSunday(c.get(Calendar.DAY_OF_WEEK)),
+                c.get(Calendar.DAY_OF_MONTH), //dayOfMonth
+                DateTimeRFC6265.MonthOfYear.values()[c.get(Calendar.MONTH)], // monthOfYear,
+                c.get(Calendar.YEAR), // int year,
+                c.get(Calendar.HOUR_OF_DAY), // int hours,
+                c.get(Calendar.MINUTE), // int minutes,
+                c.get(Calendar.SECOND), // int seconds,
+                c.getTimeZone().getID() // String timezone
+        );
     }
 }

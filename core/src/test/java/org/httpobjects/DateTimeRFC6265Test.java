@@ -4,6 +4,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.httpobjects.DateTimeRFC6265.*;
 
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
+
 public class DateTimeRFC6265Test {
 
     @Test
@@ -253,4 +256,29 @@ public class DateTimeRFC6265Test {
         Assert.assertEquals(RuntimeException.class, err.getClass());
         Assert.assertEquals("Not a date I understand: 'january seventh two-thousand and 80'", err.getMessage());
     }
+
+
+    @Test
+    public void translate(){
+        // given
+        final GregorianCalendar c = new GregorianCalendar(
+                2024, //int year,
+                GregorianCalendar.DECEMBER, //int month,
+                4, //int dayOfMonth,
+                16, //int hourOfDay,
+                24, //int minute,
+                59 //int second
+        );
+        c.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        System.out.println(c.toZonedDateTime());
+
+        // when
+        final DateTimeRFC6265 result = DateTimeRFC6265.fromCalendar(c);
+
+        // then
+        final String expected = "Wed, 04 Dec 2024 16:24:59 UTC";
+        Assert.assertEquals(expected, result.toString());
+    }
+
 }
