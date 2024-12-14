@@ -555,6 +555,16 @@ public abstract class IntegrationTest extends WireTest {
         assertResource(new GetMethod("http://localhost:" + port + "/app"), "Welcome to the app", 200);
     }
 
+
+//    @Ignore
+    @Test
+    public void connectionRecycling(){
+        final HttpClient client = new HttpClient();
+        assertResource(client, new GetMethod("http://localhost:" + port + "/app"), "Welcome to the app", 200);
+        assertResource(client, new GetMethod("http://localhost:" + port + "/app"), "Welcome to the app", 200);
+    }
+
+
     @Test
     public void happyPathForPost(){
         assertResource(new PostMethod("http://localhost:" + port + "/app/inbox"), "Message Received", 200);

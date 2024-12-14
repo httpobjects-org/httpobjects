@@ -184,19 +184,27 @@ public class Translate {
 
                     final ChunkedStream dataChunks = new ChunkedStream(input, 1024 * 1024);
 
-                    final ChannelFuture actualWritePromise;
                     if(contentLength!=null){
 //                        System.out.println("Using normal");
-                        actualWritePromise = sink.writeAndFlush(dataChunks);
+
+
+                        sink.writeAndFlush(dataChunks).addListener((ChannelFutureListener) mainPartResult -> {
+//                            System.out.println("Writing last content");
+                            sink.writeAndFlush(new DefaultLastHttpContent())
+                                 .addListener((ChannelFutureListener) lastPartResult -> {
+//                                     System.out.println("totally done");
+                                    aggregateWritePromise.setSuccess();
+                                });
+                        });
                     }else{
-//                        System.out.println("Using chunked");
-                        actualWritePromise = sink.writeAndFlush(new HttpChunkedInput(dataChunks));
+                        System.out.println("Using chunked");
+                        sink.writeAndFlush(new HttpChunkedInput(dataChunks))
+                            .addListener((ChannelFutureListener) future -> {
+                                aggregateWritePromise.setSuccess();
+    //                        System.out.println("done writing response body");
+                            });
                     }
 
-                    actualWritePromise.addListener((ChannelFutureListener) future -> {
-                        aggregateWritePromise.setSuccess();
-//                        System.out.println("done writing response body");
-                    });
                 });
 
                 writeFuture = aggregateWritePromise;
