@@ -37,7 +37,6 @@
  */
 package org.httpobjects.proxy;
 
-import org.eclipse.jetty.server.Server;
 import org.httpobjects.*;
 import org.httpobjects.Representation;
 import org.httpobjects.ResponseCode;
@@ -48,7 +47,7 @@ import org.httpobjects.header.DefaultHeaderFieldVisitor;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
 import org.httpobjects.header.request.RequestHeader;
-import org.httpobjects.jetty.HttpObjectsJettyHandler;
+import org.httpobjects.netty4.BasicNetty4Server;
 import org.httpobjects.tck.PortAllocation;
 import org.httpobjects.tck.PortFinder;
 import org.httpobjects.test.HttpObjectAssert;
@@ -69,7 +68,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class ProxyTest {
-    Server jetty;
     HttpClient client = new ApacheCommons4xHttpClient();
 
 //    public static void main(String[] args) {
@@ -90,8 +88,10 @@ public class ProxyTest {
            throw new RuntimeException("Error starting with port allocation " + portAllocation, t);
         }
     }
+
+    private BasicNetty4Server netty;
     private void foo(){
-        jetty = HttpObjectsJettyHandler.launchServer(port,
+        netty = BasicNetty4Server.serveHttp(port,
         			new HttpObject("/") {
                         public Eventual<Response> get(Request req) {
                             return OK(Text("this is the root page")).resolved();
@@ -176,7 +176,8 @@ public class ProxyTest {
                 },
                 new HttpObject("/echo") {
                     public Eventual<Response> get(Request req) {
-                        return OK(Bytes(req.representation().contentType(), new byte[]{})).resolved();
+                        System.out.println("GOT " + req.representation().contentType());
+                        return OK(Bytes(req.representation().contentType(), req.representation().data().readToMemoryUnbounded())).resolved();
                     }
                 },
                 new HttpObject("/noresponse") {
@@ -226,7 +227,7 @@ public class ProxyTest {
     @After
     public void stop() {
         try {
-            jetty.stop();
+            netty.shutdownGracefully(5000L);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

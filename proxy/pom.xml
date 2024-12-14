@@ -38,8 +38,8 @@
             <version>${pom.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.httpobjects.jetty</groupId>
-            <artifactId>httpobjects-jetty-12</artifactId>
+            <groupId>org.httpobjects.netty</groupId>
+            <artifactId>httpobjects-netty-4</artifactId>
             <version>${pom.version}</version>
             <scope>test</scope>
         </dependency>
