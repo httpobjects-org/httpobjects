@@ -113,7 +113,7 @@ public class Translate {
 
             @Override
             public Representation representation() {
-                String contentType = beforeBody.headers().get("ContentType");
+                String contentType = beforeBody.headers().get("Content-Type");
                 InputStream data = body != null ? body.toStream() : new ByteArrayInputStream("".getBytes());
                 return new InputStreamRepresentation(contentType, data);
             }

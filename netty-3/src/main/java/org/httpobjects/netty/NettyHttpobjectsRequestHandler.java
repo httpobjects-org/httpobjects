@@ -130,7 +130,7 @@ public class NettyHttpobjectsRequestHandler implements HttpChannelHandler.Reques
 
 			@Override
 			public Representation representation() {
-				String contentType = request.headers().get("ContentType");
+				String contentType = request.headers().get("Content-Type");
 				InputStream data = body != null ? body.toStream() : new ByteArrayInputStream("".getBytes());
 				return new InputStreamRepresentation(contentType, data);
 			}

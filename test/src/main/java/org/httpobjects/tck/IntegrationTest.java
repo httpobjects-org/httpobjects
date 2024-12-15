@@ -207,6 +207,12 @@ public abstract class IntegrationTest extends WireTest {
                 return OK(Text(text.toString())).resolved();
             }
         },
+        new HttpObject("/echoContentType"){
+            public Eventual<Response> post(Request req) {
+                final String ct = req.representation().contentType();
+                return OK(Text(ct == null ? "null" : ct)).resolved();
+            }
+        },
         new HttpObject("/cookieSetter"){
             public Eventual<Response> get(Request req){
                 return OK(
@@ -384,6 +390,16 @@ public abstract class IntegrationTest extends WireTest {
                 "user-agent=Jakarta Commons-HttpClient/3.1\n" +
                 "foo bar", 200);
 
+    }
+
+    @Test
+    public void relaysContentType() throws Exception {
+        // given
+        PostMethod request = new PostMethod("http://localhost:" + port + "/echoContentType");
+        request.setRequestEntity(new ByteArrayRequestEntity("foo bar".getBytes(), "foobar"));
+
+        // then/when
+        assertResource(request, "foobar", 200);
     }
 
     @Test
