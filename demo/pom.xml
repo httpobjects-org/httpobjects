@@ -5,7 +5,7 @@
     <parent>
         <artifactId>httpobjects-pom</artifactId>
         <groupId>org.httpobjects.pom</groupId>
-        <version>1.0.0.pre6-SNAPSHOT</version>
+        <version>1.0.0.pre6</version>
     </parent>
 
     <groupId>org.httpobjects.demo</groupId>
