@@ -24,11 +24,29 @@ abstract class WebsocketsTests {
         }
     }
 
+
     class RecordingSocketHandler(channel: WebSocketChannel) : WebSocketChannelHandler(channel){
         val eventsReceived = mutableListOf<WebSocketChannelEvent>()
+        fun framesReceived() = eventsReceived.filterIsInstance<FrameReceived>()
+        fun textsReceived() = framesReceived().mapNotNull { it.frame as? TextWebSocketFrame}.map{it.text()}
         override fun handleEvent(event: WebSocketChannelEvent) {
-            println("Client got $event")
+//            println("Client got ${event.describe()}")
+
             eventsReceived.add(event.copy())
+            println("Events Received: ${eventsReceived.toList().map(::describe)}}")
+            println("Texts Received: ${textsReceived()}")
+        }
+
+        fun describe(event:WebSocketChannelEvent):String = when(event){
+            is FrameReceived -> {
+                val f = event.frame
+                when(f){
+                    is TextWebSocketFrame -> ("text: ${f.text()}")
+                    is BinaryWebSocketFrame -> ("binary: ${f.data()}")
+                    else -> {"other: $f"}
+                }
+            }
+            else -> "event: $event"
         }
     }
 
@@ -63,9 +81,9 @@ abstract class WebsocketsTests {
 
             // then
             waitForCondition(timeout = 4000){
-                clientHandler.eventsReceived.isNotEmpty()
+                clientHandler.framesReceived().isNotEmpty()
             }
-            Assert.assertEquals(listOf("hello back"), clientHandler.eventsReceived.map{ e -> (e as? FrameReceived)?.frame?.let{it as TextWebSocketFrame?}?.text()})
+            Assert.assertEquals(listOf("hello back"), clientHandler.textsReceived())
 
         }
 
@@ -102,9 +120,9 @@ abstract class WebsocketsTests {
 
             // then
             waitForCondition(timeout = 4000){
-                clientHandler.eventsReceived.isNotEmpty()
+                clientHandler.framesReceived().isNotEmpty()
             }
-            Assert.assertEquals(listOf(byteArrayOf(4, 5, 6).printBytes()), clientHandler.eventsReceived.map{ e -> (e as? FrameReceived)?.frame?.let{it as BinaryWebSocketFrame?}?.data()?.arrayCopy()?.printBytes()})
+            Assert.assertEquals(listOf(byteArrayOf(4, 5, 6).printBytes()), clientHandler.eventsReceived.mapNotNull{ e -> (e as? FrameReceived)?.frame?.let{it as BinaryWebSocketFrame?}?.data()?.arrayCopy()?.printBytes()})
         }
     }
 
@@ -138,9 +156,9 @@ abstract class WebsocketsTests {
 
             // then
             waitForCondition(timeout = 4000){
-                clientHandler.eventsReceived.isNotEmpty()
+                clientHandler.framesReceived().isNotEmpty()
             }
-            Assert.assertEquals(listOf(byteArrayOf(4, 5, 6).printBytes()), clientHandler.eventsReceived.map{ e -> (e as? FrameReceived)?.frame?.let{it as PingWebSocketFrame?}?.data()?.arrayCopy()?.printBytes()})
+            Assert.assertEquals(listOf(byteArrayOf(4, 5, 6).printBytes()), clientHandler.eventsReceived.mapNotNull{ e -> (e as? FrameReceived)?.frame?.let{it as PingWebSocketFrame?}?.data()?.arrayCopy()?.printBytes()})
         }
     }
 
@@ -177,9 +195,9 @@ abstract class WebsocketsTests {
 
             // then
             waitForCondition(timeout = 4000){
-                clientHandler.eventsReceived.isNotEmpty()
+                clientHandler.framesReceived().isNotEmpty()
             }
-            Assert.assertEquals(listOf(byteArrayOf(4, 5, 6).printBytes()), clientHandler.eventsReceived.map{ e -> (e as? FrameReceived)?.frame?.let{it as PongWebSocketFrame?}?.data()?.arrayCopy()?.printBytes()})
+            Assert.assertEquals(listOf(byteArrayOf(4, 5, 6).printBytes()), clientHandler.eventsReceived.mapNotNull{ e -> (e as? FrameReceived)?.frame?.let{it as PongWebSocketFrame?}?.data()?.arrayCopy()?.printBytes()})
         }
     }
 
