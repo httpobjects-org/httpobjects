@@ -89,6 +89,8 @@ class NettyWebSocketClient(private val group: EventLoopGroup):WebSocketClient{
 
         handler.handshakeFuture()!!.sync()
 
+        handler.session()?.handleEvent(ChannelConnected)
+
         return handler.session()
     }
 }
@@ -119,16 +121,22 @@ class NettyWebSocketClientHandler<T:WebSocketChannelHandler>(
         handshaker.handshake(ctx.channel())
     }
 
+    private fun runWithSession(fn:(T)->Unit){
+        val session = this.session
+        if(session!=null){
+            fn(session)
+        }else{
+            throw Exception("Something is wrong ... I should have had a session, but there ain't one :(")
+        }
+    }
+
     override fun channelInactive(ctx: ChannelHandlerContext) {
         logs.log("WebSocket Client disconnected!")
 
-        val session = this.session
-        if(session!=null){
+        runWithSession{session ->
             session.handleEvent(ChannelDisconnected)
             this.session = null
             onDisconnect(session)
-        }else{
-            throw Exception("Something is wrong ... I should have had a session, but there ain't one :(")
         }
     }
 

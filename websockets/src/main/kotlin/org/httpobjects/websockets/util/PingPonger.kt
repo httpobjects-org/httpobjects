@@ -85,6 +85,7 @@ class PingPonger(
         scheduleNextPing()
 
         when(event){
+            is ChannelConnected -> {}
             is ChannelDisconnected -> {
                 nextPing?.cancel(false)
                 nonControlFrameReceived(event)

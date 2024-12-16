@@ -112,6 +112,7 @@ fun WebSocketFrame.copy():WebSocketFrame {
 }
 fun WebSocketChannelEvent.copy():WebSocketChannelEvent {
     return when(this){
+        is ChannelConnected -> ChannelConnected
         is ChannelDisconnected -> ChannelDisconnected
         is FrameReceived -> FrameReceived(this.frame.copy())
     }
