@@ -7,6 +7,7 @@ import io.netty.handler.codec.http.HttpRequest
 import io.netty.handler.codec.http.websocketx.WebSocketFrame
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory
+import org.httpobjects.DSL
 import org.httpobjects.impl.HTLog
 import org.httpobjects.netty4.HttpObjectsResponder
 import org.httpobjects.netty4.HttpobjectsChannelHandler
@@ -47,7 +48,13 @@ class HttpObjectsPlusWebsocketsHandler(
                         EmptyReadOnlyAccumulator,
                         connectionInfo)
 
-                    val initiationResult = socketObject.beginSession(httpObjectsRequest, toHttpObjectsChannel(ctx))
+                    val initiationResult = try{
+                        socketObject.beginSession(httpObjectsRequest, toHttpObjectsChannel(ctx))
+                    }catch (t: Throwable){
+                        t.printStackTrace()
+                        WebSocketInitiationResponse.denySession(DSL.INTERNAL_SERVER_ERROR(DSL.Text("An error was encountered while deciding whether to upgrade the connection to a websocket")))
+                    }
+                    
                     val session = initiationResult.session
                     if(session != null){
 
