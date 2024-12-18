@@ -78,7 +78,7 @@ class HttpObjectsPlusWebsocketsHandler(
 
     private fun isWebsocketsUpgradeRequest(msg: HttpRequest):Boolean {
         val headers = msg.headers()
-        return ("Upgrade".equals(headers[HttpHeaderNames.CONNECTION], ignoreCase = true) &&
+        return ("Upgrade".contains(headers[HttpHeaderNames.CONNECTION], ignoreCase = true) &&
                 "WebSocket".equals(headers[HttpHeaderNames.UPGRADE], ignoreCase = true))
     }
 
