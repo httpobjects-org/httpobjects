@@ -49,28 +49,6 @@ class UpgradeDecisionsTest {
         }
     }
 
-    fun runWithSocketsObject(o:WebSocketObject, fn:(port:Int)->Unit){
-        val port = PortFinder.allocateFreePort(this).port
-        val server = NettyWithWebsockets.serveSimpleHttp(port, emptyList(), listOf(o))
-        try{
-            fn(port)
-        } finally {
-            server.stop().then {
-                println("Stopped")
-            }
-        }
-    }
-
-
-    fun <T> tryOrNull(fn:()->T):T? {
-        return try{
-            fn()
-        }catch (t: Throwable){
-            t.printStackTrace()
-            null
-        }
-    }
-
 
     class HandlerThatNeverCloses(ctx:WebSocketChannel): WebSocketChannelHandler(ctx){
         private var didOpen = false

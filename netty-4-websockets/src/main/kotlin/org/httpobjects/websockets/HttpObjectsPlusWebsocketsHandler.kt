@@ -54,7 +54,7 @@ class HttpObjectsPlusWebsocketsHandler(
                         t.printStackTrace()
                         WebSocketInitiationResponse.denySession(DSL.INTERNAL_SERVER_ERROR(DSL.Text("An error was encountered while deciding whether to upgrade the connection to a websocket")))
                     }
-                    
+
                     val session = initiationResult.session
                     if(session != null){
 
@@ -83,10 +83,24 @@ class HttpObjectsPlusWebsocketsHandler(
 
     }
 
+    private fun parseCommaSeparatedHeader(v:String) = v.split(",").map { it.trim() }
+
+    private fun getConnectionHeader(msg:HttpRequest): List<String>? {
+        return msg.headers().get(HttpHeaderNames.CONNECTION)?.let(::parseCommaSeparatedHeader)
+    }
+
+    private fun getUpgradeHeader(msg:HttpRequest): List<String>? {
+        return msg.headers().get(HttpHeaderNames.UPGRADE)?.let(::parseCommaSeparatedHeader)
+    }
+
+    private fun hasUpgradeHeaderValue(v:String, msg: HttpRequest):Boolean = (getUpgradeHeader(msg) ?: emptyList()).any { it.equals(v, ignoreCase = true) }
+    private fun hasConnectionHeaderValue(v:String, msg: HttpRequest):Boolean = (getConnectionHeader(msg) ?: emptyList()).any { it.equals(v, ignoreCase = true) }
+
     private fun isWebsocketsUpgradeRequest(msg: HttpRequest):Boolean {
-        val headers = msg.headers()
-        return ("Upgrade".equals(headers[HttpHeaderNames.CONNECTION], ignoreCase = true) &&
-                "WebSocket".equals(headers[HttpHeaderNames.UPGRADE], ignoreCase = true))
+        println("getConnectionHeader(msg) " + getConnectionHeader(msg))
+        val isUpgrade = hasConnectionHeaderValue("Upgrade", msg)
+        val isToWebsockets = hasUpgradeHeaderValue("WebSocket", msg)
+        return ( isUpgrade && isToWebsockets )
     }
 
 

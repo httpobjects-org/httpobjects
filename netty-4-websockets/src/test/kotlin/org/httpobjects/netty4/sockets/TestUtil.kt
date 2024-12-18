@@ -1,6 +1,12 @@
 package org.httpobjects.netty4.sockets
 
+import org.httpobjects.tck.PortFinder
+import org.httpobjects.websockets.NettyWithWebsockets
+import org.httpobjects.websockets.WebSocketObject
 import org.junit.Assert
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
 
 fun waitForConditionOrFail(timeout:Long, condition:()->Boolean) {
     pauseForCondition(
@@ -37,5 +43,38 @@ fun waitUntilPrettySureThisIsntGoingToHappen(condition:()->Boolean){
     }
     if(condition()){
         Assert.fail("This wasn't supposed to happen, but it did: $condition")
+    }
+}
+
+
+
+fun runWithSocketsObject(o:WebSocketObject, fn:(port:Int)->Unit){
+    val port = PortFinder.allocateFreePort(null).port
+    val server = NettyWithWebsockets.serveSimpleHttp(port, emptyList(), listOf(o))
+    try{
+        fn(port)
+    } finally {
+        server.stop().then {
+            println("Stopped")
+        }
+    }
+}
+
+
+
+fun <T> tryOrNull(fn:()->T):T? {
+    return try{
+        fn()
+    }catch (t: Throwable){
+        t.printStackTrace()
+        null
+    }
+}
+
+fun InputStream.lines():Sequence<String> {
+    val reader = BufferedReader(InputStreamReader(this))
+
+    return generateSequence{
+        reader.readLine()
     }
 }
