@@ -21,6 +21,7 @@ import org.httpobjects.netty4.HttpObjectsResponder
 import org.httpobjects.netty4.ResponseCreationStrategy
 import org.httpobjects.netty4.buffer.ByteAccumulatorFactory
 import org.httpobjects.netty4.buffer.InMemoryByteAccumulatorFactory
+import org.httpobjects.util.SimpleErrorHandler
 import java.util.concurrent.SynchronousQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -102,9 +103,7 @@ object NettyWithWebsockets {
             responseStrategy = ResponseCreationStrategy.async(mainResponsePool),
             buffers = InMemoryByteAccumulatorFactory(),
             ssl = null,
-            errorHandler = { target, method, throwable ->
-                DSL.INTERNAL_SERVER_ERROR(DSL.Text("There was an internal error")).resolved()
-           },
+            errorHandler = SimpleErrorHandler(),
         )
     }
 }
