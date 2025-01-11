@@ -51,8 +51,7 @@ import org.httpobjects.path.RegexPathPattern;
 import org.httpobjects.HttpObject;
 import org.httpobjects.util.Method;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class Proxy extends HttpObject {
@@ -181,6 +180,7 @@ public class Proxy extends HttpObject {
         }
     }
 
+    private final Set<String> headersNotToProxy = new HashSet<>(Arrays.asList("transfer-encoding", "content-type"));
 
     private List<HeaderField> extractResponseHeaders(Response response) {
         final List<HeaderField> headersReturned = new ArrayList<HeaderField>();
@@ -196,6 +196,8 @@ public class Proxy extends HttpObject {
                 final String a = processRedirect(value);
                 log.debug("Redirecting to " + a);
                 headersReturned.add(new LocationField(a));
+            } else if (headersNotToProxy.contains(name.toLowerCase())){
+                log.debug("Ignoring header: " + name);
             } else {
                 headersReturned.add(HeaderField.parse(name, value));
             }
