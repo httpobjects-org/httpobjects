@@ -67,7 +67,6 @@ public class HttpEventsTest {
         assertEquals(error, errorResult.getCause());
     }
 
-
     private static class SampleHttpEventObserver implements HttpEvents.HttpEventObserver<Integer> {
 
         AtomicInteger atomicEventId = new AtomicInteger();
@@ -87,7 +86,7 @@ public class HttpEventsTest {
         }
 
         @Override
-        public void onError(Throwable error) {
+        public void onError(Integer eventId, Throwable error) {
             log.add("Error: " + error);
         }
     }

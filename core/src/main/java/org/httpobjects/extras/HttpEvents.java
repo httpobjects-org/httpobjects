@@ -11,7 +11,7 @@ public class HttpEvents {
     public interface HttpEventObserver<Id> {
         Id onRequest(Request request);
         void onResponse(Id id, Response response);
-        void onError(Throwable error);
+        void onError(Id id, Throwable error);
     }
 
     public static <Id> HttpObject withEventObservations(final HttpObject resource,
@@ -19,8 +19,9 @@ public class HttpEvents {
         return new HttpObject(resource.pattern()) {
 
             private Eventual<Response> dec(Method method, Request req) {
-                try {
-                    Id id = eventObserver.onRequest(req);
+                final Id id = eventObserver.onRequest(req);
+
+                try{
                     Eventual<Response> e = Method.invokeMethod(resource, method, req);
                     if(e!=null){
                         e.then(res ->{
@@ -29,7 +30,7 @@ public class HttpEvents {
                     }
                     return  e;
                 } catch (Throwable err) {
-                    eventObserver.onError(err);
+                    eventObserver.onError(id, err);
                     throw new RuntimeException(err);
                 }
             }
