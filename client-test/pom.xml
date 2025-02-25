@@ -34,7 +34,7 @@
         </dependency>
         <dependency>
             <groupId>org.httpobjects.netty</groupId>
-            <artifactId>httpobjects-netty-3</artifactId>
+            <artifactId>httpobjects-netty-4</artifactId>
             <version>${pom.version}</version>
         </dependency>
         <dependency>

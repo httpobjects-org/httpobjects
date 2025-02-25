@@ -5,7 +5,7 @@ import org.httpobjects.client.HttpClient;
 import org.httpobjects.eventual.Eventual;
 import org.httpobjects.header.GenericHeaderField;
 import org.httpobjects.header.HeaderField;
-import org.httpobjects.netty.HttpobjectsNettySupport;
+import org.httpobjects.netty4.BasicNetty4Server;
 import org.httpobjects.tck.PortFinder;
 import org.httpobjects.test.HttpObjectAssert;
 import org.httpobjects.util.Method;
@@ -17,6 +17,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 import static org.httpobjects.DSL.Text;
+import static org.httpobjects.netty4.BasicNetty4Server.serveHttp;
 
 public abstract class ClientTests {
 
@@ -25,14 +26,15 @@ public abstract class ClientTests {
     @Test
     public void sendsRequests() throws Exception {
         // given
-        final HttpobjectsNettySupport.ServerWrapper server = serve( new Echoer("/echo"));
+        final int port = PortFinder.findFreePort();
+        final BasicNetty4Server server = serveHttp(port, new Echoer("/echo"));
         try {
 
             final HttpClient testSubject = makeTestSubject();
 
             // when
             final Response response = testSubject
-                    .resource("http://localhost:" + server.port + "/echo")
+                    .resource("http://localhost:" + port + "/echo")
                     .post(DSL.Text("this is my content\nsee it?"),
                             new GenericHeaderField("echo-header-A", "alpha"),
                             new GenericHeaderField("echo-header-B", "beta"));
@@ -45,14 +47,15 @@ public abstract class ClientTests {
                             "see it?",
                     HttpObjectAssert.bodyOf(response).asString());
         } finally {
-            server.close();
+            server.shutdownGracefully((long) 1000);
         }
     }
 
     @Test
     public void returnsResponses() throws Exception {
         // given
-        final HttpobjectsNettySupport.ServerWrapper server = serve(
+        final int port = PortFinder.findFreePort();
+        final BasicNetty4Server server = serveHttp(port,
                 new HttpObject("/some/resource/with/headers") {
                     @Override
                     public Eventual<Response> get(Request req) {
@@ -65,7 +68,7 @@ public abstract class ClientTests {
 
             // when
             final Response response = testSubject
-                    .resource("http://localhost:" + server.port + "/some/resource/with/headers")
+                    .resource("http://localhost:" + port + "/some/resource/with/headers")
                     .get();
 
             // then
@@ -77,21 +80,22 @@ public abstract class ClientTests {
                     "a-custom-header-value",
                     findByName("a-custom-header-name", response.header()).value());
         } finally {
-            server.close();
+            server.shutdownGracefully((long) 1000);
         }
     }
 
     @Test
     public void supportsAllTheMethods() throws Exception {
         // given
-        final HttpobjectsNettySupport.ServerWrapper server = serve( new MethodEchoer("/i-have-all-the-methods"));
+        final int port = PortFinder.findFreePort();
+        final BasicNetty4Server server = serveHttp(port, new MethodEchoer("/i-have-all-the-methods"));
         try {
             for (Method method : Method.values()) {
 
                 final HttpClient testSubject = makeTestSubject();
 
                 final java.lang.reflect.Method m = HttpClient.RemoteObject.class.getMethod(method.name().toLowerCase(), String.class, HeaderField[].class);
-                final HttpClient.RemoteObject o = testSubject.resource("http://localhost:" + server.port + "/i-have-all-the-methods");
+                final HttpClient.RemoteObject o = testSubject.resource("http://localhost:" + port + "/i-have-all-the-methods");
 
                 // when
                 final Response response = (Response) m.invoke(o, "?foo=bar", (Object) new HeaderField[]{new GenericHeaderField("echo-foo", "bar")});
@@ -101,7 +105,7 @@ public abstract class ClientTests {
                 Assert.assertEquals(method.name().toLowerCase(), findByName("method-name", response.header()).value());
             }
         } finally {
-            server.close();
+            server.shutdownGracefully((long) 1000);
 //            PortFinder.waitTillPortIsFree(port);
         }
 
@@ -110,14 +114,15 @@ public abstract class ClientTests {
     @Test
     public void supportsAllTheMethodsWithTheQueryOnlyConvenienceVersion() throws Exception {
         // given
-        final HttpobjectsNettySupport.ServerWrapper server = serve( new Echoer("/i-have-all-the-methods"));
+        final int port = PortFinder.findFreePort();
+        final BasicNetty4Server server = serveHttp(port, new Echoer("/i-have-all-the-methods"));
         try {
             for (Method method : Method.values()) {
 
                 final HttpClient testSubject = makeTestSubject();
 
                 final java.lang.reflect.Method m = HttpClient.RemoteObject.class.getMethod(method.name().toLowerCase(), String.class, HeaderField[].class);
-                final HttpClient.RemoteObject o = testSubject.resource("http://localhost:" + server.port + "/i-have-all-the-methods");
+                final HttpClient.RemoteObject o = testSubject.resource("http://localhost:" + port + "/i-have-all-the-methods");
 
                 // when
                 final Response response = (Response) m.invoke(o, "?foo=bar", (Object) new HeaderField[]{new GenericHeaderField("echo-foo", "bar")});
@@ -127,7 +132,7 @@ public abstract class ClientTests {
                 Assert.assertEquals(method.name().toUpperCase() + " /i-have-all-the-methods?foo=bar\necho-foo=bar\n", bodyInHeader(response));
             }
         } finally {
-            server.close();
+            server.shutdownGracefully((long) 1000);
 //            PortFinder.waitTillPortIsFree(port);
         }
     }
@@ -135,14 +140,15 @@ public abstract class ClientTests {
     @Test
     public void supportsAllTheMethodsWithTheRepresentationOnlyConvenienceVersion() throws Exception {
         // given
-        final HttpobjectsNettySupport.ServerWrapper server = serve( new Echoer("/i-have-all-the-methods"));
+        final int port = PortFinder.findFreePort();
+        final BasicNetty4Server server = serveHttp(port, new Echoer("/i-have-all-the-methods"));
         try {
             for (Method method : Method.values()) {
 
                 final HttpClient testSubject = makeTestSubject();
 
                 final java.lang.reflect.Method m = HttpClient.RemoteObject.class.getMethod(method.name().toLowerCase(), Representation.class, HeaderField[].class);
-                final HttpClient.RemoteObject o = testSubject.resource("http://localhost:" + server.port + "/i-have-all-the-methods");
+                final HttpClient.RemoteObject o = testSubject.resource("http://localhost:" + port + "/i-have-all-the-methods");
 
                 // when
                 final Response response = (Response) m.invoke(o, Text("yo"), (Object) new HeaderField[]{new GenericHeaderField("echo-foo", "bar")});
@@ -152,21 +158,22 @@ public abstract class ClientTests {
                 Assert.assertEquals(method.name().toUpperCase() + " /i-have-all-the-methods\necho-foo=bar\nyo", bodyInHeader(response));
             }
         } finally {
-            server.close();
+            server.shutdownGracefully((long) 1000);
         }
     }
 
     @Test
     public void supportsAllTheMethodsWithTheNoArgsConvenienceVersion() throws Exception {
         // given
-        final HttpobjectsNettySupport.ServerWrapper server = serve( new Echoer("/i-have-all-the-methods"));
+        final int port = PortFinder.findFreePort();
+        final BasicNetty4Server server = serveHttp(port, new Echoer("/i-have-all-the-methods"));
         try {
             for (Method method : Method.values()) {
 
                 final HttpClient testSubject = makeTestSubject();
 
                 final java.lang.reflect.Method m = HttpClient.RemoteObject.class.getMethod(method.name().toLowerCase(), HeaderField[].class);
-                final HttpClient.RemoteObject o = testSubject.resource("http://localhost:" + server.port + "/i-have-all-the-methods");
+                final HttpClient.RemoteObject o = testSubject.resource("http://localhost:" + port + "/i-have-all-the-methods");
 
                 // when
                 final Response response = (Response) m.invoke(o, (Object) new HeaderField[]{new GenericHeaderField("echo-foo", "bar")});
@@ -178,14 +185,9 @@ public abstract class ClientTests {
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            server.close();
+            server.shutdownGracefully((long) 1000);
         }
 
-    }
-
-    private HttpobjectsNettySupport.ServerWrapper serve(HttpObject... objects) {
-        final int port = PortFinder.findFreePort();
-        return HttpobjectsNettySupport.serve(port, objects);
     }
 
     private String bodyInHeader(Response response) {
