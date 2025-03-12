@@ -44,5 +44,5 @@ A: The primary reason that httpobjects is 'nouny' is that the http spec/protocol
 
 So, given that httpobjects strives to be the best representation of the http spec, the 'nouny' approach seems best.
 
-A secondary consideration is java6 compatibility; given that one of the design goals is to support java6, a highly 'verby' api would pose some problems.  These are not insurmountable, but they would complicate the API, and, in the end, the reasoning above (that the spec itself is 'nouny') makes this a non-issue.
+A secondary consideration was java6 compatibility; given that one of the design goals was to support java6, a highly 'verby' api would pose some problems.  They were not insurmountable, but they would have complicated the API, and, in the end, the reasoning above (that the spec itself is 'nouny') made this a non-issue.
 
