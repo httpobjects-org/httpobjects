@@ -11,16 +11,16 @@
     <groupId>org.httpobjects.jetty</groupId>
     <artifactId>httpobjects-jetty-9-and-10</artifactId>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.0</version>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <release>8</release>
                 </configuration>
             </plugin>
         </plugins>
@@ -35,23 +35,23 @@
         <dependency>
             <groupId>org.httpobjects</groupId>
             <artifactId>httpobjects</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.httpobjects.servlet</groupId>
             <artifactId>httpobjects-servlet</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.httpobjects.test</groupId>
             <artifactId>httpobjects-test</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.httpobjects.apache-httpclient-4.x</groupId>
             <artifactId>httpobjects-apache-httpclient-4.x</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

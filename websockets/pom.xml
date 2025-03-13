@@ -11,7 +11,7 @@
     <groupId>org.httpobjects.websockets</groupId>
     <artifactId>httpobjects-websockets</artifactId>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
 
     <properties>
         <kotlin.version>1.8.0</kotlin.version>
@@ -45,9 +45,9 @@
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.14.0</version>
             <configuration>
-                <source>8</source>
-                <target>8</target>
+                <release>8</release>
             </configuration>
         </plugin>
         
@@ -55,6 +55,7 @@
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-jar-plugin</artifactId>
+            <version>3.4.2</version>
             <executions>
                 <execution>
                     <id>empty-javadoc-jar</id>
@@ -76,7 +77,7 @@
         <dependency>
             <groupId>org.httpobjects</groupId>
             <artifactId>httpobjects</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

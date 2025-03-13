@@ -11,31 +11,31 @@
     <groupId>org.httpobjects.demo</groupId>
     <artifactId>httpobjects-demo</artifactId>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
 
     <dependencies>
         <dependency>
             <groupId>org.httpobjects</groupId>
             <artifactId>httpobjects</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
 
         <dependency>
             <groupId>org.httpobjects.jetty</groupId>
             <artifactId>httpobjects-jetty-9-and-10</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.httpobjects.servlet</groupId>
             <artifactId>httpobjects-servlet</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.httpobjects.freemarker</groupId>
             <artifactId>httpobjects-freemarker</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

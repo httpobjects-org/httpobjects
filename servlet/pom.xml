@@ -11,13 +11,13 @@
     <groupId>org.httpobjects.servlet</groupId>
     <artifactId>httpobjects-servlet</artifactId>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
 
     <dependencies>
         <dependency>
             <groupId>org.httpobjects</groupId>
             <artifactId>httpobjects</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

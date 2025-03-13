@@ -11,16 +11,16 @@
     <groupId>org.httpobjects.client-jdk</groupId>
     <artifactId>client-jdk</artifactId>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.0</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <release>11</release>
                 </configuration>
             </plugin>
         </plugins>
@@ -30,12 +30,12 @@
         <dependency>
             <groupId>org.httpobjects.client</groupId>
             <artifactId>httpobjects-client</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.httpobjects.test.client</groupId>
             <artifactId>client-test</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
