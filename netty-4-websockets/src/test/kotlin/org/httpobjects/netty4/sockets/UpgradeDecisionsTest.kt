@@ -25,7 +25,7 @@ class UpgradeDecisionsTest {
 
         val objectThatFailsWhenMakingDecisions = object: WebSocketObject(SimplePathPattern("/foo")){
             override fun beginSession(request: Request, channel: WebSocketChannel,): WebSocketInitiationResponse {
-                throw Exception("something happened")
+                throw Exception("Test exception please ignore")
             }
         }
 

@@ -55,7 +55,7 @@ public class BinaryRepresentationTest {
     @Test
     public void leavesInputExceptionsAlone() {
         // given
-        final RuntimeException connectionException = new RuntimeException("boo!");
+        final RuntimeException connectionException = new RuntimeException("Test exception please ignore");
         final InputStream in = new InputStream() {
             @Override
             public int read() throws IOException {
