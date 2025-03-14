@@ -115,7 +115,7 @@ class HttpObjectsPlusWebsocketsHandler(
         }
     }
 
-    private fun getWebSocketURL(req: HttpRequest) = "ws://" + req.headers()["Host"] + req.uri
+    private fun getWebSocketURL(req: HttpRequest) = "ws://" + req.headers()["Host"] + req.uri()
 }
 
 

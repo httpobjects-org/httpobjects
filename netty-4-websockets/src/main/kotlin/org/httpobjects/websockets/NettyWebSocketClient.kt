@@ -155,7 +155,7 @@ class NettyWebSocketClientHandler<T:WebSocketChannelHandler>(
         }
         if (msg is FullHttpResponse) {
             throw IllegalStateException(
-                "Unexpected FullHttpResponse (getStatus=" + msg.status +
+                "Unexpected FullHttpResponse (getStatus=" + msg.status() +
                         ", content=" + msg.content().toString(CharsetUtil.UTF_8) + ')'
             )
         }
