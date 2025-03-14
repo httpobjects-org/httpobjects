@@ -1,6 +1,6 @@
 package org.httpobjects.netty4;
 
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.client.methods.HttpGet;
 import org.httpobjects.*;
 import org.httpobjects.eventual.Eventual;
 import org.httpobjects.netty4.buffer.InMemoryByteAccumulatorFactory;
@@ -44,7 +44,7 @@ public class Netty4ExceptionHandlingTest extends WireTest {
     @Test
     public void testIt(){
 
-        GetMethod get = new GetMethod("http://localhost:" + portAllocation.port + "/explode");
+        HttpGet get = new HttpGet("http://localhost:" + portAllocation.port + "/explode");
 
         assertResource(get, "There was an error", 500);
     }

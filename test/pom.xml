@@ -33,9 +33,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version> <!-- TODO: Update to 5.x series? 3.x last released in 2007 -->
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.14</version> <!-- TODO: Update to 5.x series? 4.x last released in 2022 -->
         </dependency>
         <dependency>
             <groupId>junit</groupId>

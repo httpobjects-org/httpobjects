@@ -1,10 +1,14 @@
 package org.httpobjects.tck;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 
 import java.io.IOException;
@@ -12,42 +16,56 @@ import java.net.InetAddress;
 
 public class WireTest {
 
-    public void assertResource(HttpMethod method,
+    public void assertResource(HttpRequestBase request,
                                 int expectedResponseCode, HeaderSpec ... header) {
-        assertResource(method, null, expectedResponseCode, header);
+        assertResource(request, null, expectedResponseCode, header);
     }
-    public void assertResource(HttpMethod method, String expectedBody,
+    public void assertResource(HttpRequestBase request, String expectedBody,
                                 int expectedResponseCode, HeaderSpec ... header) {
 
-        assertResource(new HttpClient(), method, expectedBody, expectedResponseCode, header);
+        CloseableHttpClient client = HttpClients.createDefault();
+        assertResource(HttpClients.createDefault(), request, expectedBody, expectedResponseCode, header);
+
+        try {
+            client.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void assertResource(HttpClient client, HttpMethod method, String expectedBody,
+    public void assertResource(HttpClient client, HttpRequestBase request, String expectedBody,
                                int expectedResponseCode, HeaderSpec ... header) {
         try {
-            System.out.println(method.getName() + " " + method.getURI());
-            int response = client.executeMethod(method);
-            System.out.println(method.getName() + " " + method.getURI() + ": " + response);
+            // httpclient 4.x follows redirects by default.  Don't follow redirects in order to not break redirectsAndSetsCookies test.
+            RequestConfig requestConfig = RequestConfig.custom().setRedirectsEnabled(false).build();
+            request.setConfig(requestConfig);
 
-            Assert.assertEquals(expectedResponseCode, response);
+            System.out.println(request.getMethod() + " " + request.getURI());
+            HttpResponse response = client.execute(request);
+            int statusCode = response.getStatusLine().getStatusCode();
+            System.out.println(request.getMethod() + " " + request.getURI() + ": " + statusCode);
+
+            Assert.assertEquals(expectedResponseCode, statusCode);
+
             if(expectedBody!=null) {
-                final String actualBody = method.getResponseBodyAsString();
+                final String actualBody = EntityUtils.toString(response.getEntity());
                 System.out.println("got: " + actualBody);
                 Assert.assertEquals(expectedBody, actualBody);
             }
 
-
             if(header!=null){
                 for(HeaderSpec next : header){
-                    Header h = method.getResponseHeader(next.name);
+                    Header h = response.getFirstHeader(next.name);
                     Assert.assertNotNull("Expected a \"" + next.name + "\" value of \"" + next.value + "\"", h);
                     Assert.assertEquals(next.value, h.getValue());
                 }
             }
-        } catch (HttpException e) {
-            throw new RuntimeException(e);
+
+            EntityUtils.consume(response.getEntity());
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            request.releaseConnection();
         }
     }
 
@@ -64,22 +82,39 @@ public class WireTest {
 
     public String getFrom(String address, String url) {
         try {
-            HttpClient client = new HttpClient();
-            client.getHostConfiguration().setLocalAddress(InetAddress.getByName(address));
-            GetMethod request = new GetMethod(url);
-            int responseCode = client.executeMethod(request);
-            String result = request.getResponseBodyAsString();
+            InetAddress localAddress = InetAddress.getByName(address);
+            RequestConfig config = RequestConfig.custom()
+                    .setLocalAddress(localAddress)
+                    .build();
+
+            CloseableHttpClient client = HttpClients.custom()
+                    .setDefaultRequestConfig(config)
+                    .build();
+
+            HttpGet request = new HttpGet(url);
+            HttpResponse response = client.execute(request);
+            String result = EntityUtils.toString(response.getEntity());
+
+            EntityUtils.consume(response.getEntity());
+            request.releaseConnection();
+            client.close();
+
             return result;
         }catch(Exception e){
             throw new RuntimeException(e);
         }
     }
 
-    public String get(String url) throws IOException, HttpException {
-        HttpClient client = new HttpClient();
-        GetMethod request = new GetMethod(url);
-        int responseCode = client.executeMethod(request);
-        String result = request.getResponseBodyAsString();
+    public String get(String url) throws IOException {
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpGet request = new HttpGet(url);
+        HttpResponse response = client.execute(request);
+        String result = EntityUtils.toString(response.getEntity());
+
+        EntityUtils.consume(response.getEntity());
+        request.releaseConnection();
+        client.close();
+
         return result;
     }
 }

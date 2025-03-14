@@ -37,8 +37,13 @@
  */
 package org.httpobjects.tck;
 
-import org.apache.commons.httpclient.*;
-import org.apache.commons.httpclient.methods.*;
+import org.apache.http.*;
+import org.apache.http.client.methods.*;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.httpobjects.*;
 import org.httpobjects.data.DataSource;
 import org.httpobjects.data.OutputStreamDataSource;
@@ -218,7 +223,7 @@ public abstract class IntegrationTest extends WireTest {
                 return OK(
                         Text("Here are some cookies!"),
                         new SetCookieField("name", "cookie monster", "sesamestreet.com"),
-                        new SetCookieField("specialGuest", "mr rogers", "mrrogers.com", "/myNeighborhood", "Wed, 13-Jan-2021 22:23:01 GMT", true),
+                        new SetCookieField("specialGuest", "mr rogers", "mrrogers.com", "/myNeighborhood", "Wed, 13-Jan-2041 22:23:01 GMT", true),
                         new SetCookieField("oldInsecureCookie", "yes", "the90sIntranet.com", "/images/animatedGifs", "Wed, 13-Jan-1999 22:23:01 GMT", false)).resolved();
             }
         },
@@ -309,46 +314,42 @@ public abstract class IntegrationTest extends WireTest {
         });
     }
 
-    class PatchMethod extends EntityEnclosingMethod {
-
-        public PatchMethod(String uri) {
-            super(uri);
-        }
-
-        @Override
-        public String getName() {
-            return "PATCH";
-        }
-    }
-
     @Test
     public void supportsHead() throws Exception {
         // given
-        HttpClient client = new HttpClient();
-        HeadMethod request = new HeadMethod("http://localhost:" + port + "/head");
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpHead request = new HttpHead("http://localhost:" + port + "/head");
 
         //when
-        int responseCode = client.executeMethod(request);
+        HttpResponse response = client.execute(request);
 
         // then
 
-        assertEquals(200, responseCode);
-        assertEquals("bar", request.getResponseHeader("foo").getValue());
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        assertEquals("bar", response.getFirstHeader("foo").getValue());
+
+        EntityUtils.consume(response.getEntity());
+        request.releaseConnection();
+        client.close();
     }
 
     @Test
     public void supportsOptions() throws Exception{
         // given
-        HttpClient client = new HttpClient();
-        OptionsMethod request = new OptionsMethod("http://localhost:" + port + "/options");
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpOptions request = new HttpOptions("http://localhost:" + port + "/options");
 
         //when
-        int responseCode = client.executeMethod(request);
+        HttpResponse response = client.execute(request);
 
         // then
 
-        assertEquals(200, responseCode);
-        assertEquals("bar", request.getResponseHeader("foo").getValue());
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        assertEquals("bar", response.getFirstHeader("foo").getValue());
+
+        EntityUtils.consume(response.getEntity());
+        request.releaseConnection();
+        client.close();
     }
 
     @Test
@@ -368,8 +369,8 @@ public abstract class IntegrationTest extends WireTest {
     @Test
     public void hasRepresentation() throws Exception {
         // given
-        PostMethod request = new PostMethod("http://localhost:" + port + "/echoHasRepresentation");
-        request.setRequestEntity(new StringRequestEntity("foo bar", "text/plain", "UTF-8"));
+        HttpPost request = new HttpPost("http://localhost:" + port + "/echoHasRepresentation");
+        request.setEntity(new StringEntity("foo bar", "UTF-8"));
 
         // then/when
         assertResource(request, "yes", 200);
@@ -378,16 +379,23 @@ public abstract class IntegrationTest extends WireTest {
     @Test
     public void immutableCopies() throws Exception {
         // given
-        PostMethod request = new PostMethod("http://localhost:" + port + "/immutablecopy/no/mutation/allowed");
-        request.setRequestEntity(new StringRequestEntity("foo bar", "text/plain", "UTF-8"));
+        HttpPost request = new HttpPost("http://localhost:" + port + "/immutablecopy/no/mutation/allowed");
+        request.setEntity(new StringEntity("foo bar", "UTF-8"));
+
+        // Original: "Apache-HttpClient/4.5.14 (Java/17.0.14)" (would break test when running on different Java version)
+        request.setHeader("User-Agent", "Apache-HttpClient");
+        // JettyIntegrationTest returns this lowercased "keep-alive", the Netty tests return it with default capitalization "Keep-Alive".  Make it always lowercase.
+        request.setHeader("connection", "keep-alive");
 
         // then/when
         assertResource(request,
                 "URI: /immutablecopy/no/mutation/allowed?\n" +
+                "accept-encoding=gzip,deflate\n" +
+                "connection=keep-alive\n" +
                 "content-length=7\n" +
                 "content-type=text/plain; charset=UTF-8\n" +
                 "host=localhost:" + port + "\n" +
-                "user-agent=Jakarta Commons-HttpClient/3.1\n" +
+                "user-agent=Apache-HttpClient\n" +
                 "foo bar", 200);
 
     }
@@ -395,8 +403,8 @@ public abstract class IntegrationTest extends WireTest {
     @Test
     public void relaysContentType() throws Exception {
         // given
-        PostMethod request = new PostMethod("http://localhost:" + port + "/echoContentType");
-        request.setRequestEntity(new ByteArrayRequestEntity("foo bar".getBytes(), "foobar"));
+        HttpPost request = new HttpPost("http://localhost:" + port + "/echoContentType");
+        request.setEntity(new ByteArrayEntity("foo bar".getBytes(), org.apache.http.entity.ContentType.create("foobar")));
 
         // then/when
         assertResource(request, "foobar", 200);
@@ -405,7 +413,7 @@ public abstract class IntegrationTest extends WireTest {
     @Test
     public void parsesPathVars() throws Exception {
         // given
-        GetMethod request = new GetMethod("http://localhost:" + port + "/pows/marty/private/abc123");
+        HttpGet request = new HttpGet("http://localhost:" + port + "/pows/marty/private/abc123");
 
         // then/when
         assertResource(request, "private marty, abc123", 200);
@@ -414,7 +422,7 @@ public abstract class IntegrationTest extends WireTest {
     @Test
     public void parsesSubpaths() throws Exception {
         // given
-        GetMethod request = new GetMethod("http://localhost:" + port + "/subpathEcho/i/am/my/own/grandpa");
+        HttpGet request = new HttpGet("http://localhost:" + port + "/subpathEcho/i/am/my/own/grandpa");
 
         // then/when
         assertResource(request, "i/am/my/own/grandpa", 200);
@@ -423,8 +431,8 @@ public abstract class IntegrationTest extends WireTest {
     @Test
     public void supportsPatch() throws Exception {
         // given
-        PatchMethod request = new PatchMethod("http://localhost:" + port + "/patchme");
-        request.setRequestEntity(new StringRequestEntity(" foo bar", "text/plain", "UTF-8"));
+        HttpPatch request = new HttpPatch("http://localhost:" + port + "/patchme");
+        request.setEntity(new StringEntity(" foo bar", "text/plain", "UTF-8"));
 
         // then/when
         assertResource(request, "You told me to patch! foo bar", 200);
@@ -433,15 +441,15 @@ public abstract class IntegrationTest extends WireTest {
     @Test
     public void setCookieHeadersAreTranslated() throws Exception{
         // given
-        GetMethod request = new GetMethod("http://localhost:" + port + "/cookieSetter");
-        HttpClient client = new HttpClient();
+        HttpGet request = new HttpGet("http://localhost:" + port + "/cookieSetter");
+        CloseableHttpClient client = HttpClients.createDefault();
 
         // when
-        int response = client.executeMethod(request);
+        HttpResponse response = client.execute(request);
 
         // then
-        assertEquals(200, response);
-        List<Header> setCookies = sortByValue(Arrays.asList(request.getResponseHeaders("Set-Cookie")));
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        List<Header> setCookies = sortByValue(Arrays.asList(response.getHeaders("Set-Cookie")));
         assertEquals(3, setCookies.size());
 
         {
@@ -470,9 +478,13 @@ public abstract class IntegrationTest extends WireTest {
             assertEquals("mr rogers", cookie.value);
             assertEquals("mrrogers.com", cookie.domain);
             assertEquals("/myNeighborhood", cookie.path);
-            assertEquals("Wed, 13-Jan-2021 22:23:01 GMT", cookie.expiration);
+            assertEquals("Wed, 13-Jan-2041 22:23:01 GMT", cookie.expiration);
             assertEquals(Boolean.TRUE, cookie.secure);
         }
+
+        EntityUtils.consume(response.getEntity());
+        request.releaseConnection();
+        client.close();
     }
     private List<Header> sortByValue(final List<Header> cookies) {
         List<Header> result = new ArrayList<Header>(cookies);
@@ -490,8 +502,8 @@ public abstract class IntegrationTest extends WireTest {
     @Test
     public void requestCookiesAreTranslated() throws Exception {
         // WHEN
-        GetMethod get = new GetMethod("http://localhost:" + port + "/echoCookies");
-        get.setRequestHeader("Cookie", "Larry=Moe");
+        HttpGet get = new HttpGet("http://localhost:" + port + "/echoCookies");
+        get.setHeader("Cookie", "Larry=Moe");
 
         assertResource(get, "Larry=Moe", 200);
     }
@@ -499,12 +511,12 @@ public abstract class IntegrationTest extends WireTest {
     @Test
     public void basicAuthentication(){
         // without authorization header
-        assertResource(new GetMethod("http://localhost:" + port + "/secure"), "You must first log-in", 401,
+        assertResource(new HttpGet("http://localhost:" + port + "/secure"), "You must first log-in", 401,
                 new HeaderSpec("WWW-Authenticate", "Basic realm=secure area"));
 
         // with authorization header
-        GetMethod get = new GetMethod("http://localhost:" + port + "/secure");
-        get.setRequestHeader("Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
+        HttpGet get = new HttpGet("http://localhost:" + port + "/secure");
+        get.setHeader("Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
         assertResource(get, "You're In!", 200);
     }
 
@@ -523,16 +535,20 @@ public abstract class IntegrationTest extends WireTest {
         final BigInteger expectedNumBytesRead = BigInteger.valueOf(numChunks).multiply(BigInteger.valueOf(chunkSize));
         System.out.println("URL is " + uri);
         System.out.println("printSizeInGb is " + printSizeInGb(expectedNumBytesRead));
-        final GetMethod request = new GetMethod(uri);
-        final HttpClient client = new HttpClient();
-        final int responseCode = client.executeMethod(request);
+        final HttpGet request = new HttpGet(uri);
+        final CloseableHttpClient client = HttpClients.createDefault();
+        final HttpResponse response = client.execute(request);
 
         // when
-        final BigInteger numBytesRead = streamSize(request.getResponseBodyAsStream(), expectedNumBytesRead);
+        final BigInteger numBytesRead = streamSize(response.getEntity().getContent(), expectedNumBytesRead);
 
         // then
-        assertEquals(200, responseCode);
+        assertEquals(200, response.getStatusLine().getStatusCode());
         assertEquals(expectedNumBytesRead, numBytesRead);
+
+        EntityUtils.consume(response.getEntity());
+        request.releaseConnection();
+        client.close();
     }
 
     private static BigInteger streamSize(InputStream data, BigInteger expectedSize) throws IOException {
@@ -558,82 +574,86 @@ public abstract class IntegrationTest extends WireTest {
 
     @Test
     public void nullResponsesAreTreatedAsNotFound(){
-        assertResource(new GetMethod("http://localhost:" + port + "/nothing"), 404);
+        assertResource(new HttpGet("http://localhost:" + port + "/nothing"), 404);
     }
 
     @Test
     public void returnsNotFoundIfThereIsNoMatchingPattern(){
-        assertResource(new GetMethod("http://localhost:" + port + "/bob"), 404);
+        assertResource(new HttpGet("http://localhost:" + port + "/bob"), 404);
     }
 
     @Test
     public void happyPathForGet(){
-        assertResource(new GetMethod("http://localhost:" + port + "/app"), "Welcome to the app", 200);
+        assertResource(new HttpGet("http://localhost:" + port + "/app"), "Welcome to the app", 200);
     }
 
 
 //    @Ignore
     @Test
-    public void connectionRecycling(){
-        final HttpClient client = new HttpClient();
-        assertResource(client, new GetMethod("http://localhost:" + port + "/app"), "Welcome to the app", 200);
-        assertResource(client, new GetMethod("http://localhost:" + port + "/app"), "Welcome to the app", 200);
+    public void connectionRecycling() throws IOException {
+        final CloseableHttpClient client = HttpClients.createDefault();
+        assertResource(client, new HttpGet("http://localhost:" + port + "/app"), "Welcome to the app", 200);
+        assertResource(client, new HttpGet("http://localhost:" + port + "/app"), "Welcome to the app", 200);
+        client.close();
     }
 
 
     @Test
     public void happyPathForPost(){
-        assertResource(new PostMethod("http://localhost:" + port + "/app/inbox"), "Message Received", 200);
+        assertResource(new HttpPost("http://localhost:" + port + "/app/inbox"), "Message Received", 200);
     }
 
     @Test
     public void happyPathForPut(){
-        assertResource(withBody(new PutMethod("http://localhost:" + port + "/app/inbox/abc"), "hello world"), "hello world", 200);
+        assertResource(withBody(new HttpPut("http://localhost:" + port + "/app/inbox/abc"), "hello world"), "hello world", 200);
     }
 
     @Test
     public void queryParameters(){
-        assertResource(new GetMethod("http://localhost:" + port + "/echoQuery?a=1&b=2"), "a=1\nb=2", 200);
+        assertResource(new HttpGet("http://localhost:" + port + "/echoQuery?a=1&b=2"), "a=1\nb=2", 200);
     }
     @Test
     public void queryParametersWithSlashes(){
-        assertResource(new GetMethod("http://localhost:" + port + "/echoQuery?a=http://apple.com"), "a=http://apple.com", 200);
+        assertResource(new HttpGet("http://localhost:" + port + "/echoQuery?a=http://apple.com"), "a=http://apple.com", 200);
     }
 
 
     @Test
     public void urlToString(){
-        assertResource(new GetMethod("http://localhost:" + port + "/echoUrl/34/marty?a=1&b=2"), "/echoUrl/34/marty?a=1&b=2", 200);
-        assertResource(new GetMethod("http://localhost:" + port + "/echoUrl/44/foo"), "/echoUrl/44/foo", 200);
+        assertResource(new HttpGet("http://localhost:" + port + "/echoUrl/34/marty?a=1&b=2"), "/echoUrl/34/marty?a=1&b=2", 200);
+        assertResource(new HttpGet("http://localhost:" + port + "/echoUrl/44/foo"), "/echoUrl/44/foo", 200);
     }
 
     @Test
     public void methodNotAllowed(){
-        assertResource(new GetMethod("http://localhost:" + port + "/app/inbox"), "405 Client Error: Method Not Allowed", 405);
+        assertResource(new HttpGet("http://localhost:" + port + "/app/inbox"), "405 Client Error: Method Not Allowed", 405);
     }
 
     @Test
     public void redirectsAndSetsCookies(){
 
-        assertResource(new PostMethod("http://localhost:" + port + "/app/message"), 303,
+        assertResource(new HttpPost("http://localhost:" + port + "/app/message"), 303,
                 new HeaderSpec("Location", "/app"),
                 new HeaderSpec("Set-Cookie", "name=frank"));
     }
 
     @Test
     public void handlesExpectContinue(){
-        PostMethod request = new PostMethod("http://localhost:" + port + "/bigfiles");
-        request.setUseExpectHeader(true);
+        HttpPost request = new HttpPost("http://localhost:" + port + "/bigfiles");
+        request.setHeader("Expect", "100-continue");
         byte[] data = new byte[1024 * 1024];
-        request.setRequestEntity(new ByteArrayRequestEntity(data));
+        request.setEntity(new ByteArrayEntity(data));
         assertResource(request, "received " + data.length + " bytes", 200);
     }
 
 
-    @SuppressWarnings("deprecation")
-    private static <T extends EntityEnclosingMethod> T withBody(T m, String body){
-        m.setRequestBody(body);
-        return m;
+    private static <T extends HttpEntityEnclosingRequest> T withBody(T m, String body){
+        try {
+            m.setEntity(new StringEntity(body));
+            return m;
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
