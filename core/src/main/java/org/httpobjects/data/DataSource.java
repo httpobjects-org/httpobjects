@@ -57,7 +57,7 @@ public interface DataSource {
      */
     boolean enforcesLimits();
     default String decodeToUTF8Unbounded(){
-        return decodeToAscii(null);
+        return decodeToUTF8(null);
     }
     default String decodeToAsciiUnbounded(){
         return decodeToAscii(null);

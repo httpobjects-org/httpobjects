@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 abstract class DataSourceTest {
 
@@ -81,28 +82,28 @@ abstract class DataSourceTest {
     @Test
     public void decodeToUTF8Unbounded(){
         // given
-        final byte[] data = "hello world".getBytes();
+        final byte[] data = "Café".getBytes(StandardCharsets.UTF_8);
         final DataSource subject = createTestSubject(data);
 
         // when
         final String result = subject.decodeToUTF8Unbounded();
 
         // then
-        Assert.assertEquals("hello world", result);
+        Assert.assertEquals("Café", result);
     }
 
 
     @Test
     public void decodeToAsciiUnbounded(){
         // given
-        final byte[] data = "hello world".getBytes();
+        final byte[] data = "Cafe".getBytes(StandardCharsets.US_ASCII);
         final DataSource subject = createTestSubject(data);
 
         // when
         final String result = subject.decodeToAsciiUnbounded();
 
         // then
-        Assert.assertEquals("hello world", result);
+        Assert.assertEquals("Cafe", result);
     }
 
 
