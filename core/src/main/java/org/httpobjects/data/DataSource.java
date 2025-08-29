@@ -59,11 +59,17 @@ public interface DataSource {
     default String decodeToUTF8Unbounded(){
         return decodeToUTF8(null);
     }
+    default String decodeToISO88591Unbounded(){
+        return decodeToISO88591(null);
+    }
     default String decodeToAsciiUnbounded(){
         return decodeToAscii(null);
     }
     default String decodeToUTF8(Integer maxBytes) {
         return decodeToString(maxBytes, StandardCharsets.UTF_8);
+    }
+    default String decodeToISO88591(Integer maxBytes) {
+        return decodeToString(maxBytes, StandardCharsets.ISO_8859_1);
     }
     default String decodeToAscii(Integer maxBytes) {
         return decodeToString(maxBytes, StandardCharsets.US_ASCII);

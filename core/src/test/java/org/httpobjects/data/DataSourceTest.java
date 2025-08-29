@@ -94,6 +94,20 @@ abstract class DataSourceTest {
 
 
     @Test
+    public void decodeToISO88591Unbounded(){
+        // given
+        final byte[] data = "Café".getBytes(StandardCharsets.ISO_8859_1);
+        final DataSource subject = createTestSubject(data);
+
+        // when
+        final String result = subject.decodeToISO88591Unbounded();
+
+        // then
+        Assert.assertEquals("Café", result);
+    }
+
+
+    @Test
     public void decodeToAsciiUnbounded(){
         // given
         final byte[] data = "Cafe".getBytes(StandardCharsets.US_ASCII);
