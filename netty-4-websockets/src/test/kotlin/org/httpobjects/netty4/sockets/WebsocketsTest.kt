@@ -28,7 +28,7 @@ class WebsocketsTest {
                 |Origin: localhost
                 |Connection: upgrade
                 |Upgrade: Websocket
-            """.trimMargin() + "\r\n\r\n"
+            """.trimMargin().replace(Regex("\r?\n"), "\r\n") + "\r\n\r\n"
 
             println("Writing:\n------------\n$request\n-----------")
             socket.outputStream.write(request.encodeToByteArray())
@@ -58,7 +58,7 @@ class WebsocketsTest {
                 |Origin: localhost
                 |Connection: keep-alive, Upgrade
                 |Upgrade: Websocket
-            """.trimMargin() + "\r\n\r\n"
+            """.trimMargin().replace(Regex("\r?\n"), "\r\n") + "\r\n\r\n"
 
             println("Writing:\n------------\n$request\n-----------")
             socket.outputStream.write(request.encodeToByteArray())
