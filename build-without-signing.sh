@@ -1,2 +1,2 @@
 #!/bin/bash
-mvn install -Dgpg.skip=true
+mvn install -Dgpg.skip=true $@
