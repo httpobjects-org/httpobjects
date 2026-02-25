@@ -40,16 +40,36 @@ object NettyWithWebsockets {
         buffers: ByteAccumulatorFactory,
         ssl: SslContext?,
         errorHandler:ErrorHandler): NettyWithWebsocketsServer {
-
-
-        val httpobjectsRequestHandler = HttpObjectsResponder(objects, errorHandler)
-        val bossGroup: EventLoopGroup = NioEventLoopGroup()
-        val workerGroup: EventLoopGroup = NioEventLoopGroup()
         val log = object:BasicLog("netty"){
             override fun emit(formattedMessage: String?) {
                 log.log(formattedMessage ?: "")
             }
         }
+        return serve(
+            port = port,
+            objects = objects,
+            websocketsSessionHandlers = websocketsSessionHandlers,
+            responseStrategy = responseStrategy,
+            buffers = buffers,
+            ssl = ssl,
+            errorHandler = errorHandler,
+            log = log
+        )
+    }
+    fun serve(
+        port: Int,
+        objects: List<HttpObject>,
+        websocketsSessionHandlers:List<WebSocketObject>,
+        responseStrategy: ResponseCreationStrategy,
+        buffers: ByteAccumulatorFactory,
+        ssl: SslContext?,
+        errorHandler:ErrorHandler,
+        log:org.httpobjects.netty4.Log): NettyWithWebsocketsServer {
+
+        val httpobjectsRequestHandler = HttpObjectsResponder(objects, errorHandler)
+        val bossGroup: EventLoopGroup = NioEventLoopGroup()
+        val workerGroup: EventLoopGroup = NioEventLoopGroup()
+
         val b = ServerBootstrap()
         b.group(bossGroup, workerGroup)
             .channel(NioServerSocketChannel::class.java)

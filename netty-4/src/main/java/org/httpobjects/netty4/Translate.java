@@ -197,7 +197,7 @@ public class Translate {
                                 });
                         });
                     }else{
-                        System.out.println("Using chunked");
+//                        System.out.println("Using chunked");
                         sink.writeAndFlush(new HttpChunkedInput(dataChunks))
                             .addListener((ChannelFutureListener) future -> {
                                 aggregateWritePromise.setSuccess();

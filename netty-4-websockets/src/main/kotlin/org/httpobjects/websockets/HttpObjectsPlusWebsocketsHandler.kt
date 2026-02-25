@@ -97,7 +97,7 @@ class HttpObjectsPlusWebsocketsHandler(
     private fun hasConnectionHeaderValue(v:String, msg: HttpRequest):Boolean = (getConnectionHeader(msg) ?: emptyList()).any { it.equals(v, ignoreCase = true) }
 
     private fun isWebsocketsUpgradeRequest(msg: HttpRequest):Boolean {
-        println("getConnectionHeader(msg) " + getConnectionHeader(msg))
+//        println("getConnectionHeader(msg) " + getConnectionHeader(msg))
         val isUpgrade = hasConnectionHeaderValue("Upgrade", msg)
         val isToWebsockets = hasUpgradeHeaderValue("WebSocket", msg)
         return ( isUpgrade && isToWebsockets )
