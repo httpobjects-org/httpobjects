@@ -61,7 +61,7 @@ class NettyWebSocketClient(
                 beginSession(toHttpObjectsChannel(ctx))
             },
             onDisconnect = onDisconnect,
-            WebSocketClientHandshakerFactory.newHandshaker(
+            handshaker = WebSocketClientHandshakerFactory.newHandshaker(
                 uri,
                 WebSocketVersion.V13,
                 null,

@@ -47,7 +47,9 @@ class HttpObjectsPlusWebsocketsHandler(
                         socketObject.pathPattern,
                         msg,
                         EmptyReadOnlyAccumulator,
-                        connectionInfo)
+                        connectionInfo,
+                    )
+
 
                     val initiationResult = try{
                         socketObject.beginSession(httpObjectsRequest, toHttpObjectsChannel(ctx))
