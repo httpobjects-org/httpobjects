@@ -1,6 +1,7 @@
 package org.httpobjects.netty4;
 
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelId;
 import io.netty.handler.codec.DecoderResult;
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpRequest;
@@ -13,4 +14,7 @@ public interface Log {
     void handlerCreated(UUID handlerId);
     void contentReceivedBeforeRequest(UUID handlerId, long requestNum, HttpContent httpContent, ChannelHandlerContext ctx);
     void requestDecodeFailed(UUID traceId, UUID handlerId, long requestNum, DecoderResult decoderResult);
+    void websocketFailed(ChannelId channelId, Throwable t);
+    void websocketUpgraded(ChannelId id, HttpRequest msg);
+    void websocketUpgradeNotAccepted(ChannelId id, HttpRequest msg);
 }

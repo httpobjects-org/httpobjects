@@ -2,6 +2,7 @@ package org.httpobjects.netty4;
 
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelId;
 import io.netty.handler.codec.DecoderResult;
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpRequest;
@@ -68,6 +69,21 @@ public class BasicLog implements Log {
         final Throwable cause = decoderResult.cause();
         emit(format(handlerId, requestNum) + " request decode failed (trace " + traceId + "): " + (cause == null ? "null" : toString(cause)));
 
+    }
+
+    @Override
+    public void websocketFailed(ChannelId channelId, Throwable t) {
+        emit( prefix + " websocket failed (channel " + channelId + "): " + (t == null ? "null" : toString(t)));
+    }
+
+    @Override
+    public void websocketUpgraded(ChannelId channelId, HttpRequest msg) {
+        emit( prefix + " request upgraded to websocket (channel " + channelId + "): " + msg.uri());
+    }
+
+    @Override
+    public void websocketUpgradeNotAccepted(ChannelId channelId, HttpRequest msg) {
+        emit( prefix + " request for websocket upgrade denied (channel " + channelId + "): " + msg.uri());
     }
 
     private static String toString(Throwable t) {

@@ -23,11 +23,16 @@ class HttpObjectsPlusWebsocketsHandler(
     responder:HttpObjectsResponder,
     private val responseCreator:ResponseCreationStrategy,
     buffers:ByteAccumulatorFactory,
-    log:org.httpobjects.netty4.Log) : HttpobjectsChannelHandler(responseCreator, responder, buffers, log) {
+    private val log:org.httpobjects.netty4.Log) : HttpobjectsChannelHandler(responseCreator, responder, buffers, log) {
 
     private var handshaker: WebSocketServerHandshaker? = null
-
     private val logs = HTLog(this)
+
+    override fun exceptionCaught(ctx: ChannelHandlerContext, cause:Throwable) {
+        val channelId = ctx.channel().id()
+        log.websocketFailed(channelId, cause)
+        ctx.close()
+    }
 
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
 
@@ -36,10 +41,10 @@ class HttpObjectsPlusWebsocketsHandler(
                 val path = msg.uri()
                 val socketObject = sessionsHandlers.firstOrNull { it.pathPattern.matches(path) }
                 if(socketObject==null){
-                    logs.log("Websockets requested, but no websockets handler for path: $path.  Handling as regular HTTP")
+                    log.websocketUpgradeNotAccepted(ctx.channel().id(), msg)
                     super.channelRead(ctx, msg)
                 }else{
-                    logs.log("Upgrading to websockets : $path")
+                    log.websocketUpgraded(ctx.channel().id(), msg)
 
                     val connectionInfo = Translate.connectionInfo(ctx)
 
@@ -61,7 +66,7 @@ class HttpObjectsPlusWebsocketsHandler(
                     val session = initiationResult.session
                     if(session != null){
 
-                        ctx.pipeline().replace(this, "websocketHandler", WebSocketHandler(sessionHandler = session))
+                        ctx.pipeline().replace(this, "websocketHandler", WebSocketHandler(sessionHandler = session, log = log))
 
                         //Do the Handshake to upgrade connection from HTTP to WebSocket protocol
                         handleHandshake(ctx, msg)
@@ -134,7 +139,16 @@ private object EmptyReadOnlyAccumulator: ByteAccumulator {
     override fun dispose(){}
 }
 
-private class WebSocketHandler(private val sessionHandler: WebSocketChannelHandler) : ChannelInboundHandlerAdapter() {
+private class WebSocketHandler(
+    private val sessionHandler: WebSocketChannelHandler,
+    private val log:org.httpobjects.netty4.Log,
+) : ChannelInboundHandlerAdapter() {
+
+    override fun exceptionCaught(ctx: ChannelHandlerContext, cause:Throwable) {
+        val channelId = ctx.channel().id()
+        log.websocketFailed(channelId, cause)
+        ctx.close()
+    }
 
     override fun handlerRemoved(ctx: ChannelHandlerContext) {
         this.sessionHandler.handleEvent(ChannelDisconnected)
