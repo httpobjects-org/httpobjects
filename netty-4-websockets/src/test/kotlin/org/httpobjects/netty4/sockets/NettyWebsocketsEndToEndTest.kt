@@ -12,7 +12,10 @@ import org.httpobjects.websockets.test.StoppableWebsocketsTestServer
 import org.httpobjects.websockets.test.WebsocketsTests
 
 class NettyWebsocketsEndToEndTest: WebsocketsTests() {
-    private val client = NettyWebSocketClient(group = NioEventLoopGroup())
+    private val client = NettyWebSocketClient(
+        websocketsConfig = WebsocketsConfig(),
+        group = NioEventLoopGroup(),
+    )
 
     override fun client() = client
 

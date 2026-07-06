@@ -18,6 +18,7 @@ import org.httpobjects.netty4.buffer.ByteAccumulatorFactory
 import java.io.ByteArrayInputStream
 
 class HttpObjectsPlusWebsocketsHandler(
+    private val websocketsConfig:WebsocketsConfig,
     private val sessionsHandlers:List<WebSocketObject>,
     responder:HttpObjectsResponder,
     private val responseCreator:ResponseCreationStrategy,
@@ -106,7 +107,12 @@ class HttpObjectsPlusWebsocketsHandler(
 
 
     private fun handleHandshake(ctx: ChannelHandlerContext, req: HttpRequest) {
-        val wsFactory = WebSocketServerHandshakerFactory(getWebSocketURL(req), null, true)
+        val wsFactory = WebSocketServerHandshakerFactory(
+            getWebSocketURL(req),
+            null,
+            true,
+            websocketsConfig.maxFramePayloadSize,
+        )
         handshaker = wsFactory.newHandshaker(req)
         if (handshaker == null) {
             WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel())

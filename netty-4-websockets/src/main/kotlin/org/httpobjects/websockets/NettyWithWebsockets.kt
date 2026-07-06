@@ -37,6 +37,7 @@ object NettyWithWebsockets {
         objects: List<HttpObject>,
         websocketsSessionHandlers:List<WebSocketObject>,
         responseStrategy: ResponseCreationStrategy,
+        websocketsConfig:WebsocketsConfig = WebsocketsConfig(),
         buffers: ByteAccumulatorFactory,
         ssl: SslContext?,
         errorHandler:ErrorHandler): NettyWithWebsocketsServer {
@@ -50,6 +51,7 @@ object NettyWithWebsockets {
             objects = objects,
             websocketsSessionHandlers = websocketsSessionHandlers,
             responseStrategy = responseStrategy,
+            websocketsConfig = websocketsConfig,
             buffers = buffers,
             ssl = ssl,
             errorHandler = errorHandler,
@@ -61,6 +63,7 @@ object NettyWithWebsockets {
         objects: List<HttpObject>,
         websocketsSessionHandlers:List<WebSocketObject>,
         responseStrategy: ResponseCreationStrategy,
+        websocketsConfig:WebsocketsConfig,
         buffers: ByteAccumulatorFactory,
         ssl: SslContext?,
         errorHandler:ErrorHandler,
@@ -83,7 +86,15 @@ object NettyWithWebsockets {
                     p.addLast(HttpRequestDecoder())
                     p.addLast(HttpResponseEncoder())
                     p.addLast(ChunkedWriteHandler())
-                    p.addLast(HttpObjectsPlusWebsocketsHandler(websocketsSessionHandlers, httpobjectsRequestHandler, responseStrategy, buffers, log))
+                    p.addLast(HttpObjectsPlusWebsocketsHandler(
+                        websocketsConfig = websocketsConfig,
+                        sessionsHandlers = websocketsSessionHandlers,
+                        responder = httpobjectsRequestHandler,
+                        responseCreator = responseStrategy,
+                        buffers = buffers,
+                        log = log
+                    ))
+//                    p.addLast(InboundGlobalErrorHandler())
                 }
             })
 

@@ -14,6 +14,7 @@ import org.httpobjects.websockets.WebSocketChannelEvent
 import org.httpobjects.websockets.WebSocketChannelHandler
 import org.httpobjects.websockets.WebSocketInitiationResponse
 import org.httpobjects.websockets.WebSocketObject
+import org.httpobjects.websockets.WebsocketsConfig
 import org.junit.Test
 
 class UpgradeDecisionsTest {
@@ -33,7 +34,7 @@ class UpgradeDecisionsTest {
 
             // when
             val session = tryOrNull{
-                NettyWebSocketClient(NioEventLoopGroup()).connect(
+                NettyWebSocketClient(WebsocketsConfig(), NioEventLoopGroup()).connect(
                     url = "ws://localhost:$port/foo",
                     headers = mapOf(),
                     onDisconnect = {},

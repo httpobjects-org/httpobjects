@@ -18,7 +18,9 @@ import io.netty.util.CharsetUtil
 import org.httpobjects.impl.HTLog
 import java.net.URI
 
-class NettyWebSocketClient(private val group: EventLoopGroup):WebSocketClient{
+class NettyWebSocketClient(
+    private val websocketsConfig: WebsocketsConfig,
+    private val group: EventLoopGroup):WebSocketClient{
 
     private fun defaultPortForScheme(scheme:String) = when(scheme.toLowerCase()){
         "ws" -> 80
@@ -64,7 +66,9 @@ class NettyWebSocketClient(private val group: EventLoopGroup):WebSocketClient{
                 WebSocketVersion.V13,
                 null,
                 false,
-                headerFu))
+                headerFu,
+                websocketsConfig.maxFramePayloadSize,
+            ))
 
         val b = Bootstrap()
         b.group(group)
