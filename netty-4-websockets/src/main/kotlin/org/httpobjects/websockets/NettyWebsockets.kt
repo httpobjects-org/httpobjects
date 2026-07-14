@@ -27,7 +27,6 @@ fun toNettyFrame(frame: org.httpobjects.websockets.WebSocketFrame): WebSocketFra
         is org.httpobjects.websockets.PingWebSocketFrame -> PingWebSocketFrame(data(frame))
         is org.httpobjects.websockets.PongWebSocketFrame -> PongWebSocketFrame(data(frame))
         is org.httpobjects.websockets.TextWebSocketFrame ->  TextWebSocketFrame(frame.text())
-        else -> throw Exception("Don't know how to translate $frame")
     }
 }
 fun arrayCopy(b:ByteBuf): ByteArray{
