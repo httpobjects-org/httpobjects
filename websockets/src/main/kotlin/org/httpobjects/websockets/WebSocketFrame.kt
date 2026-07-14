@@ -7,10 +7,7 @@ import org.httpobjects.websockets.impl.BasicGarbageCollectedTextWebSocketFrame
 import java.io.OutputStream
 import java.nio.charset.Charset
 
-sealed interface WebSocketFrame {
-    fun release()
-    fun retain()
-}
+sealed interface WebSocketFrame
 
 sealed interface WebSocketDataFrame:WebSocketFrame{
     fun data():FrameData
@@ -48,13 +45,11 @@ const val normalCloseStatus = 1000
 data class BasicCloseWebSocketFrame(private val statusCode:Int, private val reasonText:String):CloseWebSocketFrame{
     override fun statusCode() = this.statusCode
     override fun reasonText() = this.reasonText
-    override fun release() {}
-    override fun retain() {}
 }
 
 interface BinaryWebSocketFrame:WebSocketDataFrame {
     companion object {
-        fun of(array: ByteArray):BinaryWebSocketFrame = BasicGarbageCollectedBinaryWebSocketFrame(ArrayFrameData(array))
+        fun of(array: ByteArray):BinaryWebSocketFrame = BasicGarbageCollectedBinaryWebSocketFrame(array)
     }
 }
 
@@ -63,7 +58,7 @@ interface ContinuationWebSocketFrame:WebSocketFrame
 interface PingWebSocketFrame:WebSocketDataFrame{
     companion object {
         fun of(array: ByteArray):PingWebSocketFrame {
-            return BasicGarbageCollectedPingWebSocketFrame(ArrayFrameData(array))
+            return BasicGarbageCollectedPingWebSocketFrame(array)
         }
     }
 }
@@ -72,7 +67,7 @@ interface PingWebSocketFrame:WebSocketDataFrame{
 interface PongWebSocketFrame:WebSocketDataFrame{
     companion object {
         fun of(array: ByteArray):PongWebSocketFrame {
-            return BasicGarbageCollectedPongWebSocketFrame(ArrayFrameData(array))
+            return BasicGarbageCollectedPongWebSocketFrame(array)
         }
     }
 }

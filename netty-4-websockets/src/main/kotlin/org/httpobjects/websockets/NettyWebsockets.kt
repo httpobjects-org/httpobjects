@@ -14,7 +14,6 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrame
 import org.httpobjects.eventual.Resolvable
 import org.httpobjects.eventual.Eventual
 import org.httpobjects.websockets.impl.*
-import java.io.OutputStream
 
 fun FrameData.toByteBuf(): ByteBuf = Unpooled.wrappedBuffer(this.arrayCopy())
 
@@ -31,47 +30,39 @@ fun toNettyFrame(frame: org.httpobjects.websockets.WebSocketFrame): WebSocketFra
         else -> throw Exception("Don't know how to translate $frame")
     }
 }
+fun arrayCopy(b:ByteBuf): ByteArray{
+    val bytes = ByteArray(size = b.readableBytes())
+    b.readBytes(bytes)
+    return bytes
+}
+
+
 fun toHttpObjectsFrame(frame: WebSocketFrame): org.httpobjects.websockets.WebSocketFrame {
-    val c = frame.content()
-    val data: FrameData = object: FrameData {
-        override fun write(out: OutputStream) {
-            c.readBytes(out, c.readableBytes())
-        }
 
-        override fun write(out: ByteArray) {
-            c.readBytes(out)
-        }
+    val data = arrayCopy(frame.content())
 
-        override fun readableBytes(): Int = c.readableBytes()
-        override fun arrayCopy(): ByteArray {
-            val data = ByteArray(readableBytes())
-            this.write(out = data)
-            return data
-        }
-    }
-    return when(frame){
+    val result = when(frame){
         is BinaryWebSocketFrame -> BasicGarbageCollectedBinaryWebSocketFrame(data)
         is CloseWebSocketFrame -> object:org.httpobjects.websockets.CloseWebSocketFrame{
-            override fun statusCode() = frame.statusCode()
-            override fun reasonText() = frame.reasonText()
-            override fun release() {
-                frame.release()
-            }
-
-            override fun retain() {
-                frame.retain()
-            }
+            val statusCode = frame.statusCode()
+            val reasonText = frame.reasonText()
+            override fun statusCode() = statusCode
+            override fun reasonText() = reasonText
         }
         is ContinuationWebSocketFrame -> BasicGarbageCollectedContinuationWebSocketFrame(data)
         is PingWebSocketFrame -> BasicGarbageCollectedPingWebSocketFrame(data)
         is PongWebSocketFrame ->  BasicGarbageCollectedPongWebSocketFrame(data)
-        is TextWebSocketFrame -> BasicGarbageCollectedTextWebSocketFrame(frame.text())
+        is TextWebSocketFrame -> BasicGarbageCollectedTextWebSocketFrame(data)
         else -> {
             throw Exception("Unknown frame type: ${frame.javaClass.simpleName} ($frame)")
         }
     }
-}
 
+
+    frame.release()
+
+    return result
+}
 
 fun wrapChannelFuture(future: ChannelFuture): Eventual<Unit> {
     val result = Resolvable<Unit>()

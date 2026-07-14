@@ -55,6 +55,11 @@ import java.util.concurrent.Executors;
 class NettyWithWebsocketsTest: IntegrationTest() {
 	private var server:NettyWithWebsocketsServer? = null;
 
+	init {
+	    println("io.netty.leakDetection.level: ${System.getProperty("io.netty.leakDetection.level")}")
+	}
+
+
 	override fun serve(port: Int, vararg objects: HttpObject) {
 		server = NettyWithWebsockets.serveSimpleHttp(port, objects.toList(), emptyList());
 	}

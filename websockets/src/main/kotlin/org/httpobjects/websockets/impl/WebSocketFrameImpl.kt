@@ -1,35 +1,19 @@
 package org.httpobjects.websockets.impl
 
 import org.httpobjects.websockets.*
+import java.io.OutputStream
 import java.nio.charset.Charset
 
+class BasicGarbageCollectedBinaryWebSocketFrame(private val data: ByteArray):BinaryWebSocketFrame{
+    override fun data() = ArrayFrameData(data)
+}
+class BasicGarbageCollectedContinuationWebSocketFrame(private val data:ByteArray):ContinuationWebSocketFrame
 
-class BasicGarbageCollectedCloseFrame(private val statusCode:Int, val reasonText:String):CloseWebSocketFrame{
-    override fun statusCode() = statusCode
-    override fun reasonText() = reasonText
-    override fun release() {}
-    override fun retain() {}
+class BasicGarbageCollectedPingWebSocketFrame(private val data:ByteArray):PingWebSocketFrame{
+    override fun data() = ArrayFrameData(data)
 }
-
-class BasicGarbageCollectedBinaryWebSocketFrame(private val data:FrameData):BinaryWebSocketFrame{
-    override fun data() = data
-    override fun release() {}
-    override fun retain() {}
-}
-class BasicGarbageCollectedContinuationWebSocketFrame(private val data:FrameData):ContinuationWebSocketFrame{
-    override fun release() {}
-    override fun retain() {}
-}
-
-class BasicGarbageCollectedPingWebSocketFrame(private val data:FrameData):PingWebSocketFrame{
-    override fun data() = data
-    override fun release() {}
-    override fun retain() {}
-}
-class BasicGarbageCollectedPongWebSocketFrame(private val data:FrameData):PongWebSocketFrame{
-    override fun data() = data
-    override fun release() {}
-    override fun retain() {}
+class BasicGarbageCollectedPongWebSocketFrame(private val data:ByteArray):PongWebSocketFrame{
+    override fun data() = ArrayFrameData(data)
 }
 
 class BasicGarbageCollectedTextWebSocketFrame(private val array:ByteArray):TextWebSocketFrame{
@@ -39,8 +23,6 @@ class BasicGarbageCollectedTextWebSocketFrame(private val array:ByteArray):TextW
     constructor(text:String):this(text.toByteArray(textEncoding))
 
     override fun data() = ArrayFrameData(this.array)
-    override fun release() {}
-    override fun retain() {}
     override fun text() = this.text
 
     companion object {
