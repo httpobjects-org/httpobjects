@@ -135,7 +135,7 @@ class HttpObjectsPlusWebsocketsHandler(
 private object EmptyReadOnlyAccumulator: ByteAccumulator {
     private val emptyBytes = ByteArray(0)
     override fun toStream() = ByteArrayInputStream(emptyBytes)
-    override fun out() = throw Exception("This is ready only")
+    override fun out() = throw Exception("This is read only")
     override fun dispose(){}
 }
 
