@@ -75,16 +75,20 @@ public class HttpobjectsChannelHandler extends SimpleChannelInboundHandler<Objec
 
                 if (msg instanceof LastHttpContent) {
 
+                    // Capture the request in a local before the async dispatch: the I/O
+                    // thread is free to read the next pipelined request and reassign the
+                    // currentRequest field before this Runnable runs.
+                    final RequestAccumulator request = this.currentRequest;
                     responseCreator.doIt(new Runnable() {
                         @Override
                         public void run() {
-                            responder.respond(currentRequest, Translate.connectionInfo(ctx)).then(response -> {
+                            responder.respond(request, Translate.connectionInfo(ctx)).then(response -> {
                                 Translate.writeResponse(
-                                        currentRequest.beforeBody,
+                                        request.beforeBody,
                                         ctx.channel(),
                                         response,
                                         responseCreator);
-                                currentRequest.dispose();
+                                request.dispose();
                             });
                         }
                     });
